@@ -53,8 +53,30 @@ const maintenanceController = {
         error.statusCode = 403;
         throw error;
       }
-      const maintenances = await maintenanceModel.findByVehicleId(vehicleId);
-      res.status(200).json(maintenances);
+      const { page = 1, limit = 10, sortBy = "created_at", order = "DESC", service_type } = req.query;
+      const maintenancesResult = await maintenanceModel.findByVehicleId(
+        vehicleId,
+        {
+          page: page ? parseInt(page) : 1,
+          limit: limit ? parseInt(limit) : 10,
+          sortBy,
+          order,
+          service_type,
+        }
+      );
+      res.status(200).json(maintenancesResult);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getMaintenanceById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const userId = req.user.userId;
+      await checkMaintenanceOwnership(id, userId);
+      const maintenance = await maintenanceModel.findById(id);
+      res.status(200).json(maintenance);
     } catch (error) {
       next(error);
     }

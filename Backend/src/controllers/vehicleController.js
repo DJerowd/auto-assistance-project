@@ -32,8 +32,21 @@ const vehicleController = {
   async getMyVehicles(req, res, next) {
     try {
       const userId = req.user.userId;
-      const vehicles = await vehicleModel.findByUserId(userId);
+      const { page = 1, limit = 10, sortBy = "created_at", order = "DESC", model, } = req.query;
+      const options = { page: parseInt(page, 10), limit: parseInt(limit, 10), sortBy, order, model, };
+      const vehicles = await vehicleModel.findByUserId(userId, options);
       res.status(200).json(vehicles);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getVehicleById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const userId = req.user.userId;
+      const vehicle = await checkVehicleOwnership(id, userId);
+      res.status(200).json(vehicle);
     } catch (error) {
       next(error);
     }

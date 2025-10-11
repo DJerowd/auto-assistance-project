@@ -9,6 +9,7 @@ router.use(authMiddleware);
 
 router
   .route("/:id")
+  .get(maintenanceController.getMaintenanceById)
   .put(maintenanceRules(), validate, maintenanceController.updateMaintenance)
   .delete(maintenanceController.deleteMaintenance);
 

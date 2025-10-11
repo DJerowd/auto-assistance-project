@@ -9,6 +9,7 @@ router.use(authMiddleware);
 
 router
   .route("/:id")
+  .get(reminderController.getReminderById)
   .put(reminderRules(), validate, reminderController.updateReminder)
   .delete(reminderController.deleteReminder);
 

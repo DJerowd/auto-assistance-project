@@ -26,11 +26,52 @@ const maintenanceModel = {
     return { id: result.insertId, ...maintenanceData, vehicle_id: vehicleId };
   },
 
-  async findByVehicleId(vehicleId) {
-    const sql =
-      "SELECT * FROM maintenances WHERE vehicle_id = ? ORDER BY maintenance_date DESC";
-    const [rows] = await pool.query(sql, [vehicleId]);
-    return rows;
+  async findByVehicleId(vehicleId, options = {}) {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = "maintenance_date",
+      order = "DESC",
+      service_type = null,
+    } = options;
+    const offset = (page - 1) * limit;
+    const allowedSortBy = [
+      "id",
+      "service_type",
+      "maintenance_date",
+      "mileage",
+      "cost",
+    ];
+    const safeSortBy = allowedSortBy.includes(sortBy)
+      ? sortBy
+      : "maintenance_date";
+    const safeOrder = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
+    let countSql =
+      "SELECT COUNT(*) as total FROM maintenances WHERE vehicle_id = ?";
+    const params = [vehicleId];
+    if (service_type) {
+      countSql += " AND service_type LIKE ?";
+      params.push(`%${service_type}%`);
+    }
+    const [countResult] = await pool.query(countSql, params);
+    const totalItems = countResult[0].total;
+    const totalPages = Math.ceil(totalItems / limit);
+    let dataSql = "SELECT * FROM maintenances WHERE vehicle_id = ?";
+    if (service_type) {
+      dataSql += " AND service_type LIKE ?";
+    }
+    dataSql += ` ORDER BY ${safeSortBy} ${safeOrder} LIMIT ? OFFSET ?`;
+    params.push(limit, offset);
+    const [maintenances] = await pool.query(dataSql, params);
+    return {
+      data: maintenances,
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    };
   },
 
   async findById(maintenanceId) {

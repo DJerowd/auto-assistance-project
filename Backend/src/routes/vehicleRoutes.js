@@ -15,6 +15,7 @@ router
 
 router
   .route("/:id")
+  .get(vehicleController.getVehicleById)
   .put(vehicleRules(), validate, vehicleController.updateVehicle)
   .delete(vehicleController.deleteVehicle);
 

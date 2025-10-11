@@ -31,7 +31,6 @@ const reminderController = {
         error.statusCode = 403;
         throw error;
       }
-
       const newReminder = await reminderModel.create(req.body, vehicleId);
       res
         .status(201)
@@ -48,7 +47,6 @@ const reminderController = {
     try {
       const { vehicleId } = req.params;
       const userId = req.user.userId;
-
       const vehicle = await vehicleModel.findById(vehicleId);
       if (!vehicle || vehicle.user_id !== userId) {
         const error = new Error(
@@ -57,9 +55,21 @@ const reminderController = {
         error.statusCode = 403;
         throw error;
       }
+      const { page = 1, limit = 10, sortBy = "created_at", order = "DESC", status } = req.query;
+      const remindersResult = await reminderModel.findByVehicleId(vehicleId, { page: page ? parseInt(page) : 1, limit: limit ? parseInt(limit) : 10, sortBy, order, status });
+      res.status(200).json(remindersResult);
+    } catch (error) {
+      next(error);
+    }
+  },
 
-      const reminders = await reminderModel.findByVehicleId(vehicleId);
-      res.status(200).json(reminders);
+  async getReminderById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const userId = req.user.userId;
+      await checkReminderOwnership(id, userId);
+      const reminder = await reminderModel.findById(id);
+      res.status(200).json(reminder);
     } catch (error) {
       next(error);
     }
@@ -69,9 +79,7 @@ const reminderController = {
     try {
       const { id } = req.params;
       const userId = req.user.userId;
-
       await checkReminderOwnership(id, userId);
-
       await reminderModel.update(id, req.body);
       const updatedReminder = await reminderModel.findById(id);
       res
@@ -89,9 +97,7 @@ const reminderController = {
     try {
       const { id } = req.params;
       const userId = req.user.userId;
-
       await checkReminderOwnership(id, userId);
-
       await reminderModel.delete(id);
       res.status(200).json({ message: "Reminder deleted successfully." });
     } catch (error) {

@@ -11,6 +11,7 @@ yarn-error.log*
 
 # Dependências e arquivos de build
 node_modules/
+uploads/
 dist/
 build/
 coverage/

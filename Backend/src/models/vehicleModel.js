@@ -32,15 +32,46 @@ const vehicleModel = {
     return { id: result.insertId, ...vehicleData, user_id: userId };
   },
 
-  async findByUserId(userId) {
-    const vehiclesSql = `
+  async findByUserId(userId, options = {}) {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = "created_at",
+      order = "DESC",
+      model = null,
+    } = options;
+    const offset = (page - 1) * limit;
+    const allowedSortBy = [
+      "id",
+      "model",
+      "year_model",
+      "current_mileage",
+      "created_at",
+    ];
+    const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : "created_at";
+    const safeOrder = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
+    let countSql = `SELECT COUNT(*) as total FROM vehicles WHERE user_id = ?`;
+    const params = [userId];
+    if (model) {
+      countSql += ` AND model LIKE ?`;
+      params.push(`%${model}%`);
+    }
+    const [countResult] = await pool.query(countSql, params);
+    const totalItems = countResult[0].total;
+    const totalPages = Math.ceil(totalItems / limit);
+    let dataSql = `
       SELECT v.*, b.name as brand_name, c.name as color_name
       FROM vehicles v
       LEFT JOIN brands b ON v.brand_id = b.id
       LEFT JOIN colors c ON v.color_id = c.id
       WHERE v.user_id = ?
     `;
-    const [vehicles] = await pool.query(vehiclesSql, [userId]);
+    if (model) {
+      dataSql += ` AND v.model LIKE ?`;
+    }
+    dataSql += ` ORDER BY v.${safeSortBy} ${safeOrder} LIMIT ? OFFSET ?`;
+    params.push(limit, offset);
+    const [vehicles] = await pool.query(dataSql, params);
     for (const vehicle of vehicles) {
       const imagesSql =
         "SELECT id, image_path, is_primary FROM vehicle_images WHERE vehicle_id = ?";
@@ -50,7 +81,15 @@ const vehicleModel = {
         url: `${process.env.APP_URL}/${img.image_path.replace(/\\/g, "/")}`,
       }));
     }
-    return vehicles;
+    return {
+      data: vehicles,
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    };
   },
 
   async findById(vehicleId) {
