@@ -4,9 +4,6 @@ const jwt = require("jsonwebtoken");
 const authController = {
   async register(req, res) {
     const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required." });
-    }
     try {
       const newUser = await userModel.createUser(name, email, password);
       res
@@ -19,11 +16,6 @@ const authController = {
 
   async login(req, res) {
     const { email, password } = req.body;
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required." });
-    }
     try {
       const user = await userModel.findUserByEmail(email);
       if (!user) {
