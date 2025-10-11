@@ -7,13 +7,14 @@ const vehicleModel = {
       color_id,
       license_plate,
       model,
+      version,
       year_of_manufacture,
       year_model,
       current_mileage,
       nickname,
     } = vehicleData;
     const sql = `
-      INSERT INTO vehicles (user_id, brand_id, color_id, license_plate, model, year_of_manufacture, year_model, current_mileage, nickname)
+      INSERT INTO vehicles (user_id, brand_id, color_id, license_plate, model, version, year_of_manufacture, year_model, current_mileage, nickname)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await pool.query(sql, [
@@ -22,6 +23,7 @@ const vehicleModel = {
       color_id,
       license_plate,
       model,
+      version,
       year_of_manufacture,
       year_model,
       current_mileage,
@@ -79,6 +81,7 @@ const vehicleModel = {
       color_id,
       license_plate,
       model,
+      version,
       year_of_manufacture,
       year_model,
       current_mileage,
@@ -86,7 +89,7 @@ const vehicleModel = {
     } = vehicleData;
     const sql = `
       UPDATE vehicles
-      SET brand_id = ?, color_id = ?, license_plate = ?, model = ?, year_of_manufacture = ?, year_model = ?, current_mileage = ?, nickname = ?
+      SET brand_id = ?, color_id = ?, license_plate = ?, model = ?, version = ?, year_of_manufacture = ?, year_model = ?, current_mileage = ?, nickname = ?
       WHERE id = ?
     `;
     const [result] = await pool.query(sql, [
@@ -94,6 +97,7 @@ const vehicleModel = {
       color_id,
       license_plate,
       model,
+      version,
       year_of_manufacture,
       year_model,
       current_mileage,

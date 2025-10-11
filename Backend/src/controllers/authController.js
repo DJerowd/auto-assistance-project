@@ -37,7 +37,7 @@ const authController = {
       }
       const payload = { userId: user.id, email: user.email };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "1h",
+        expiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
       });
       res.status(200).json({
         message: "Login successful!",
