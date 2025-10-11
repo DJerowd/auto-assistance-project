@@ -2,7 +2,7 @@ const userModel = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 
 const authController = {
-  async register(req, res) {
+  async register(req, res, next) {
     const { name, email, password } = req.body;
     try {
       const newUser = await userModel.createUser(name, email, password);
@@ -10,23 +10,30 @@ const authController = {
         .status(201)
         .json({ message: "User registered successfully!", user: newUser });
     } catch (error) {
-      res.status(409).json({ message: error.message });
+      if (error.message.includes("Email already registered")) {
+        error.statusCode = 409;
+      }
+      next(error);
     }
   },
 
-  async login(req, res) {
+  async login(req, res, next) {
     const { email, password } = req.body;
     try {
       const user = await userModel.findUserByEmail(email);
       if (!user) {
-        return res.status(401).json({ message: "Invalid credentials." });
+        const error = new Error("Invalid credentials.");
+        error.statusCode = 401;
+        throw error;
       }
       const isPasswordValid = await userModel.comparePassword(
         password,
         user.password
       );
       if (!isPasswordValid) {
-        return res.status(401).json({ message: "Invalid credentials." });
+        const error = new Error("Invalid credentials.");
+        error.statusCode = 401;
+        throw error;
       }
       const payload = { userId: user.id, email: user.email };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -38,9 +45,7 @@ const authController = {
         user: { id: user.id, email: user.email, name: user.name },
       });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "An error occurred during login. " + error });
+      next(error);
     }
   },
 };

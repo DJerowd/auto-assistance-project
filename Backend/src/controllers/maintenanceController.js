@@ -1,116 +1,90 @@
 const maintenanceModel = require("../models/maintenanceModel");
 const vehicleModel = require("../models/vehicleModel");
 
+const checkMaintenanceOwnership = async (maintenanceId, userId) => {
+  const maintenance = await maintenanceModel.findById(maintenanceId);
+  if (!maintenance) {
+    const error = new Error("Maintenance record not found.");
+    error.statusCode = 404;
+    throw error;
+  }
+  const vehicle = await vehicleModel.findById(maintenance.vehicle_id);
+  if (!vehicle || vehicle.user_id !== userId) {
+    const error = new Error(
+      "Forbidden: You do not have permission for this record."
+    );
+    error.statusCode = 403;
+    throw error;
+  }
+};
+
 const maintenanceController = {
-  async addMaintenance(req, res) {
+  async addMaintenance(req, res, next) {
     try {
       const { vehicleId } = req.params;
       const userId = req.user.userId;
       const vehicle = await vehicleModel.findById(vehicleId);
       if (!vehicle || vehicle.user_id !== userId) {
-        return res
-          .status(403)
-          .json({
-            message: "Forbidden: Vehicle not found or not owned by user.",
-          });
+        const error = new Error(
+          "Forbidden: Vehicle not found or not owned by user."
+        );
+        error.statusCode = 403;
+        throw error;
       }
       const newMaintenance = await maintenanceModel.create(req.body, vehicleId);
-      res
-        .status(201)
-        .json({
-          message: "Maintenance added successfully!",
-          maintenance: newMaintenance,
-        });
+      res.status(201).json({
+        message: "Maintenance added successfully!",
+        maintenance: newMaintenance,
+      });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error adding maintenance.", error: error.message });
+      next(error);
     }
   },
 
-  async getVehicleMaintenances(req, res) {
+  async getVehicleMaintenances(req, res, next) {
     try {
       const { vehicleId } = req.params;
       const userId = req.user.userId;
       const vehicle = await vehicleModel.findById(vehicleId);
       if (!vehicle || vehicle.user_id !== userId) {
-        return res
-          .status(403)
-          .json({
-            message: "Forbidden: Vehicle not found or not owned by user.",
-          });
+        const error = new Error(
+          "Forbidden: Vehicle not found or not owned by user."
+        );
+        error.statusCode = 403;
+        throw error;
       }
       const maintenances = await maintenanceModel.findByVehicleId(vehicleId);
       res.status(200).json(maintenances);
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          message: "Error fetching maintenances.",
-          error: error.message,
-        });
+      next(error);
     }
   },
 
-  async updateMaintenance(req, res) {
+  async updateMaintenance(req, res, next) {
     try {
       const { id } = req.params;
       const userId = req.user.userId;
-      const maintenance = await maintenanceModel.findById(id);
-      if (!maintenance) {
-        return res
-          .status(404)
-          .json({ message: "Maintenance record not found." });
-      }
-      const vehicle = await vehicleModel.findById(maintenance.vehicle_id);
-      if (!vehicle || vehicle.user_id !== userId) {
-        return res
-          .status(403)
-          .json({
-            message:
-              "Forbidden: You do not have permission to edit this record.",
-          });
-      }
+      await checkMaintenanceOwnership(id, userId);
       await maintenanceModel.update(id, req.body);
       const updatedMaintenance = await maintenanceModel.findById(id);
-      res
-        .status(200)
-        .json({
-          message: "Maintenance updated successfully!",
-          maintenance: updatedMaintenance,
-        });
+      res.status(200).json({
+        message: "Maintenance updated successfully!",
+        maintenance: updatedMaintenance,
+      });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error updating maintenance.", error: error.message });
+      next(error);
     }
   },
 
-  async deleteMaintenance(req, res) {
+  async deleteMaintenance(req, res, next) {
     try {
       const { id } = req.params;
       const userId = req.user.userId;
-      const maintenance = await maintenanceModel.findById(id);
-      if (!maintenance) {
-        return res
-          .status(404)
-          .json({ message: "Maintenance record not found." });
-      }
-      const vehicle = await vehicleModel.findById(maintenance.vehicle_id);
-      if (!vehicle || vehicle.user_id !== userId) {
-        return res
-          .status(403)
-          .json({
-            message:
-              "Forbidden: You do not have permission to delete this record.",
-          });
-      }
+      await checkMaintenanceOwnership(id, userId);
       await maintenanceModel.delete(id);
       res.status(200).json({ message: "Maintenance deleted successfully." });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error deleting maintenance.", error: error.message });
+      next(error);
     }
   },
 };
