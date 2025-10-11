@@ -31,27 +31,46 @@ const vehicleModel = {
   },
 
   async findByUserId(userId) {
-    const sql = `
+    const vehiclesSql = `
       SELECT v.*, b.name as brand_name, c.name as color_name
       FROM vehicles v
       LEFT JOIN brands b ON v.brand_id = b.id
       LEFT JOIN colors c ON v.color_id = c.id
       WHERE v.user_id = ?
     `;
-    const [rows] = await pool.query(sql, [userId]);
-    return rows;
+    const [vehicles] = await pool.query(vehiclesSql, [userId]);
+    for (const vehicle of vehicles) {
+      const imagesSql =
+        "SELECT id, image_path, is_primary FROM vehicle_images WHERE vehicle_id = ?";
+      const [images] = await pool.query(imagesSql, [vehicle.id]);
+      vehicle.images = images.map((img) => ({
+        ...img,
+        url: `${process.env.APP_URL}/${img.image_path.replace(/\\/g, "/")}`,
+      }));
+    }
+    return vehicles;
   },
 
   async findById(vehicleId) {
-    const sql = `
+    const vehicleSql = `
       SELECT v.*, b.name as brand_name, c.name as color_name
       FROM vehicles v
       LEFT JOIN brands b ON v.brand_id = b.id
       LEFT JOIN colors c ON v.color_id = c.id
       WHERE v.id = ?
     `;
-    const [rows] = await pool.query(sql, [vehicleId]);
-    return rows[0];
+    const [rows] = await pool.query(vehicleSql, [vehicleId]);
+    const vehicle = rows[0];
+    if (vehicle) {
+      const imagesSql =
+        "SELECT id, image_path, is_primary FROM vehicle_images WHERE vehicle_id = ?";
+      const [images] = await pool.query(imagesSql, [vehicleId]);
+      vehicle.images = images.map((img) => ({
+        ...img,
+        url: `${process.env.APP_URL}/${img.image_path.replace(/\\/g, "/")}`,
+      }));
+    }
+    return vehicle;
   },
 
   async update(vehicleId, vehicleData) {
