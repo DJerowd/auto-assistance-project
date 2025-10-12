@@ -45,7 +45,6 @@ const dashboardModel = {
     const [nextReminderResult] = await pool.query(nextReminderSql, [userId]);
     const nextReminder = nextReminderResult[0] || null;
 
-    // 5. Retornar todos os dados consolidados
     return {
       totalVehicles,
       pendingReminders,

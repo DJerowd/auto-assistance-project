@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 
 const authRoutes = require("./routes/authRoutes");
+const profileRoutes = require('./routes/profileRoutes');
 const vehicleRoutes = require("./routes/vehicleRoutes");
 const maintenanceRoutes = require("./routes/maintenanceRoutes");
 const reminderRoutes = require("./routes/reminderRoutes");
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use("/public", express.static(path.join(__dirname, "..", "public")));
 
 app.use("/api/auth", authRoutes);
+app.use('/api/profile', profileRoutes);
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/maintenances", maintenanceRoutes);
 app.use("/api/reminders", reminderRoutes);
