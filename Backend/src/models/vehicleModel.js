@@ -1,7 +1,7 @@
 const pool = require("../config/database");
 
 const vehicleModel = {
-  async create(vehicleData, userId) {
+  async create(vehicleData, userId, connection = pool) {
     const {
       brand_id,
       color_id,
@@ -15,9 +15,9 @@ const vehicleModel = {
     } = vehicleData;
     const sql = `
       INSERT INTO vehicles (user_id, brand_id, color_id, license_plate, model, version, year_of_manufacture, year_model, current_mileage, nickname)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await pool.query(sql, [
+    const [result] = await connection.query(sql, [
       userId,
       brand_id,
       color_id,
@@ -114,7 +114,7 @@ const vehicleModel = {
     return vehicle;
   },
 
-  async update(vehicleId, vehicleData) {
+  async update(vehicleId, vehicleData, connection = pool) {
     const {
       brand_id,
       color_id,
@@ -131,7 +131,7 @@ const vehicleModel = {
       SET brand_id = ?, color_id = ?, license_plate = ?, model = ?, version = ?, year_of_manufacture = ?, year_model = ?, current_mileage = ?, nickname = ?
       WHERE id = ?
     `;
-    const [result] = await pool.query(sql, [
+    const [result] = await connection.query(sql, [
       brand_id,
       color_id,
       license_plate,
@@ -146,9 +146,9 @@ const vehicleModel = {
     return result.affectedRows;
   },
 
-  async delete(vehicleId) {
+  async delete(vehicleId, connection = pool) {
     const sql = "DELETE FROM vehicles WHERE id = ?";
-    const [result] = await pool.query(sql, [vehicleId]);
+    const [result] = await connection.query(sql, [vehicleId]);
     return result.affectedRows;
   },
 };

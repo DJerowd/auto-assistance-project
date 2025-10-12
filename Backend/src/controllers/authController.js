@@ -1,19 +1,32 @@
 const userModel = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const pool = require("../config/database");
 
 const authController = {
   async register(req, res, next) {
     const { name, email, password } = req.body;
+    let connection;
     try {
-      const newUser = await userModel.createUser(name, email, password);
+      connection = await pool.getConnection();
+      await connection.beginTransaction();
+      const newUser = await userModel.createUser(
+        name,
+        email,
+        password,
+        connection
+      );
+      await connection.commit();
       res
         .status(201)
         .json({ message: "User registered successfully!", user: newUser });
     } catch (error) {
+      if (connection) await connection.rollback();
       if (error.message.includes("Email already registered")) {
         error.statusCode = 409;
       }
       next(error);
+    } finally {
+      if (connection) connection.release();
     }
   },
 

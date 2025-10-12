@@ -1,7 +1,7 @@
 const pool = require("../config/database");
 
 const maintenanceModel = {
-  async create(maintenanceData, vehicleId) {
+  async create(maintenanceData, vehicleId, connection = pool) {
     const {
       service_type,
       maintenance_date,
@@ -14,7 +14,7 @@ const maintenanceModel = {
       INSERT INTO maintenances (vehicle_id, service_type, maintenance_date, mileage, cost, service_provider, notes)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await pool.query(sql, [
+    const [result] = await connection.query(sql, [
       vehicleId,
       service_type,
       maintenance_date,
@@ -80,7 +80,7 @@ const maintenanceModel = {
     return rows[0];
   },
 
-  async update(maintenanceId, maintenanceData) {
+  async update(maintenanceId, maintenanceData, connection = pool) {
     const {
       service_type,
       maintenance_date,
@@ -94,7 +94,7 @@ const maintenanceModel = {
       SET service_type = ?, maintenance_date = ?, mileage = ?, cost = ?, service_provider = ?, notes = ?
       WHERE id = ?
     `;
-    const [result] = await pool.query(sql, [
+    const [result] = await connection.query(sql, [
       service_type,
       maintenance_date,
       mileage,
@@ -106,9 +106,15 @@ const maintenanceModel = {
     return result.affectedRows;
   },
 
-  async delete(maintenanceId) {
+  async delete(maintenanceId, connection = pool) {
     const sql = "DELETE FROM maintenances WHERE id = ?";
-    const [result] = await pool.query(sql, [maintenanceId]);
+    const [result] = await connection.query(sql, [maintenanceId]);
+    return result.affectedRows;
+  },
+  
+  async deleteByVehicleId(vehicleId, connection = pool) {
+    const sql = "DELETE FROM maintenances WHERE vehicle_id = ?";
+    const [result] = await connection.query(sql, [vehicleId]);
     return result.affectedRows;
   },
 };
