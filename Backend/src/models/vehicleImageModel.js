@@ -19,6 +19,25 @@ const vehicleImageModel = {
     const [rows] = await pool.query(sql, [imageId]);
     return rows[0];
   },
+
+  async setAsPrimary(imageId, vehicleId) {
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
+      const resetSql =
+        "UPDATE vehicle_images SET is_primary = FALSE WHERE vehicle_id = ?";
+      await connection.query(resetSql, [vehicleId]);
+      const setSql =
+        "UPDATE vehicle_images SET is_primary = TRUE WHERE id = ? AND vehicle_id = ?";
+      await connection.query(setSql, [imageId, vehicleId]);
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  },
 };
 
 module.exports = vehicleImageModel;

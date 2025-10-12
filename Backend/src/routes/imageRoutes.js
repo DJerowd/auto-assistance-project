@@ -7,4 +7,6 @@ router.use(authMiddleware);
 
 router.delete("/:id", imageController.deleteImage);
 
+router.patch("/:id/set-primary", imageController.setPrimaryImage);
+
 module.exports = router;

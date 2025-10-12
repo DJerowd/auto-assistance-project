@@ -2,6 +2,7 @@ const vehicleImageModel = require("../models/vehicleImageModel");
 const vehicleModel = require("../models/vehicleModel");
 const fs = require("fs");
 const path = require("path");
+const sharp = require("sharp");
 
 const imageController = {
   async uploadImages(req, res, next) {
@@ -16,20 +17,53 @@ const imageController = {
         error.statusCode = 403;
         throw error;
       }
-
       if (!req.files || req.files.length === 0) {
         const error = new Error("No files uploaded.");
         error.statusCode = 400;
         throw error;
       }
-      await vehicleImageModel.addImages(req.files, vehicleId);
-      res
-        .status(201)
-        .json({ message: "Images uploaded successfully!", files: req.files });
-    } catch (error) {
-      if (req.files) {
-        req.files.forEach((file) => fs.unlinkSync(file.path));
+      const processedImages = [];
+      for (const file of req.files) {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        const newFilename = `images-${uniqueSuffix}.webp`;
+        const newPath = path.join("public", "uploads", newFilename);
+        await sharp(file.buffer)
+          .resize({ width: 1280, withoutEnlargement: true })
+          .toFormat("webp", { quality: 100 })
+          .toFile(newPath);
+        processedImages.push({ path: newPath.replace(/\\/g, "/") });
       }
+      await vehicleImageModel.addImages(processedImages, vehicleId);
+      res.status(201).json({
+        message: "Images uploaded and processed successfully!",
+        files: processedImages,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async setPrimaryImage(req, res, next) {
+    try {
+      const { id } = req.params;
+      const userId = req.user.userId;
+      const image = await vehicleImageModel.findById(id);
+      if (!image) {
+        const error = new Error("Image not found.");
+        error.statusCode = 404;
+        throw error;
+      }
+      const vehicle = await vehicleModel.findById(image.vehicle_id);
+      if (!vehicle || vehicle.user_id !== userId) {
+        const error = new Error(
+          "Forbidden: You do not have permission to modify this image."
+        );
+        error.statusCode = 403;
+        throw error;
+      }
+      await vehicleImageModel.setAsPrimary(id, image.vehicle_id);
+      res.status(200).json({ message: "Image set as primary successfully." });
+    } catch (error) {
       next(error);
     }
   },
@@ -52,16 +86,18 @@ const imageController = {
         error.statusCode = 403;
         throw error;
       }
-      fs.unlink(
-        path.join(__dirname, "..", "..", image.image_path),
-        async (err) => {
-          if (err) {
-            console.error("Failed to delete physical file:", err);
-          }
-          await vehicleImageModel.delete(id);
-          res.status(200).json({ message: "Image deleted successfully." });
+      const affectedRows = await vehicleImageModel.delete(id);
+      if (affectedRows > 0) {
+        const filePath = path.join(__dirname, "..", "..", image.image_path);
+        if (fs.existsSync(filePath)) {
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              console.error("Failed to delete physical file:", err);
+            }
+          });
         }
-      );
+      }
+      res.status(200).json({ message: "Image deleted successfully." });
     } catch (error) {
       next(error);
     }

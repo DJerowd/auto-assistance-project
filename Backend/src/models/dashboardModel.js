@@ -3,15 +3,13 @@ const pool = require("../config/database");
 const dashboardModel = {
   async getStatsByUserId(userId) {
     // 1. Contar o total de veículos do usuário
-    const totalVehiclesSql =
-      "SELECT COUNT(*) as total FROM vehicles WHERE user_id = ?";
+    const totalVehiclesSql = "SELECT COUNT(*) as total FROM vehicles WHERE user_id = ?";
     const [vehiclesResult] = await pool.query(totalVehiclesSql, [userId]);
     const totalVehicles = vehiclesResult[0].total;
 
     // 2. Contar o total de lembretes pendentes
     const pendingRemindersSql = `
-      SELECT COUNT(*) as total 
-      FROM reminders r
+      SELECT COUNT(*) as total FROM reminders r
       JOIN vehicles v ON r.vehicle_id = v.id
       WHERE v.user_id = ? AND r.status = 'PENDING'
     `;
@@ -45,11 +43,39 @@ const dashboardModel = {
     const [nextReminderResult] = await pool.query(nextReminderSql, [userId]);
     const nextReminder = nextReminderResult[0] || null;
 
+    // 5. Gráfico de Custo de Manutenção por Mês (Últimos 12 meses)
+    const costByMonthSql = `
+      SELECT DATE_FORMAT(m.maintenance_date, '%Y-%m') as month, SUM(m.cost) as totalCost
+      FROM maintenances m
+      JOIN vehicles v ON m.vehicle_id = v.id
+      WHERE v.user_id = ? AND m.maintenance_date >= ?
+      GROUP BY month
+      ORDER BY month ASC
+    `;
+    const [maintenanceCostByMonth] = await pool.query(costByMonthSql, [userId, yearAgoDate]);
+
+    // 6. Gráfico de Contagem de Manutenções por Tipo de Serviço
+    const byTypeSql = `
+      SELECT m.service_type, COUNT(m.id) as count
+      FROM maintenances m
+      JOIN vehicles v ON m.vehicle_id = v.id
+      WHERE v.user_id = ?
+      GROUP BY m.service_type
+      ORDER BY count DESC
+    `;
+    const [maintenancesByType] = await pool.query(byTypeSql, [userId]);
+
     return {
-      totalVehicles,
-      pendingReminders,
-      totalCostLastYear: parseFloat(totalCostLastYear),
-      nextReminder,
+      kpi: {
+        totalVehicles,
+        pendingReminders,
+        totalCostLastYear: parseFloat(totalCostLastYear),
+        nextReminder,
+      },
+      charts: {
+        maintenanceCostByMonth,
+        maintenancesByType,
+      }
     };
   },
 };
