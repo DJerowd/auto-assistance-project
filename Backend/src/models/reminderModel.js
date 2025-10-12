@@ -95,6 +95,33 @@ const reminderModel = {
     const [result] = await pool.query(sql, [reminderId]);
     return result.affectedRows;
   },
+
+  async findAllDueReminders() {
+    const sql = `
+      SELECT
+        r.id as reminderId,
+        r.service_type,
+        r.mileage_threshold,
+        r.date_threshold,
+        v.id as vehicleId,
+        v.model as vehicleModel,
+        v.nickname as vehicleNickname,
+        v.current_mileage,
+        u.name as userName,
+        u.email as userEmail
+      FROM reminders r
+      JOIN vehicles v ON r.vehicle_id = v.id
+      JOIN users u ON v.user_id = u.id
+      WHERE 
+        r.status = 'PENDING' AND (
+          (r.date_threshold IS NOT NULL AND r.date_threshold BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY))
+          OR
+          (r.mileage_threshold IS NOT NULL AND (r.mileage_threshold - v.current_mileage) <= 500)
+        )
+    `;
+    const [rows] = await pool.query(sql);
+    return rows;
+  },
 };
 
 module.exports = reminderModel;
