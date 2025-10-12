@@ -2,12 +2,12 @@ const pool = require("../config/database");
 const bcrypt = require("bcryptjs");
 
 const userModel = {
-  async createUser(name, email, password) {
+  async createUser(name, email, password, connection = pool) {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
     const sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
     try {
-      const [result] = await pool.query(sql, [name, email, passwordHash]);
+      const [result] = await connection.query(sql, [name, email, passwordHash]);
       return { id: result.insertId, email, name };
     } catch (error) {
       if (error.code === "ER_DUP_ENTRY") {
@@ -33,11 +33,11 @@ const userModel = {
     return rows[0];
   },
 
-  async update(userId, userData) {
+  async update(userId, userData, connection = pool) {
     const { name, email } = userData;
     const sql = 'UPDATE users SET name = ?, email = ? WHERE id = ?';
     try {
-      const [result] = await pool.query(sql, [name, email, userId]);
+      const [result] = await connection.query(sql, [name, email, userId]);
       return result.affectedRows;
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
@@ -47,9 +47,9 @@ const userModel = {
     }
   },
 
-  async updatePassword(userId, newPasswordHash) {
+  async updatePassword(userId, newPasswordHash, connection = pool) {
     const sql = 'UPDATE users SET password = ? WHERE id = ?';
-    const [result] = await pool.query(sql, [newPasswordHash, userId]);
+    const [result] = await connection.query(sql, [newPasswordHash, userId]);
     return result.affectedRows;
   }
 };

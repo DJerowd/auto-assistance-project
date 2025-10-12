@@ -1,5 +1,6 @@
 const userModel = require('../models/userModel');
 const bcrypt = require('bcryptjs');
+const pool = require("../config/database");
 
 const profileController = {
   async getProfile(req, res, next) {
@@ -18,7 +19,10 @@ const profileController = {
   },
 
   async updateProfile(req, res, next) {
+    let connection;
     try {
+      connection = await pool.getConnection();
+      await connection.beginTransaction();
       const userId = req.user.userId;
       const { name, email } = req.body;
       const currentUser = await userModel.findById(userId);
@@ -31,19 +35,26 @@ const profileController = {
         name: name || currentUser.name,
         email: email || currentUser.email,
       };
-      await userModel.update(userId, dataToUpdate);
+      await userModel.update(userId, dataToUpdate, connection);
       const updatedUser = await userModel.findById(userId);
+      await connection.commit();
       res.status(200).json({ message: 'Profile updated successfully!', user: updatedUser });
     } catch (error) {
+      if (connection) await connection.rollback();
       if (error.message.includes("Email is already in use")) {
         error.statusCode = 409;
       }
       next(error);
+    } finally {
+      if (connection) connection.release();
     }
   },
 
   async changePassword(req, res, next) {
+    let connection;
     try {
+      connection = await pool.getConnection();
+      await connection.beginTransaction();
       const userId = req.user.userId;
       const { currentPassword, newPassword } = req.body;
       const user = await userModel.findUserByEmail(req.user.email);
@@ -60,10 +71,14 @@ const profileController = {
       }
       const salt = await bcrypt.genSalt(10);
       const newPasswordHash = await bcrypt.hash(newPassword, salt);
-      await userModel.updatePassword(userId, newPasswordHash);
+      await userModel.updatePassword(userId, newPasswordHash, connection);
+      await connection.commit();
       res.status(200).json({ message: 'Password changed successfully.' });
     } catch (error) {
+      if (connection) await connection.rollback();
       next(error);
+    } finally {
+      if (connection) connection.release();
     }
   }
 };

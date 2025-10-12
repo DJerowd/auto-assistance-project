@@ -3,9 +3,11 @@ const vehicleModel = require("../models/vehicleModel");
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
+const pool = require("../config/database");
 
 const imageController = {
   async uploadImages(req, res, next) {
+    let connection;
     try {
       const { vehicleId } = req.params;
       const userId = req.user.userId;
@@ -33,42 +35,56 @@ const imageController = {
           .toFile(newPath);
         processedImages.push({ path: newPath.replace(/\\/g, "/") });
       }
-      await vehicleImageModel.addImages(processedImages, vehicleId);
+      connection = await pool.getConnection();
+      await connection.beginTransaction();
+      await vehicleImageModel.addImages(processedImages, vehicleId, connection);
+      await connection.commit();
       res.status(201).json({
         message: "Images uploaded and processed successfully!",
         files: processedImages,
       });
     } catch (error) {
+      if (connection) await connection.rollback();
       next(error);
+    } finally {
+      if (connection) connection.release();
     }
   },
 
   async setPrimaryImage(req, res, next) {
+    let connection;
     try {
-      const { id } = req.params;
-      const userId = req.user.userId;
-      const image = await vehicleImageModel.findById(id);
-      if (!image) {
-        const error = new Error("Image not found.");
-        error.statusCode = 404;
-        throw error;
-      }
-      const vehicle = await vehicleModel.findById(image.vehicle_id);
-      if (!vehicle || vehicle.user_id !== userId) {
-        const error = new Error(
-          "Forbidden: You do not have permission to modify this image."
-        );
-        error.statusCode = 403;
-        throw error;
-      }
-      await vehicleImageModel.setAsPrimary(id, image.vehicle_id);
-      res.status(200).json({ message: "Image set as primary successfully." });
+        const { id } = req.params;
+        const userId = req.user.userId;
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+        const image = await vehicleImageModel.findById(id);
+        if (!image) {
+            const error = new Error("Image not found.");
+            error.statusCode = 404;
+            throw error;
+        }
+        const vehicle = await vehicleModel.findById(image.vehicle_id);
+        if (!vehicle || vehicle.user_id !== userId) {
+            const error = new Error(
+                "Forbidden: You do not have permission for this image."
+            );
+            error.statusCode = 403;
+            throw error;
+        }
+        await vehicleImageModel.setPrimaryImage(image.vehicle_id, id, connection);
+        await connection.commit();
+        res.status(200).json({ message: "Primary image updated successfully." });
     } catch (error) {
-      next(error);
+        if (connection) await connection.rollback();
+        next(error);
+    } finally {
+        if (connection) connection.release();
     }
   },
 
   async deleteImage(req, res, next) {
+    let connection;
     try {
       const { id } = req.params;
       const userId = req.user.userId;
@@ -86,6 +102,8 @@ const imageController = {
         error.statusCode = 403;
         throw error;
       }
+      connection = await pool.getConnection();
+      await connection.beginTransaction();
       const affectedRows = await vehicleImageModel.delete(id);
       if (affectedRows > 0) {
         const filePath = path.join(__dirname, "..", "..", image.image_path);
@@ -97,9 +115,14 @@ const imageController = {
           });
         }
       }
+      await vehicleImageModel.delete(id, connection);
+      await connection.commit();
       res.status(200).json({ message: "Image deleted successfully." });
     } catch (error) {
+      if (connection) await connection.rollback();
       next(error);
+    } finally {
+      if (connection) connection.release();
     }
   },
 };
