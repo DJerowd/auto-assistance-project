@@ -6,6 +6,7 @@ const ProfilePage = () => {
       <CardHeader>
         <CardTitle>Meu Perfil</CardTitle>
       </CardHeader>
+      
       <div className="p-6 pt-0">
         <p className="text-gray-600 dark:text-gray-400">
           A funcionalidade para visualizar e editar o perfil de usuário será
