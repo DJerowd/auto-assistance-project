@@ -1,0 +1,57 @@
+# Arquivo gerado pelo sistema operacional
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependências - a pasta mais importante a ser ignorada
+node_modules/
+
+# Pasta de build - onde os arquivos finais da aplicação são gerados
+dist/
+.output/
+.next/
+
+# Variáveis de Ambiente (MUITO IMPORTANTE)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# Arquivos de Cache e Temporários do Vite
+.vite/
+.vercel/
+.svelte-kit/
+
+# Relatórios de Cobertura de Testes
+coverage/
+.nyc_output/
+
+# Arquivos de IDEs e editores de código
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Arquivos de configuração de ferramentas de linting e formatação
+.eslintcache
+.prettierrc.local
+
+# Arquivos de dependências específicos do sistema operacional
+npm-shrinkwrap.json
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
