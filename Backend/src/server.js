@@ -11,6 +11,7 @@ const maintenanceRoutes = require("./routes/maintenanceRoutes");
 const reminderRoutes = require("./routes/reminderRoutes");
 const imageRoutes = require("./routes/imageRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const dataLoaderRoutes = require('./routes/dataLoaderRoutes');
 const errorMiddleware = require("./middlewares/errorMiddleware");
 const notificationService = require("./services/notificationService");
 
@@ -29,6 +30,7 @@ app.use("/api/maintenances", maintenanceRoutes);
 app.use("/api/reminders", reminderRoutes);
 app.use("/api/images", imageRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use('/api/data', dataLoaderRoutes);
 
 app.use(errorMiddleware);
 

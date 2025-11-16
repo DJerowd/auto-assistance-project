@@ -2,13 +2,17 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useUiStore } from "../../store/uiStore";
 import { useAuthStore } from "../../store/authStore";
 import { CloseIcon } from "../icons/CloseIcon";
+import { DashboardIcon } from "../icons/DashboardIcon";
+import { CarIcon } from "../icons/CarIcon";
+import { UserIcon } from "../icons/UserIcon";
+import { LogoutIcon } from "../icons/LogoutIcon";
 import ThemeSwitch from "../ui/ThemeSwitch";
 import { Button } from "../ui/Button";
 
 const navLinks = [
-  { name: "Dashboard", path: "/" },
-  { name: "Meus Veículos", path: "/vehicles" },
-  { name: "Meu Perfil", path: "/profile" },
+  { name: "Dashboard", path: "/", icon: <DashboardIcon size={20} /> },
+  { name: "Meus Veículos", path: "/vehicles", icon: <CarIcon size={20} /> },
+  { name: "Meu Perfil", path: "/profile", icon: <UserIcon size={20} /> },
 ];
 
 const Sidebar = () => {
@@ -37,7 +41,9 @@ const Sidebar = () => {
         }`}
       >
         <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
-          <h2 className="font-bold text-lg dark:text-white">Olá, {user?.name}</h2>
+          <h2 className="font-bold text-lg dark:text-white">
+            Olá, {user?.name}
+          </h2>
           <button onClick={closeMenu} className="dark:text-gray-300 md:hidden">
             <CloseIcon size={24} />
           </button>
@@ -51,14 +57,15 @@ const Sidebar = () => {
                   to={link.path}
                   onClick={closeMenu}
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded-md transition-colors ${
+                    `flex items-center gap-3 py-2 px-3 rounded-md transition-colors ${
                       isActive
-                        ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-white'
-                        : 'hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300'
+                        ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-white"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-100 dark:text-gray-300"
                     }`
                   }
                 >
-                  {link.name}
+                  {link.icon}
+                  <span>{link.name}</span>
                 </NavLink>
               </li>
             ))}
@@ -71,7 +78,13 @@ const Sidebar = () => {
             <ThemeSwitch />
           </div>
 
-          <Button variant="destructive" size="sm" onClick={handleLogout} className="w-full">
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2"
+          >
+            <LogoutIcon size={18} />
             Sair
           </Button>
         </div>

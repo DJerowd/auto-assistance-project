@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import VehiclesPage from './pages/VehiclesPage';
+import VehicleMaintenancesPage from './pages/VehicleMaintenancesPage';
 import ProfilePage from './pages/ProfilePage';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/vehicles" element={<VehiclesPage />} />
+            <Route path="/vehicles/:vehicleId/maintenances" element={<VehicleMaintenancesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>

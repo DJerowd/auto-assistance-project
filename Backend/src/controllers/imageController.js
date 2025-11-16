@@ -72,7 +72,7 @@ const imageController = {
             error.statusCode = 403;
             throw error;
         }
-        await vehicleImageModel.setPrimaryImage(image.vehicle_id, id, connection);
+        await vehicleImageModel.setAsPrimary(id, image.vehicle_id, connection);
         await connection.commit();
         res.status(200).json({ message: "Primary image updated successfully." });
     } catch (error) {

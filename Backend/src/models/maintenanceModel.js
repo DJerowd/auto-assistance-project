@@ -111,7 +111,7 @@ const maintenanceModel = {
     const [result] = await connection.query(sql, [maintenanceId]);
     return result.affectedRows;
   },
-  
+
   async deleteByVehicleId(vehicleId, connection = pool) {
     const sql = "DELETE FROM maintenances WHERE vehicle_id = ?";
     const [result] = await connection.query(sql, [vehicleId]);
