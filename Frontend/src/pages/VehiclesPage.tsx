@@ -17,6 +17,7 @@ import { MaintenanceIcon } from "../components/icons/MaintenanceIcon";
 import { ImageIcon } from "../components/icons/ImageIcon";
 import { EditIcon } from "../components/icons/EditIcon";
 import { TrashIcon } from "../components/icons/TrashIcon";
+import { BellIcon } from "../components/icons/BellIcon";
 import { Button } from "../components/ui/Button";
 import Spinner from "../components/ui/Spinner";
 import Modal from "../components/ui/modal/Modal";
@@ -175,6 +176,16 @@ const VehiclesPage = () => {
                   </CardHeader>
 
                   <CardContent className="mt-auto flex justify-center space-x-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() =>
+                        navigate(`/vehicles/${vehicle.id}/reminders`)
+                      }
+                      title="Lembretes"
+                    >
+                      <BellIcon size={16} />
+                    </Button>
                     <Button
                       variant="secondary"
                       size="sm"

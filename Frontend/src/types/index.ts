@@ -84,4 +84,16 @@ export interface Maintenance {
   notes?: string;
 }
 
-export type MaintenanceFormData = Omit<Maintenance, 'id' | 'vehicle_id'>;
+export type MaintenanceFormData = Omit<Maintenance, "id" | "vehicle_id">;
+
+export interface Reminder {
+  id: number;
+  vehicle_id: number;
+  service_type: string;
+  mileage_threshold?: number;
+  date_threshold?: string;
+  status: "PENDING" | "COMPLETED" | "CANCELLED";
+  notes?: string;
+}
+
+export type ReminderFormData = Omit<Reminder, "id" | "vehicle_id">;

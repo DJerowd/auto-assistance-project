@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import VehiclesPage from './pages/VehiclesPage';
 import VehicleMaintenancesPage from './pages/VehicleMaintenancesPage';
+import VehicleRemindersPage from './pages/VehicleRemindersPage';
 import ProfilePage from './pages/ProfilePage';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/vehicles" element={<VehiclesPage />} />
             <Route path="/vehicles/:vehicleId/maintenances" element={<VehicleMaintenancesPage />} />
+            <Route path="/vehicles/:vehicleId/reminders" element={<VehicleRemindersPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>

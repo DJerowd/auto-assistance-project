@@ -121,12 +121,9 @@ const VehicleMaintenancesPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h2 className="text-2xl font-bold dark:text-white truncate">
-            Manutenções de 
-              {" "}{vehicle?.nickname || vehicle?.model}
-          </h2>
-        </div>
+        <h2 className="text-2xl font-bold dark:text-white">
+          Manutenções de {vehicle?.nickname || vehicle?.model}
+        </h2>
 
         <div className="flex gap-4">
           <Button onClick={() => navigate("/vehicles")}>← Voltar</Button>
@@ -149,7 +146,7 @@ const VehicleMaintenancesPage = () => {
               key={maintenance.id}
               className="overflow-hidden flex flex-col"
             >
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex-row items-center justify-between">
                 <CardTitle
                   className="truncate"
                   title={maintenance.service_type}
@@ -157,7 +154,7 @@ const VehicleMaintenancesPage = () => {
                   {maintenance.service_type}
                 </CardTitle>
 
-                <div className="flex space-x-2 self-end md:self-center">
+                <div className="flex space-x-2 self-end md:self-center flex-shrink-0">
                   <Button
                     variant="outline"
                     size="sm"
@@ -178,7 +175,7 @@ const VehicleMaintenancesPage = () => {
                 </div>
               </CardHeader>
 
-              <CardContent className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <CardContent>
                 <div className="space-y-1">
                   <div className="text-sm text-gray-500 dark:text-gray-400 flex flex-wrap gap-x-4 gap-y-1">
                     <span>
