@@ -1,26 +1,238 @@
-import { useNavigate } from "react-router-dom";
-import { Card, CardHeader, CardTitle } from "../components/ui/Card";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  getVehicleMaintenances,
+  createMaintenance,
+  updateMaintenance,
+  deleteMaintenance,
+} from "../services/maintenanceService";
+import { getVehicleById } from "../services/vehicleService";
+import type { Maintenance, MaintenanceFormData, Vehicle } from "../types";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/Card";
+import { PlusIcon } from "../components/icons/PlusIcon";
+import { EditIcon } from "../components/icons/EditIcon";
+import { TrashIcon } from "../components/icons/TrashIcon";
 import { Button } from "../components/ui/Button";
+import Spinner from "../components/ui/Spinner";
+import Modal from "../components/ui/modal/Modal";
+import ConfirmDialog from "../components/ui/modal/ConfirmDialog";
+import MaintenanceForm from "../components/maintenances/MaintenanceForm";
 
 const VehicleMaintenancesPage = () => {
+  const { vehicleId } = useParams<{ vehicleId: string }>();
   const navigate = useNavigate();
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Manuteções</CardTitle>
-      </CardHeader>
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [maintenances, setMaintenances] = useState<Maintenance[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-      <div className="p-6 pt-0">
-        <Button onClick={() => navigate("/vehicles")}>
-          ← Voltar
-        </Button>
-        <p className="text-gray-600 dark:text-gray-400">
-          A funcionalidade para visualizar e editar as manutenções de veículos
-          será implementada aqui.
-        </p>
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedMaintenance, setSelectedMaintenance] =
+    useState<Maintenance | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchData = async () => {
+    if (!vehicleId) return;
+    try {
+      setIsLoading(true);
+      const [vehicleData, maintenanceData] = await Promise.all([
+        getVehicleById(Number(vehicleId)),
+        getVehicleMaintenances(Number(vehicleId)),
+      ]);
+      setVehicle(vehicleData);
+      setMaintenances(maintenanceData.data);
+    } catch (error) {
+      console.error("Failed to load data", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [vehicleId]);
+
+  const handleOpenAddModal = () => {
+    setSelectedMaintenance(null);
+    setIsFormModalOpen(true);
+  };
+
+  const handleOpenEditModal = (maintenance: Maintenance) => {
+    setSelectedMaintenance(maintenance);
+    setIsFormModalOpen(true);
+  };
+
+  const handleOpenDeleteModal = (maintenance: Maintenance) => {
+    setSelectedMaintenance(maintenance);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseModals = () => {
+    setIsFormModalOpen(false);
+    setIsDeleteModalOpen(false);
+    setSelectedMaintenance(null);
+  };
+
+  const handleSave = async (data: MaintenanceFormData) => {
+    if (!vehicleId) return;
+    setIsSubmitting(true);
+    try {
+      if (selectedMaintenance) {
+        await updateMaintenance(selectedMaintenance.id, data);
+      } else {
+        await createMaintenance(Number(vehicleId), data);
+      }
+      handleCloseModals();
+      fetchData();
+    } catch (error) {
+      console.error("Failed to save maintenance", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedMaintenance) return;
+    setIsSubmitting(true);
+    try {
+      await deleteMaintenance(selectedMaintenance.id);
+      handleCloseModals();
+      fetchData();
+    } catch (error) {
+      console.error("Failed to delete maintenance", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading)
+    return (
+      <div className="h-64">
+        <Spinner />
       </div>
-    </Card>
+    );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 className="text-2xl font-bold dark:text-white truncate">
+            Manutenções de 
+              {" "}{vehicle?.nickname || vehicle?.model}
+          </h2>
+        </div>
+
+        <div className="flex gap-4">
+          <Button onClick={() => navigate("/vehicles")}>← Voltar</Button>
+          <Button onClick={handleOpenAddModal}>
+            <PlusIcon className="mr-2 h-4 w-4" /> Nova Manutenção
+          </Button>
+        </div>
+      </div>
+
+      {maintenances.length === 0 ? (
+        <Card>
+          <CardContent className="pt-6 text-center text-gray-600 dark:text-gray-400">
+            Nenhuma manutenção registrada para este veículo.
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
+          {maintenances.map((maintenance) => (
+            <Card
+              key={maintenance.id}
+              className="overflow-hidden flex flex-col"
+            >
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle
+                  className="truncate"
+                  title={maintenance.service_type}
+                >
+                  {maintenance.service_type}
+                </CardTitle>
+
+                <div className="flex space-x-2 self-end md:self-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleOpenEditModal(maintenance)}
+                    title="Editar"
+                  >
+                    <EditIcon size={16} />
+                  </Button>
+
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleOpenDeleteModal(maintenance)}
+                    title="Excluir"
+                  >
+                    <TrashIcon size={16} />
+                  </Button>
+                </div>
+              </CardHeader>
+
+              <CardContent className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="space-y-1">
+                  <div className="text-sm text-gray-500 dark:text-gray-400 flex flex-wrap gap-x-4 gap-y-1">
+                    <span>
+                      📅{" "}
+                      {new Date(
+                        maintenance.maintenance_date
+                      ).toLocaleDateString()}
+                    </span>
+                    <span>🚗 {maintenance.mileage} km</span>
+                    <span>
+                      💰 R${" "}
+                      {maintenance.cost.toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      })}
+                    </span>
+                    {maintenance.service_provider && (
+                      <span>🔧 {maintenance.service_provider}</span>
+                    )}
+                  </div>
+                  {maintenance.notes && (
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 italic">
+                      "{maintenance.notes}"
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <Modal
+        isOpen={isFormModalOpen}
+        onClose={handleCloseModals}
+        title={selectedMaintenance ? "Editar Manutenção" : "Nova Manutenção"}
+      >
+        <MaintenanceForm
+          onSubmit={handleSave}
+          onCancel={handleCloseModals}
+          initialData={selectedMaintenance}
+          isLoading={isSubmitting}
+        />
+      </Modal>
+
+      <ConfirmDialog
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseModals}
+        onConfirm={handleDelete}
+        title="Excluir Manutenção"
+        description="Tem certeza que deseja excluir este registro de manutenção? Esta ação não pode ser desfeita."
+        isLoading={isSubmitting}
+      />
+    </div>
   );
 };
 

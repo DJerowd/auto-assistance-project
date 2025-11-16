@@ -5,7 +5,7 @@ const Header = () => {
   const { toggleMenu } = useUiStore();
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-30">
+    <header className="bg-white dark:bg-gray-600 shadow-sm sticky top-0 z-30">
       <div className="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8 flex items-center">
         <button
           onClick={toggleMenu}

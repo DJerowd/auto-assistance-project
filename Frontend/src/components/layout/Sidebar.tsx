@@ -36,12 +36,12 @@ const Sidebar = () => {
       ></div>
 
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg z-50 transform transition-transform ${
+        className={`fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-800 shadow-lg z-50 transform transition-transform ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
-          <h2 className="font-bold text-lg dark:text-white">
+          <h2 className="font-bold text-lg dark:text-white truncate" title={`Olá, ${user?.name}`}>
             Olá, {user?.name}
           </h2>
           <button onClick={closeMenu} className="dark:text-gray-300 md:hidden">
@@ -57,7 +57,7 @@ const Sidebar = () => {
                   to={link.path}
                   onClick={closeMenu}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 py-2 px-3 rounded-md transition-colors ${
+                    `flex text-gray-800 dark:text-gray-200 items-center gap-3 py-2 px-3 rounded-md transition-colors ${
                       isActive
                         ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-white"
                         : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-100 dark:text-gray-300"

@@ -28,7 +28,6 @@ import type { Vehicle, VehicleFormData } from "../types";
 const DEFAULT_VEHICLE_IMG = "http://localhost:8800/public/default-vehicle.png";
 
 const VehiclesPage = () => {
-  const navigate = useNavigate();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +37,8 @@ const VehiclesPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const navigate = useNavigate();
 
   const fetchVehicles = async () => {
     try {
@@ -127,10 +128,10 @@ const VehiclesPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold dark:text-white">Meus Veículos</h2>
+        <h2 className="text-2xl font-bold dark:text-white">Meus Veículos</h2>
 
         <Button onClick={handleOpenAddModal}>
-          <PlusIcon className="mr-2 h-4 w-4" /> Adicionar Veículo
+          <PlusIcon className="mr-2 h-4 w-4" /> Novo Veículo
         </Button>
       </div>
 
@@ -150,14 +151,24 @@ const VehiclesPage = () => {
                 <img
                   src={primaryImage ? primaryImage.url : DEFAULT_VEHICLE_IMG}
                   alt={vehicle.model}
-                  className="w-full h-38 object-cover"
+                  className="w-full h-38 object-cover bg-gray-800"
                 />
 
                 <div className="flex-grow flex flex-col">
-                  <CardHeader className="flex flex-row space-x-2">
-                    <CardTitle>{vehicle.nickname || vehicle.model}</CardTitle>
+                  <CardHeader>
+                    <CardTitle
+                      className="truncate"
+                      title={vehicle.nickname || vehicle.model}
+                    >
+                      {vehicle.nickname || vehicle.model}
+                    </CardTitle>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p
+                      className="text-sm text-gray-500 dark:text-gray-400 truncate"
+                      title={`${
+                        vehicle.brand_name || "Marca não informada"
+                      } - ${vehicle.year_model}`}
+                    >
                       {vehicle.brand_name || "Marca não informada"} -{" "}
                       {vehicle.year_model}
                     </p>

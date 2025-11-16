@@ -72,3 +72,16 @@ export type VehicleFormData = Omit<
   Vehicle,
   "id" | "user_id" | "brand_name" | "color_name" | "images"
 >;
+
+export interface Maintenance {
+  id: number;
+  vehicle_id: number;
+  service_type: string;
+  maintenance_date: string;
+  mileage: number;
+  cost: number;
+  service_provider?: string;
+  notes?: string;
+}
+
+export type MaintenanceFormData = Omit<Maintenance, 'id' | 'vehicle_id'>;

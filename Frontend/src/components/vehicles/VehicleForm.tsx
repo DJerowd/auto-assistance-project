@@ -185,12 +185,12 @@ const VehicleForm = ({
 
         <div>
           <label className="block text-sm font-medium mb-1 dark:text-gray-300">
-            Versão
+            Placa
           </label>
 
           <Input
-            name="version"
-            value={formData.version}
+            name="license_plate"
+            value={formData.license_plate}
             onChange={handleChange}
             required
           />
@@ -214,12 +214,12 @@ const VehicleForm = ({
 
         <div>
           <label className="block text-sm font-medium mb-1 dark:text-gray-300">
-            Placa
+            Versão
           </label>
 
           <Input
-            name="license_plate"
-            value={formData.license_plate}
+            name="version"
+            value={formData.version}
             onChange={handleChange}
             required
           />
