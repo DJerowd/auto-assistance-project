@@ -104,7 +104,7 @@ const imageController = {
       }
       connection = await pool.getConnection();
       await connection.beginTransaction();
-      const affectedRows = await vehicleImageModel.delete(id);
+      const affectedRows = await vehicleImageModel.delete(id, connection);
       if (affectedRows > 0) {
         const filePath = path.join(__dirname, "..", "..", image.image_path);
         if (fs.existsSync(filePath)) {
@@ -115,7 +115,6 @@ const imageController = {
           });
         }
       }
-      await vehicleImageModel.delete(id, connection);
       await connection.commit();
       res.status(200).json({ message: "Image deleted successfully." });
     } catch (error) {

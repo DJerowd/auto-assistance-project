@@ -39,4 +39,4 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-useAuthStore.getState().finishLoading();
+// useAuthStore.getState().finishLoading();

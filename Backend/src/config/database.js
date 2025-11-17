@@ -11,6 +11,6 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-console.log("Database connection pool created successfully.");
+// console.log("Database connection pool created successfully.");
 
 module.exports = pool;

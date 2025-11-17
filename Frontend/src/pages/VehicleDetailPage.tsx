@@ -136,15 +136,13 @@ const VehicleDetailPage = () => {
 
   return (
     <div className="space-y-6">
-      <Button
-        onClick={() => navigate("/vehicles")}
-      >
+      <Button onClick={() => navigate("/vehicles")}>
         <ReturnIcon className="mr-2 h-4 w-4" /> Voltar
       </Button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden relative group">
             <div className="w-full h-128 bg-gray-200 dark:bg-gray-700">
               <img
                 src={selectedImage ? selectedImage.url : DEFAULT_VEHICLE_IMG}
@@ -152,30 +150,31 @@ const VehicleDetailPage = () => {
                 className="w-full h-full object-cover"
               />
             </div>
+            {vehicle.images.length > 1 && (
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent transition-all duration-300 opacity-0 group-hover:opacity-100">
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {vehicle.images.map((image) => (
+                    <button
+                      key={image.id}
+                      onClick={() => setSelectedImage(image)}
+                      className={cn(
+                        "w-16 h-16 rounded-md overflow-hidden flex-shrink-0 border-2 transition-all",
+                        selectedImage?.id === image.id
+                          ? "border-indigo-500"
+                          : "border-transparent hover:border-gray-400"
+                      )}
+                    >
+                      <img
+                        src={image.url}
+                        alt="Miniatura"
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </Card>
-
-          {vehicle.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {vehicle.images.map((image) => (
-                <button
-                  key={image.id}
-                  onClick={() => setSelectedImage(image)}
-                  className={cn(
-                    "w-16 h-16 rounded-md overflow-hidden flex-shrink-0 border-2 transition-all",
-                    selectedImage?.id === image.id
-                      ? "border-indigo-500"
-                      : "border-transparent hover:border-gray-400"
-                  )}
-                >
-                  <img
-                    src={image.url}
-                    alt="Miniatura"
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
 
           <Card>
             <CardHeader>
@@ -190,7 +189,7 @@ const VehicleDetailPage = () => {
                 </div>
                 <div className="flex space-x-2">
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     size="sm"
                     onClick={() => setIsFormModalOpen(true)}
                     title="Editar Informações"
@@ -198,7 +197,7 @@ const VehicleDetailPage = () => {
                     <EditIcon size={16} />
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     size="sm"
                     onClick={() => setIsImagesModalOpen(true)}
                     title="Gerenciar Imagens"
@@ -246,7 +245,7 @@ const VehicleDetailPage = () => {
                     {vehicle.year_of_manufacture} / {vehicle.year_model}
                   </span>
                 </li>
-                
+
                 <li className="pt-2 flex justify-between items-center">
                   <span className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
                     <SpeedometerIcon size={16} /> Quilometragem Atual:
@@ -260,7 +259,7 @@ const VehicleDetailPage = () => {
           </Card>
         </div>
 
-        <div className="lg:col-span-1 space-y-6"> 
+        <div className="lg:col-span-1 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Ações Rápidas</CardTitle>

@@ -11,6 +11,7 @@ import type { Reminder, ReminderFormData, Vehicle } from "../types";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "../components/ui/Card";
@@ -156,19 +157,18 @@ const VehicleRemindersPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h2 className="text-2xl font-bold dark:text-white">
-          Lembretes de {vehicle?.nickname || vehicle?.model}
-        </h2>
+        <div>
+          <h2 className="text-2xl font-bold dark:text-white">Lembretes</h2>
+          <CardDescription>
+            {vehicle?.nickname || vehicle?.model}
+          </CardDescription>
+        </div>
 
         <div className="flex gap-4">
-          <Button
-            onClick={() => navigate(-1)}
-          >
+          <Button onClick={() => navigate(-1)}>
             <ReturnIcon className="mr-2 h-4 w-4" /> Voltar
           </Button>
-          <Button
-            onClick={handleOpenAddModal}
-          >
+          <Button onClick={handleOpenAddModal}>
             <PlusIcon className="mr-2 h-4 w-4" />
             Novo Lembrete
           </Button>
@@ -217,8 +217,7 @@ const VehicleRemindersPage = () => {
 
                   <div className="flex space-x-2 self-end md:self-center flex-shrink-0">
                     <Button
-                      variant="outline"
-                      size="sm"
+                      variant="secondary"
                       onClick={() => handleOpenEditModal(reminder)}
                       title="Editar"
                     >
@@ -227,7 +226,6 @@ const VehicleRemindersPage = () => {
 
                     <Button
                       variant="destructive"
-                      size="sm"
                       onClick={() => handleOpenDeleteModal(reminder)}
                       title="Excluir"
                     >

@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  getVehicles,
-  createVehicle,
-} from "../services/vehicleService";
+import { AxiosError } from "axios";
+import { getVehicles, createVehicle } from "../services/vehicleService";
 import {
   Card,
   CardContent,
@@ -26,6 +24,7 @@ const VehiclesPage = () => {
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const fetchVehicles = async () => {
     try {
@@ -52,12 +51,18 @@ const VehiclesPage = () => {
 
   const handleSaveVehicle = async (data: VehicleFormData) => {
     setIsSubmitting(true);
+    setFormError(null);
     try {
       await createVehicle(data);
       handleCloseModals();
       fetchVehicles();
     } catch (err) {
       console.error("Failed to save vehicle", err);
+      if (err instanceof AxiosError && err.response) {
+        setFormError(err.response.data.message || "Ocorreu um erro ao salvar.");
+      } else {
+        setFormError("Ocorreu um erro desconhecido.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -141,6 +146,9 @@ const VehiclesPage = () => {
         onClose={handleCloseModals}
         title={"Adicionar Novo Veículo"}
       >
+        {formError && (
+          <p className="text-red-500 text-center text-sm mb-4">{formError}</p>
+        )}
         <VehicleForm
           onSubmit={handleSaveVehicle}
           onCancel={handleCloseModals}
