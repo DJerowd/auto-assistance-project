@@ -7,6 +7,18 @@ export interface RegisterData extends LoginCredentials {
   name: string;
 }
 
+export interface Pagination {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: Pagination;
+}
+
 export interface Kpi {
   totalVehicles: number;
   pendingReminders: number;

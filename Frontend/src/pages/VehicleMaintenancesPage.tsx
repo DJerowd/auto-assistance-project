@@ -7,7 +7,12 @@ import {
   deleteMaintenance,
 } from "../services/maintenanceService";
 import { getVehicleById } from "../services/vehicleService";
-import type { Maintenance, MaintenanceFormData, Vehicle } from "../types";
+import type {
+  Maintenance,
+  MaintenanceFormData,
+  Vehicle,
+  PaginatedResponse,
+} from "../types";
 import {
   Card,
   CardContent,
@@ -34,7 +39,9 @@ const VehicleMaintenancesPage = () => {
   const navigate = useNavigate();
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
-  const [maintenances, setMaintenances] = useState<Maintenance[]>([]);
+  const [maintenanceResponse, setMaintenanceResponse] =
+    useState<PaginatedResponse<Maintenance> | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -49,10 +56,10 @@ const VehicleMaintenancesPage = () => {
       setIsLoading(true);
       const [vehicleData, maintenanceData] = await Promise.all([
         getVehicleById(Number(vehicleId)),
-        getVehicleMaintenances(Number(vehicleId)),
+        getVehicleMaintenances(Number(vehicleId), currentPage, 10),
       ]);
       setVehicle(vehicleData);
-      setMaintenances(maintenanceData.data);
+      setMaintenanceResponse(maintenanceData);
     } catch (error) {
       console.error("Failed to load data", error);
     } finally {
@@ -62,7 +69,7 @@ const VehicleMaintenancesPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [vehicleId]);
+  }, [vehicleId, currentPage]);
 
   const handleOpenAddModal = () => {
     setSelectedMaintenance(null);
@@ -91,11 +98,16 @@ const VehicleMaintenancesPage = () => {
     try {
       if (selectedMaintenance) {
         await updateMaintenance(selectedMaintenance.id, data);
+        fetchData();
       } else {
         await createMaintenance(Number(vehicleId), data);
+        if (currentPage !== 1) {
+          setCurrentPage(1);
+        } else {
+          fetchData();
+        }
       }
       handleCloseModals();
-      fetchData();
     } catch (error) {
       console.error("Failed to save maintenance", error);
     } finally {
@@ -109,7 +121,11 @@ const VehicleMaintenancesPage = () => {
     try {
       await deleteMaintenance(selectedMaintenance.id);
       handleCloseModals();
-      fetchData();
+      if (maintenanceResponse?.data.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      } else {
+        fetchData();
+      }
     } catch (error) {
       console.error("Failed to delete maintenance", error);
     } finally {
@@ -117,12 +133,31 @@ const VehicleMaintenancesPage = () => {
     }
   };
 
-  if (isLoading)
+  const handleNextPage = () => {
+    if (
+      maintenanceResponse &&
+      currentPage < maintenanceResponse.pagination.totalPages
+    ) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  if (isLoading && !maintenanceResponse) {
     return (
       <div className="h-64">
         <Spinner />
       </div>
     );
+  }
+
+  const maintenances = maintenanceResponse?.data || [];
+  const pagination = maintenanceResponse?.pagination;
 
   return (
     <div className="space-y-6">
@@ -144,7 +179,9 @@ const VehicleMaintenancesPage = () => {
         </div>
       </div>
 
-      {maintenances.length === 0 ? (
+      {isLoading && <Spinner />}
+
+      {!isLoading && maintenances.length === 0 ? (
         <Card>
           <CardContent className="pt-6 text-center text-gray-600 dark:text-gray-400">
             Nenhuma manutenção registrada para este veículo.
@@ -221,6 +258,28 @@ const VehicleMaintenancesPage = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      {pagination && pagination.totalPages > 1 && !isLoading && (
+        <div className="flex justify-center items-center gap-4">
+          <Button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            variant="outline"
+          >
+            Anterior
+          </Button>
+          <span className="text-sm text-gray-700 dark:text-gray-300">
+            Página {pagination.currentPage} de {pagination.totalPages}
+          </span>
+          <Button
+            onClick={handleNextPage}
+            disabled={currentPage === pagination.totalPages}
+            variant="outline"
+          >
+            Próxima
+          </Button>
         </div>
       )}
 

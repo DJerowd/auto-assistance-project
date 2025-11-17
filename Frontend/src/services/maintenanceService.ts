@@ -1,11 +1,15 @@
 import apiClient from "../config/api";
-import type { MaintenanceFormData } from "../types";
+import type {
+  Maintenance,
+  MaintenanceFormData,
+  PaginatedResponse,
+} from "../types";
 
 export const getVehicleMaintenances = async (
   vehicleId: number,
   page = 1,
   limit = 20
-) => {
+): Promise<PaginatedResponse<Maintenance>> => {
   const response = await apiClient.get(`/vehicles/${vehicleId}/maintenances`, {
     params: { page, limit },
   });

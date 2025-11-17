@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { AxiosError } from "axios";
 import { getVehicles, createVehicle } from "../services/vehicleService";
@@ -13,12 +13,17 @@ import { Button } from "../components/ui/Button";
 import Spinner from "../components/ui/Spinner";
 import Modal from "../components/ui/modal/Modal";
 import VehicleForm from "../components/vehicles/VehicleForm";
-import type { Vehicle, VehicleFormData } from "../types";
+import { Input } from "../components/ui/Input";
+import type { Vehicle, VehicleFormData, PaginatedResponse } from "../types";
 
 const DEFAULT_VEHICLE_IMG = "http://localhost:8800/public/default-vehicle.png";
 
 const VehiclesPage = () => {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [vehiclesResponse, setVehiclesResponse] =
+    useState<PaginatedResponse<Vehicle> | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,20 +31,32 @@ const VehiclesPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const fetchVehicles = async () => {
+  const fetchVehicles = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
     try {
-      const response = await getVehicles();
-      setVehicles(response.data);
+      const response = await getVehicles(currentPage, 8, debouncedQuery);
+      setVehiclesResponse(response);
     } catch {
       setError("Não foi possível carregar seus veículos.");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, debouncedQuery]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchTerm);
+      setCurrentPage(1);
+    }, 500);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchVehicles();
-  }, []);
+  }, [fetchVehicles]);
 
   const handleOpenAddModal = () => {
     setIsFormModalOpen(true);
@@ -47,6 +64,7 @@ const VehiclesPage = () => {
 
   const handleCloseModals = () => {
     setIsFormModalOpen(false);
+    setFormError(null);
   };
 
   const handleSaveVehicle = async (data: VehicleFormData) => {
@@ -55,7 +73,12 @@ const VehiclesPage = () => {
     try {
       await createVehicle(data);
       handleCloseModals();
-      fetchVehicles();
+      if (currentPage !== 1 || debouncedQuery !== "") {
+        setCurrentPage(1);
+        setSearchTerm("");
+      } else {
+        fetchVehicles();
+      }
     } catch (err) {
       console.error("Failed to save vehicle", err);
       if (err instanceof AxiosError && err.response) {
@@ -68,7 +91,22 @@ const VehiclesPage = () => {
     }
   };
 
-  if (isLoading) {
+  const handleNextPage = () => {
+    if (
+      vehiclesResponse &&
+      currentPage < vehiclesResponse.pagination.totalPages
+    ) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  if (isLoading && !vehiclesResponse) {
     return (
       <div className="flex justify-center items-center h-64">
         <Spinner />
@@ -80,19 +118,38 @@ const VehiclesPage = () => {
     return <p className="text-red-500 text-center">{error}</p>;
   }
 
+  const vehicles = vehiclesResponse?.data || [];
+  const pagination = vehiclesResponse?.pagination;
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <h2 className="text-2xl font-bold dark:text-white">Meus Veículos</h2>
-        <Button onClick={handleOpenAddModal}>
+        <div className="w-full md:w-1/3">
+          <Input
+            placeholder="Buscar por modelo ou apelido..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <Button onClick={handleOpenAddModal} className="flex-shrink-0">
           <PlusIcon className="mr-2 h-4 w-4" /> Adicionar Veículo
         </Button>
       </div>
 
-      {vehicles.length === 0 ? (
+      {isLoading && (
+        <div className="h-64">
+          <Spinner />
+        </div>
+      )}
+
+      {!isLoading && vehicles.length === 0 ? (
         <Card>
           <CardContent className="pt-6 text-center text-gray-600 dark:text-gray-400">
-            Você ainda não cadastrou nenhum veículo.
+            {debouncedQuery
+              ? `Nenhum veículo encontrado para "${debouncedQuery}".`
+              : "Você ainda não cadastrou nenhum veículo."}
           </CardContent>
         </Card>
       ) : (
@@ -138,6 +195,28 @@ const VehiclesPage = () => {
               </Link>
             );
           })}
+        </div>
+      )}
+
+      {pagination && pagination.totalPages > 1 && !isLoading && (
+        <div className="flex justify-center items-center gap-4">
+          <Button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            variant="outline"
+          >
+            Anterior
+          </Button>
+          <span className="text-sm text-gray-700 dark:text-gray-300">
+            Página {pagination.currentPage} de {pagination.totalPages}
+          </span>
+          <Button
+            onClick={handleNextPage}
+            disabled={currentPage === pagination.totalPages}
+            variant="outline"
+          >
+            Próxima
+          </Button>
         </div>
       )}
 

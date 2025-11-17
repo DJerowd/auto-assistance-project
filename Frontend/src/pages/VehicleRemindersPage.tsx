@@ -7,7 +7,12 @@ import {
   deleteReminder,
 } from "../services/reminderService";
 import { getVehicleById } from "../services/vehicleService";
-import type { Reminder, ReminderFormData, Vehicle } from "../types";
+import type {
+  Reminder,
+  ReminderFormData,
+  Vehicle,
+  PaginatedResponse,
+} from "../types";
 import {
   Card,
   CardContent,
@@ -50,7 +55,9 @@ const VehicleRemindersPage = () => {
   const navigate = useNavigate();
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
-  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [reminderResponse, setReminderResponse] =
+    useState<PaginatedResponse<Reminder> | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -66,10 +73,10 @@ const VehicleRemindersPage = () => {
       setIsLoading(true);
       const [vehicleData, reminderData] = await Promise.all([
         getVehicleById(Number(vehicleId)),
-        getVehicleReminders(Number(vehicleId)),
+        getVehicleReminders(Number(vehicleId), currentPage, 10),
       ]);
       setVehicle(vehicleData);
-      setReminders(reminderData.data);
+      setReminderResponse(reminderData);
     } catch (error) {
       console.error("Failed to load data", error);
     } finally {
@@ -79,7 +86,7 @@ const VehicleRemindersPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [vehicleId]);
+  }, [vehicleId, currentPage]);
 
   const handleOpenAddModal = () => {
     setSelectedReminder(null);
@@ -108,11 +115,16 @@ const VehicleRemindersPage = () => {
     try {
       if (selectedReminder) {
         await updateReminder(selectedReminder.id, data);
+        fetchData();
       } else {
         await createReminder(Number(vehicleId), data);
+        if (currentPage !== 1) {
+          setCurrentPage(1);
+        } else {
+          fetchData();
+        }
       }
       handleCloseModals();
-      fetchData();
     } catch (error) {
       console.error("Failed to save reminder", error);
     } finally {
@@ -126,7 +138,11 @@ const VehicleRemindersPage = () => {
     try {
       await deleteReminder(selectedReminder.id);
       handleCloseModals();
-      fetchData();
+      if (reminderResponse?.data.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      } else {
+        fetchData();
+      }
     } catch (error) {
       console.error("Failed to delete reminder", error);
     } finally {
@@ -147,12 +163,31 @@ const VehicleRemindersPage = () => {
     }
   };
 
-  if (isLoading)
+  const handleNextPage = () => {
+    if (
+      reminderResponse &&
+      currentPage < reminderResponse.pagination.totalPages
+    ) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  if (isLoading && !reminderResponse) {
     return (
       <div className="h-64">
         <Spinner />
       </div>
     );
+  }
+
+  const reminders = reminderResponse?.data || [];
+  const pagination = reminderResponse?.pagination;
 
   return (
     <div className="space-y-6">
@@ -175,7 +210,9 @@ const VehicleRemindersPage = () => {
         </div>
       </div>
 
-      {reminders.length === 0 ? (
+      {isLoading && <Spinner />}
+
+      {!isLoading && reminders.length === 0 ? (
         <Card>
           <CardContent className="pt-6 text-center text-gray-600 dark:text-gray-400">
             Nenhum lembrete cadastrado para este veículo.
@@ -318,7 +355,28 @@ const VehicleRemindersPage = () => {
         </div>
       )}
 
-      {/* Modais */}
+      {pagination && pagination.totalPages > 1 && !isLoading && (
+        <div className="flex justify-center items-center gap-4">
+          <Button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            variant="outline"
+          >
+            Anterior
+          </Button>
+          <span className="text-sm text-gray-700 dark:text-gray-300">
+            Página {pagination.currentPage} de {pagination.totalPages}
+          </span>
+          <Button
+            onClick={handleNextPage}
+            disabled={currentPage === pagination.totalPages}
+            variant="outline"
+          >
+            Próxima
+          </Button>
+        </div>
+      )}
+
       <Modal
         isOpen={isFormModalOpen}
         onClose={handleCloseModals}
