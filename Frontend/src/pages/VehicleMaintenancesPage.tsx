@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/Card";
+import { ReturnIcon } from "../components/icons/ReturnIcon";
 import { PlusIcon } from "../components/icons/PlusIcon";
 import { EditIcon } from "../components/icons/EditIcon";
 import { TrashIcon } from "../components/icons/TrashIcon";
@@ -124,9 +125,13 @@ const VehicleMaintenancesPage = () => {
         <h2 className="text-2xl font-bold dark:text-white">
           Manutenções de {vehicle?.nickname || vehicle?.model}
         </h2>
-
+        
         <div className="flex gap-4">
-          <Button onClick={() => navigate("/vehicles")}>← Voltar</Button>
+          <Button
+            onClick={() => navigate(-1)}
+          >
+            <ReturnIcon className="mr-2 h-4 w-4" /> Voltar
+          </Button>
           <Button onClick={handleOpenAddModal}>
             <PlusIcon className="mr-2 h-4 w-4" /> Nova Manutenção
           </Button>
@@ -197,7 +202,7 @@ const VehicleMaintenancesPage = () => {
                     )}
                   </div>
                   {maintenance.notes && (
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 italic">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 italic truncate">
                       "{maintenance.notes}"
                     </p>
                   )}

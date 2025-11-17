@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
+import { ReturnIcon } from "../components/icons/ReturnIcon";
 import { PlusIcon } from "../components/icons/PlusIcon";
 import { EditIcon } from "../components/icons/EditIcon";
 import { TrashIcon } from "../components/icons/TrashIcon";
@@ -160,12 +161,15 @@ const VehicleRemindersPage = () => {
         </h2>
 
         <div className="flex gap-4">
-          <Button onClick={() => navigate("/vehicles")}>← Voltar</Button>
+          <Button
+            onClick={() => navigate(-1)}
+          >
+            <ReturnIcon className="mr-2 h-4 w-4" /> Voltar
+          </Button>
           <Button
             onClick={handleOpenAddModal}
-            className="flex items-center gap-2"
           >
-            <PlusIcon size={16} />
+            <PlusIcon className="mr-2 h-4 w-4" />
             Novo Lembrete
           </Button>
         </div>
@@ -231,7 +235,7 @@ const VehicleRemindersPage = () => {
                     </Button>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent>
                   <div className="flex-grow space-y-2 w-full">
                     <div className="text-sm text-gray-500 dark:text-gray-400 flex flex-wrap items-center gap-x-4 gap-y-1">

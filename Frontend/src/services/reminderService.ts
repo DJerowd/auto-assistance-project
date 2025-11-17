@@ -1,13 +1,14 @@
 import apiClient from "../config/api";
-import type { ReminderFormData } from "../types";
+import type { ReminderFormData, Reminder } from "../types";
 
 export const getVehicleReminders = async (
   vehicleId: number,
   page = 1,
-  limit = 20
+  limit = 20,
+  status?: Reminder['status'] 
 ) => {
   const response = await apiClient.get(`/vehicles/${vehicleId}/reminders`, {
-    params: { page, limit },
+    params: { page, limit, status },
   });
   return response.data;
 };

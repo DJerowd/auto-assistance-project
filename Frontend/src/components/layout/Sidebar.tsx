@@ -6,7 +6,7 @@ import { DashboardIcon } from "../icons/DashboardIcon";
 import { CarIcon } from "../icons/CarIcon";
 import { UserIcon } from "../icons/UserIcon";
 import { LogoutIcon } from "../icons/LogoutIcon";
-import ThemeSwitch from "../ui/ThemeSwitch";
+// import ThemeSwitch from "../ui/ThemeSwitch";
 import { Button } from "../ui/Button";
 
 const navLinks = [
@@ -73,10 +73,10 @@ const Sidebar = () => {
         </nav>
 
         <div className="p-4 border-t dark:border-gray-700 space-y-4">
-          <div className="flex justify-between items-center">
+          {/* <div className="flex justify-between items-center">
             <span className="text-sm dark:text-gray-300">Mudar Tema</span>
             <ThemeSwitch />
-          </div>
+          </div> */}
 
           <Button
             variant="destructive"
