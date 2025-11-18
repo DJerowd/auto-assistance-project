@@ -28,7 +28,11 @@ const vehicleController = {
       connection = await pool.getConnection();
       await connection.beginTransaction();
       const userId = req.user.userId;
-      const newVehicle = await vehicleModel.create(req.body, userId, connection);
+      const newVehicle = await vehicleModel.create(
+        req.body,
+        userId,
+        connection
+      );
       await connection.commit();
       res.status(201).json({
         message: "Vehicle created successfully!",
@@ -45,8 +49,22 @@ const vehicleController = {
   async getMyVehicles(req, res, next) {
     try {
       const userId = req.user.userId;
-      const { page = 1, limit = 10, sortBy = "created_at", order = "DESC", model, } = req.query;
-      const options = { page: parseInt(page, 10), limit: parseInt(limit, 10), sortBy, order, model, };
+      const {
+        page = 1,
+        limit = 10,
+        sortBy = "created_at",
+        order = "DESC",
+        model,
+        favorites,
+      } = req.query;
+      const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+        sortBy,
+        order,
+        model,
+        favoritesOnly: favorites === "true",
+      };
       const vehicles = await vehicleModel.findByUserId(userId, options);
       res.status(200).json(vehicles);
     } catch (error) {
@@ -93,6 +111,24 @@ const vehicleController = {
     }
   },
 
+  async toggleFavorite(req, res, next) {
+    try {
+      const { id } = req.params;
+      const userId = req.user.userId;
+      await checkVehicleOwnership(id, userId);
+
+      await vehicleModel.toggleFavorite(id);
+      const updatedVehicle = await vehicleModel.findById(id);
+
+      res.status(200).json({
+        message: "Favorite status updated.",
+        vehicle: updatedVehicle,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async deleteVehicle(req, res, next) {
     let connection;
     try {
@@ -101,13 +137,16 @@ const vehicleController = {
       connection = await pool.getConnection();
       await connection.beginTransaction();
       await checkVehicleOwnership(id, userId);
-      const { images } = await vehicleImageModel.deleteByVehicleId(id, connection);
+      const { images } = await vehicleImageModel.deleteByVehicleId(
+        id,
+        connection
+      );
       for (const image of images) {
         try {
           const imagePath = path.join(__dirname, "..", "..", image.image_path);
           await fs.unlink(imagePath);
         } catch (fileError) {
-          if (fileError.code !== 'ENOENT') {
+          if (fileError.code !== "ENOENT") {
             throw fileError;
           }
         }
@@ -119,7 +158,11 @@ const vehicleController = {
         throw new Error("Vehicle not found during deletion.");
       }
       await connection.commit();
-      res.status(200).json({ message: "Vehicle and all associated data deleted successfully." });
+      res
+        .status(200)
+        .json({
+          message: "Vehicle and all associated data deleted successfully.",
+        });
     } catch (error) {
       if (connection) await connection.rollback();
       next(error);

@@ -29,7 +29,12 @@ const vehicleModel = {
       current_mileage,
       nickname,
     ]);
-    return { id: result.insertId, ...vehicleData, user_id: userId };
+    return {
+      id: result.insertId,
+      ...vehicleData,
+      user_id: userId,
+      is_favorite: 0,
+    };
   },
 
   async findByUserId(userId, options = {}) {
@@ -39,6 +44,7 @@ const vehicleModel = {
       sortBy = "created_at",
       order = "DESC",
       model = null,
+      favoritesOnly = false,
     } = options;
     const offset = (page - 1) * limit;
     const allowedSortBy = [
@@ -47,18 +53,26 @@ const vehicleModel = {
       "year_model",
       "current_mileage",
       "created_at",
+      "is_favorite",
     ];
     const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : "created_at";
     const safeOrder = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
+
     let countSql = `SELECT COUNT(*) as total FROM vehicles WHERE user_id = ?`;
     const params = [userId];
+
     if (model) {
       countSql += ` AND model LIKE ?`;
       params.push(`%${model}%`);
     }
+    if (favoritesOnly) {
+      countSql += ` AND is_favorite = 1`;
+    }
+
     const [countResult] = await pool.query(countSql, params);
     const totalItems = countResult[0].total;
     const totalPages = Math.ceil(totalItems / limit);
+
     let dataSql = `
       SELECT v.*, b.name as brand_name, c.name as color_name
       FROM vehicles v
@@ -66,10 +80,20 @@ const vehicleModel = {
       LEFT JOIN colors c ON v.color_id = c.id
       WHERE v.user_id = ?
     `;
+
     if (model) {
       dataSql += ` AND v.model LIKE ?`;
     }
-    dataSql += ` ORDER BY v.${safeSortBy} ${safeOrder} LIMIT ? OFFSET ?`;
+    if (favoritesOnly) {
+      dataSql += ` AND v.is_favorite = 1`;
+    }
+
+    if (safeSortBy === "created_at") {
+      dataSql += ` ORDER BY v.is_favorite DESC, v.${safeSortBy} ${safeOrder} LIMIT ? OFFSET ?`;
+    } else {
+      dataSql += ` ORDER BY v.${safeSortBy} ${safeOrder} LIMIT ? OFFSET ?`;
+    }
+
     params.push(limit, offset);
     const [vehicles] = await pool.query(dataSql, params);
     for (const vehicle of vehicles) {
@@ -80,6 +104,7 @@ const vehicleModel = {
         ...img,
         url: `${process.env.APP_URL}/${img.image_path.replace(/\\/g, "/")}`,
       }));
+      vehicle.is_favorite = Boolean(vehicle.is_favorite);
     }
     return {
       data: vehicles,
@@ -110,6 +135,7 @@ const vehicleModel = {
         ...img,
         url: `${process.env.APP_URL}/${img.image_path.replace(/\\/g, "/")}`,
       }));
+      vehicle.is_favorite = Boolean(vehicle.is_favorite);
     }
     return vehicle;
   },
@@ -143,6 +169,12 @@ const vehicleModel = {
       nickname,
       vehicleId,
     ]);
+    return result.affectedRows;
+  },
+
+  async toggleFavorite(vehicleId, connection = pool) {
+    const sql = `UPDATE vehicles SET is_favorite = NOT is_favorite WHERE id = ?`;
+    const [result] = await connection.query(sql, [vehicleId]);
     return result.affectedRows;
   },
 

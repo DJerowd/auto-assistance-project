@@ -1,9 +1,14 @@
 import apiClient from "../config/api";
 import type { Vehicle, VehicleFormData, PaginatedResponse } from "../types";
 
-export const getVehicles = async (page = 1, limit = 10, model = ""): Promise<PaginatedResponse<Vehicle>> => {
+export const getVehicles = async (
+  page = 1,
+  limit = 10,
+  model = "",
+  favorites = false
+): Promise<PaginatedResponse<Vehicle>> => {
   const response = await apiClient.get("/vehicles", {
-    params: { page, limit, model },
+    params: { page, limit, model, favorites },
   });
   return response.data;
 };
@@ -25,5 +30,10 @@ export const updateVehicle = async (id: number, data: VehicleFormData) => {
 
 export const deleteVehicle = async (id: number) => {
   const response = await apiClient.delete(`/vehicles/${id}`);
+  return response.data;
+};
+
+export const toggleVehicleFavorite = async (id: number) => {
+  const response = await apiClient.patch(`/vehicles/${id}/favorite`);
   return response.data;
 };

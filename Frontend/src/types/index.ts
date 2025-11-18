@@ -78,11 +78,12 @@ export interface Vehicle {
   images: VehicleImage[];
   brand_id: number | string;
   color_id: number | string;
+  is_favorite: boolean;
 }
 
 export type VehicleFormData = Omit<
   Vehicle,
-  "id" | "user_id" | "brand_name" | "color_name" | "images"
+  "id" | "user_id" | "brand_name" | "color_name" | "images" | "is_favorite"
 >;
 
 export interface Maintenance {

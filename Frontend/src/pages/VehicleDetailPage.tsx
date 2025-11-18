@@ -4,6 +4,7 @@ import {
   getVehicleById,
   updateVehicle,
   deleteVehicle,
+  toggleVehicleFavorite,
 } from "../services/vehicleService";
 import { getVehicleMaintenances } from "../services/maintenanceService";
 import { getVehicleReminders } from "../services/reminderService";
@@ -23,6 +24,7 @@ import { ImageIcon } from "../components/icons/ImageIcon";
 import { MaintenanceIcon } from "../components/icons/MaintenanceIcon";
 import { BellIcon } from "../components/icons/BellIcon";
 import { SpeedometerIcon } from "../components/icons/SpeedometerIcon";
+import { StarIcon } from "../components/icons/StarIcon";
 import Spinner from "../components/ui/Spinner";
 import Modal from "../components/ui/modal/Modal";
 import ConfirmDialog from "../components/ui/modal/ConfirmDialog";
@@ -118,6 +120,17 @@ const VehicleDetailPage = () => {
     }
   };
 
+  const handleToggleFavorite = async () => {
+    if (!vehicle) return;
+    try {
+      setVehicle({ ...vehicle, is_favorite: !vehicle.is_favorite });
+      await toggleVehicleFavorite(vehicle.id);
+    } catch (err) {
+      console.error("Failed to toggle favorite", err);
+      setVehicle({ ...vehicle, is_favorite: !vehicle.is_favorite });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -179,14 +192,37 @@ const VehicleDetailPage = () => {
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
-                <div>
-                  <CardTitle className="text-2xl">
-                    {vehicle.nickname || vehicle.model}
-                  </CardTitle>
-                  <CardDescription>
-                    {vehicle.version || "Versão não informada"}
-                  </CardDescription>
+                <div className="flex items-center gap-3">
+                  <div>
+                    <CardTitle className="text-2xl flex items-center gap-2">
+                      {vehicle.nickname || vehicle.model}
+                    </CardTitle>
+                    <CardDescription>
+                      {vehicle.version || "Versão não informada"}
+                    </CardDescription>
+                  </div>
+
+                  <button
+                    onClick={handleToggleFavorite}
+                    className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    title={
+                      vehicle.is_favorite
+                        ? "Remover dos favoritos"
+                        : "Adicionar aos favoritos"
+                    }
+                  >
+                    <StarIcon
+                      size={24}
+                      className={cn(
+                        "transition-colors",
+                        vehicle.is_favorite
+                          ? "text-yellow-500 fill-yellow-500"
+                          : "text-gray-400 dark:text-gray-500"
+                      )}
+                    />
+                  </button>
                 </div>
+
                 <div className="flex space-x-2">
                   <Button
                     variant="secondary"

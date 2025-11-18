@@ -19,6 +19,8 @@ router
   .put(vehicleRules(), validate, vehicleController.updateVehicle)
   .delete(vehicleController.deleteVehicle);
 
+router.patch("/:id/favorite", vehicleController.toggleFavorite);
+
 router.use("/:vehicleId", vehicleSubRoutes);
 
 module.exports = router;
