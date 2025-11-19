@@ -1,6 +1,31 @@
 const pool = require("../config/database");
 
 const vehicleModel = {
+  async _getVehicleFeatures(vehicleId, connection = pool) {
+    const sql = `
+      SELECT f.id, f.name 
+      FROM features f
+      JOIN vehicle_features vf ON f.id = vf.feature_id
+      WHERE vf.vehicle_id = ?
+    `;
+    const [rows] = await connection.query(sql, [vehicleId]);
+    return rows;
+  },
+
+  async _saveVehicleFeatures(vehicleId, featureIds, connection) {
+    await connection.query(
+      "DELETE FROM vehicle_features WHERE vehicle_id = ?",
+      [vehicleId]
+    );
+    if (featureIds && featureIds.length > 0) {
+      const values = featureIds.map((fid) => [vehicleId, fid]);
+      await connection.query(
+        "INSERT INTO vehicle_features (vehicle_id, feature_id) VALUES ?",
+        [values]
+      );
+    }
+  },
+
   async create(vehicleData, userId, connection = pool) {
     const {
       brand_id,
@@ -12,6 +37,7 @@ const vehicleModel = {
       year_model,
       current_mileage,
       nickname,
+      features,
     } = vehicleData;
     const sql = `
       INSERT INTO vehicles (user_id, brand_id, color_id, license_plate, model, version, year_of_manufacture, year_model, current_mileage, nickname)
@@ -29,8 +55,12 @@ const vehicleModel = {
       current_mileage,
       nickname,
     ]);
+    const vehicleId = result.insertId;
+    if (features && Array.isArray(features)) {
+      await this._saveVehicleFeatures(vehicleId, features, connection);
+    }
     return {
-      id: result.insertId,
+      id: vehicleId,
       ...vehicleData,
       user_id: userId,
       is_favorite: 0,
@@ -131,6 +161,7 @@ const vehicleModel = {
       }));
       vehicle.is_favorite = Boolean(vehicle.is_favorite);
       vehicle.has_pending_reminders = Boolean(vehicle.has_pending_reminders);
+      vehicle.features = await this._getVehicleFeatures(vehicle.id, pool);
     }
 
     return {
@@ -190,6 +221,7 @@ const vehicleModel = {
       }));
       vehicle.is_favorite = Boolean(vehicle.is_favorite);
       vehicle.has_pending_reminders = Boolean(vehicle.has_pending_reminders);
+      vehicle.features = await this._getVehicleFeatures(vehicleId, pool);
     }
     return vehicle;
   },
@@ -205,6 +237,7 @@ const vehicleModel = {
       year_model,
       current_mileage,
       nickname,
+      features,
     } = vehicleData;
     const sql = `
       UPDATE vehicles
@@ -223,6 +256,9 @@ const vehicleModel = {
       nickname,
       vehicleId,
     ]);
+    if (features && Array.isArray(features)) {
+      await this._saveVehicleFeatures(vehicleId, features, connection);
+    }
     return result.affectedRows;
   },
 

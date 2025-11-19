@@ -7,7 +7,6 @@ import {
   toggleVehicleFavorite,
   getUserVehicleFilters,
 } from "../services/vehicleService";
-import { getVehicleOptions } from "../services/optionsService";
 import {
   Card,
   CardContent,
@@ -46,18 +45,18 @@ const VehiclesPage = () => {
   // Dados
   const [vehiclesResponse, setVehiclesResponse] =
     useState<PaginatedResponse<Vehicle> | null>(null);
-  const [brands, setBrands] = useState<Brand[]>([]);
 
+  // Paginação
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Filtros Dinâmicos
   const [filterOptions, setFilterOptions] = useState<{
     brands: Brand[];
     minYear: number | null;
     maxYear: number | null;
   }>({ brands: [], minYear: null, maxYear: null });
 
-  // Paginação
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // Filtros
+  // Filtros Selecionados
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [showFavorites, setShowFavorites] = useState(false);
@@ -76,6 +75,7 @@ const VehiclesPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
+  // Carregar os filtros disponíveis
   const fetchFilterOptions = useCallback(async () => {
     try {
       const data = await getUserVehicleFilters();
@@ -86,16 +86,7 @@ const VehiclesPage = () => {
   }, []);
 
   useEffect(() => {
-    const fetchBrandOptions = async () => {
-      try {
-        const data = await getVehicleOptions();
-        setBrands(data.brands);
-      } catch (err) {
-        console.error("Failed to load global brands", err);
-      }
-    };
-    fetchBrandOptions();
-    fetchFilterOptions();
+     fetchFilterOptions();
   }, [fetchFilterOptions]);
 
   const fetchVehicles = useCallback(async () => {

@@ -25,6 +25,7 @@ import { MaintenanceIcon } from "../components/icons/MaintenanceIcon";
 import { BellIcon } from "../components/icons/BellIcon";
 import { SpeedometerIcon } from "../components/icons/SpeedometerIcon";
 import { StarIcon } from "../components/icons/StarIcon";
+import { Badge } from "../components/ui/Badge";
 import Spinner from "../components/ui/Spinner";
 import Modal from "../components/ui/modal/Modal";
 import ConfirmDialog from "../components/ui/modal/ConfirmDialog";
@@ -291,6 +292,20 @@ const VehicleDetailPage = () => {
                   </span>
                 </li>
               </ul>
+              {vehicle.features && vehicle.features.length > 0 && (
+                <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+                    Itens Opcionais
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {vehicle.features.map((feature) => (
+                      <Badge key={feature.id} variant="default" className="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-200 hover:dark:bg-indigo-800">
+                        {feature.name}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

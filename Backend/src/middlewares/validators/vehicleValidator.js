@@ -20,4 +20,8 @@ exports.vehicleRules = () => [
     .optional({ checkFalsy: true })
     .isInt({ min: 1900, max: new Date().getFullYear() + 2 })
     .withMessage("Invalid model year."),
+  body("features")
+    .optional()
+    .isArray()
+    .withMessage("Features must be an array of IDs."),
 ];

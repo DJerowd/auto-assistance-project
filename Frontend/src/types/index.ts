@@ -57,9 +57,15 @@ export interface Color {
   hex: string;
 }
 
+export interface Feature {
+  id: number;
+  name: string;
+}
+
 export interface VehicleOptions {
   brands: Brand[];
   colors: Color[];
+  features: Feature[];
 }
 
 export interface VehicleImage {
@@ -82,6 +88,7 @@ export interface Vehicle {
   current_mileage: number;
   nickname?: string;
   images: VehicleImage[];
+  features: Feature[];
   brand_id: number | string;
   color_id: number | string;
   is_favorite: boolean;
@@ -97,7 +104,8 @@ export type VehicleFormData = Omit<
   | "images"
   | "is_favorite"
   | "has_pending_reminders"
->;
+  | "features"
+> & { features: number[] };
 
 export interface Maintenance {
   id: number;

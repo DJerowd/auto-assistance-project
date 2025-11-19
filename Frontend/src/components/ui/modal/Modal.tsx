@@ -22,10 +22,11 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
           className={cn(
             "fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%]",
             "rounded-lg border bg-white shadow-lg dark:bg-gray-800 dark:border-gray-700",
-            "data-[state=open]:animate-content-show focus:outline-none"
+            "data-[state=open]:animate-content-show focus:outline-none",
+            "max-h-[90vh] flex flex-col"
           )}
         >
-          <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
+          <div className="flex justify-between items-center p-4 border-b dark:border-gray-700 flex-shrink-0">
             <Dialog.Title className="text-lg font-bold dark:text-white">
               {title}
             </Dialog.Title>
@@ -42,7 +43,8 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
               </button>
             </Dialog.Close>
           </div>
-          <div className="p-6">{children}</div>
+
+          <div className="p-6 overflow-y-auto">{children}</div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

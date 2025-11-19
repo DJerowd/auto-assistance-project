@@ -12,6 +12,12 @@ const dataLoaderModel = {
     const [rows] = await pool.query(sql);
     return rows;
   },
+
+  async getFeatures() {
+    const sql = "SELECT id, name FROM features ORDER BY name ASC";
+    const [rows] = await pool.query(sql);
+    return rows;
+  },
 };
 
 module.exports = dataLoaderModel;
