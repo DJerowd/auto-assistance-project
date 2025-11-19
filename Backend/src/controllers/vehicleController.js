@@ -56,7 +56,12 @@ const vehicleController = {
         order = "DESC",
         model,
         favorites,
+        brandId,
+        minYear,
+        maxYear,
+        pendingReminders,
       } = req.query;
+
       const options = {
         page: parseInt(page, 10),
         limit: parseInt(limit, 10),
@@ -64,9 +69,24 @@ const vehicleController = {
         order,
         model,
         favoritesOnly: favorites === "true",
+        brandId: brandId ? parseInt(brandId, 10) : null,
+        minYear: minYear ? parseInt(minYear, 10) : null,
+        maxYear: maxYear ? parseInt(maxYear, 10) : null,
+        pendingReminders: pendingReminders === "true",
       };
+
       const vehicles = await vehicleModel.findByUserId(userId, options);
       res.status(200).json(vehicles);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getFilters(req, res, next) {
+    try {
+      const userId = req.user.userId;
+      const filters = await vehicleModel.getUserFilterOptions(userId);
+      res.status(200).json(filters);
     } catch (error) {
       next(error);
     }
@@ -158,11 +178,9 @@ const vehicleController = {
         throw new Error("Vehicle not found during deletion.");
       }
       await connection.commit();
-      res
-        .status(200)
-        .json({
-          message: "Vehicle and all associated data deleted successfully.",
-        });
+      res.status(200).json({
+        message: "Vehicle and all associated data deleted successfully.",
+      });
     } catch (error) {
       if (connection) await connection.rollback();
       next(error);

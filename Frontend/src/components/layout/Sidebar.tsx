@@ -29,19 +29,22 @@ const Sidebar = () => {
   return (
     <>
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity ${
-          isMenuOpen ? "opacity-20" : "opacity-0 pointer-events-none"
+        className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
+          isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={closeMenu}
       ></div>
 
       <aside
-        className={`fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-800 shadow-lg z-50 transform transition-transform ${
+        className={`fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-800 shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
-          <h2 className="font-bold text-lg dark:text-white truncate" title={`Olá, ${user?.name}`}>
+          <h2
+            className="font-bold text-lg dark:text-white truncate"
+            title={`Olá, ${user?.name}`}
+          >
             Olá, {user?.name}
           </h2>
           <button onClick={closeMenu} className="dark:text-gray-300 md:hidden">

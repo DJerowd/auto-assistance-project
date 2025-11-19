@@ -1,15 +1,59 @@
 import apiClient from "../config/api";
-import type { Vehicle, VehicleFormData, PaginatedResponse } from "../types";
+import type {
+  Vehicle,
+  VehicleFormData,
+  PaginatedResponse,
+  FilterOptions,
+} from "../types";
+
+interface GetVehiclesOptions {
+  page?: number;
+  limit?: number;
+  model?: string;
+  favorites?: boolean;
+  sortBy?: string;
+  order?: string;
+  brandId?: string;
+  minYear?: number;
+  maxYear?: number;
+  pendingReminders?: boolean;
+}
 
 export const getVehicles = async (
-  page = 1,
-  limit = 10,
-  model = "",
-  favorites = false
+  options: GetVehiclesOptions = {}
 ): Promise<PaginatedResponse<Vehicle>> => {
+  const { 
+    page = 1, 
+    limit = 10, 
+    model = "", 
+    favorites = false, 
+    sortBy = "created_at", 
+    order = "DESC",
+    brandId,
+    minYear,
+    maxYear,
+    pendingReminders 
+  } = options;
+
   const response = await apiClient.get("/vehicles", {
-    params: { page, limit, model, favorites },
+    params: { 
+      page, 
+      limit, 
+      model, 
+      favorites, 
+      sortBy, 
+      order,
+      brandId,
+      minYear,
+      maxYear,
+      pendingReminders
+    },
   });
+  return response.data;
+};
+
+export const getUserVehicleFilters = async (): Promise<FilterOptions> => {
+  const response = await apiClient.get("/vehicles/filters");
   return response.data;
 };
 

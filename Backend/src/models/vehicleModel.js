@@ -34,6 +34,7 @@ const vehicleModel = {
       ...vehicleData,
       user_id: userId,
       is_favorite: 0,
+      has_pending_reminders: false,
     };
   },
 
@@ -45,7 +46,12 @@ const vehicleModel = {
       order = "DESC",
       model = null,
       favoritesOnly = false,
+      brandId = null,
+      minYear = null,
+      maxYear = null,
+      pendingReminders = false,
     } = options;
+
     const offset = (page - 1) * limit;
     const allowedSortBy = [
       "id",
@@ -58,15 +64,30 @@ const vehicleModel = {
     const safeSortBy = allowedSortBy.includes(sortBy) ? sortBy : "created_at";
     const safeOrder = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
 
-    let countSql = `SELECT COUNT(*) as total FROM vehicles WHERE user_id = ?`;
+    let countSql = `SELECT COUNT(*) as total FROM vehicles v WHERE v.user_id = ?`;
     const params = [userId];
 
     if (model) {
-      countSql += ` AND model LIKE ?`;
+      countSql += ` AND v.model LIKE ?`;
       params.push(`%${model}%`);
     }
     if (favoritesOnly) {
-      countSql += ` AND is_favorite = 1`;
+      countSql += ` AND v.is_favorite = 1`;
+    }
+    if (brandId) {
+      countSql += ` AND v.brand_id = ?`;
+      params.push(brandId);
+    }
+    if (minYear) {
+      countSql += ` AND v.year_model >= ?`;
+      params.push(minYear);
+    }
+    if (maxYear) {
+      countSql += ` AND v.year_model <= ?`;
+      params.push(maxYear);
+    }
+    if (pendingReminders) {
+      countSql += ` AND EXISTS (SELECT 1 FROM reminders r WHERE r.vehicle_id = v.id AND r.status = 'PENDING')`;
     }
 
     const [countResult] = await pool.query(countSql, params);
@@ -74,18 +95,21 @@ const vehicleModel = {
     const totalPages = Math.ceil(totalItems / limit);
 
     let dataSql = `
-      SELECT v.*, b.name as brand_name, c.name as color_name
+      SELECT v.*, b.name as brand_name, c.name as color_name,
+      (SELECT COUNT(*) FROM reminders r WHERE r.vehicle_id = v.id AND r.status = 'PENDING') > 0 as has_pending_reminders
       FROM vehicles v
       LEFT JOIN brands b ON v.brand_id = b.id
       LEFT JOIN colors c ON v.color_id = c.id
       WHERE v.user_id = ?
     `;
 
-    if (model) {
-      dataSql += ` AND v.model LIKE ?`;
-    }
-    if (favoritesOnly) {
-      dataSql += ` AND v.is_favorite = 1`;
+    if (model) dataSql += ` AND v.model LIKE ?`;
+    if (favoritesOnly) dataSql += ` AND v.is_favorite = 1`;
+    if (brandId) dataSql += ` AND v.brand_id = ?`;
+    if (minYear) dataSql += ` AND v.year_model >= ?`;
+    if (maxYear) dataSql += ` AND v.year_model <= ?`;
+    if (pendingReminders) {
+      dataSql += ` AND EXISTS (SELECT 1 FROM reminders r WHERE r.vehicle_id = v.id AND r.status = 'PENDING')`;
     }
 
     if (safeSortBy === "created_at") {
@@ -96,6 +120,7 @@ const vehicleModel = {
 
     params.push(limit, offset);
     const [vehicles] = await pool.query(dataSql, params);
+
     for (const vehicle of vehicles) {
       const imagesSql =
         "SELECT id, image_path, is_primary FROM vehicle_images WHERE vehicle_id = ?";
@@ -105,7 +130,9 @@ const vehicleModel = {
         url: `${process.env.APP_URL}/${img.image_path.replace(/\\/g, "/")}`,
       }));
       vehicle.is_favorite = Boolean(vehicle.is_favorite);
+      vehicle.has_pending_reminders = Boolean(vehicle.has_pending_reminders);
     }
+
     return {
       data: vehicles,
       pagination: {
@@ -117,9 +144,35 @@ const vehicleModel = {
     };
   },
 
+  async getUserFilterOptions(userId) {
+    const brandsSql = `
+      SELECT DISTINCT b.id, b.name
+      FROM vehicles v
+      JOIN brands b ON v.brand_id = b.id
+      WHERE v.user_id = ?
+      ORDER BY b.name ASC
+    `;
+
+    const yearsSql = `
+      SELECT MIN(year_model) as minYear, MAX(year_model) as maxYear
+      FROM vehicles
+      WHERE user_id = ?
+    `;
+
+    const [brands] = await pool.query(brandsSql, [userId]);
+    const [years] = await pool.query(yearsSql, [userId]);
+
+    return {
+      brands,
+      minYear: years[0].minYear,
+      maxYear: years[0].maxYear,
+    };
+  },
+
   async findById(vehicleId) {
     const vehicleSql = `
-      SELECT v.*, b.name as brand_name, c.name as color_name
+      SELECT v.*, b.name as brand_name, c.name as color_name,
+      (SELECT COUNT(*) FROM reminders r WHERE r.vehicle_id = v.id AND r.status = 'PENDING') > 0 as has_pending_reminders
       FROM vehicles v
       LEFT JOIN brands b ON v.brand_id = b.id
       LEFT JOIN colors c ON v.color_id = c.id
@@ -136,6 +189,7 @@ const vehicleModel = {
         url: `${process.env.APP_URL}/${img.image_path.replace(/\\/g, "/")}`,
       }));
       vehicle.is_favorite = Boolean(vehicle.is_favorite);
+      vehicle.has_pending_reminders = Boolean(vehicle.has_pending_reminders);
     }
     return vehicle;
   },

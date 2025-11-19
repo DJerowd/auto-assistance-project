@@ -8,6 +8,8 @@ const { vehicleRules } = require("../middlewares/validators/vehicleValidator");
 
 router.use(authMiddleware);
 
+router.get("/filters", vehicleController.getFilters);
+
 router
   .route("/")
   .post(vehicleRules(), validate, vehicleController.createVehicle)

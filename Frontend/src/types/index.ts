@@ -19,6 +19,12 @@ export interface PaginatedResponse<T> {
   pagination: Pagination;
 }
 
+export interface FilterOptions {
+  brands: Brand[];
+  minYear: number | null;
+  maxYear: number | null;
+}
+
 export interface Kpi {
   totalVehicles: number;
   pendingReminders: number;
@@ -79,11 +85,18 @@ export interface Vehicle {
   brand_id: number | string;
   color_id: number | string;
   is_favorite: boolean;
+  has_pending_reminders: boolean;
 }
 
 export type VehicleFormData = Omit<
   Vehicle,
-  "id" | "user_id" | "brand_name" | "color_name" | "images" | "is_favorite"
+  | "id"
+  | "user_id"
+  | "brand_name"
+  | "color_name"
+  | "images"
+  | "is_favorite"
+  | "has_pending_reminders"
 >;
 
 export interface Maintenance {
