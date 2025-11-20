@@ -18,6 +18,12 @@ const dataLoaderModel = {
     const [rows] = await pool.query(sql);
     return rows;
   },
+
+  async getServiceTypes() {
+    const sql = "SELECT id, name FROM service_types ORDER BY name ASC";
+    const [rows] = await pool.query(sql);
+    return rows;
+  },
 };
 
 module.exports = dataLoaderModel;

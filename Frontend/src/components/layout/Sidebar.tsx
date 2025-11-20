@@ -5,6 +5,7 @@ import { CloseIcon } from "../icons/CloseIcon";
 import { DashboardIcon } from "../icons/DashboardIcon";
 import { CarIcon } from "../icons/CarIcon";
 import { UserIcon } from "../icons/UserIcon";
+import { SettingsIcon } from "../icons/SettingsIcon";
 import { LogoutIcon } from "../icons/LogoutIcon";
 // import ThemeSwitch from "../ui/ThemeSwitch";
 import { Button } from "../ui/Button";
@@ -72,6 +73,25 @@ const Sidebar = () => {
                 </NavLink>
               </li>
             ))}
+
+            {user?.role === 'ADMIN' && (
+              <li>
+                <NavLink
+                  to="/admin"
+                  onClick={closeMenu}
+                  className={({ isActive }) =>
+                    `flex text-gray-800 dark:text-gray-200 items-center gap-3 py-2 px-3 rounded-md transition-colors ${
+                      isActive
+                        ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-white"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-100 dark:text-gray-300"
+                    }`
+                  }
+                >
+                  <SettingsIcon size={20} />
+                  <span>Administração</span> 
+                </NavLink>
+              </li>
+            )}
           </ul>
         </nav>
 

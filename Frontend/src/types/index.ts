@@ -62,10 +62,24 @@ export interface Feature {
   name: string;
 }
 
+export interface ServiceType {
+  id: number;
+  name: string;
+}
+
+export interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  role: 'ADMIN' | 'USER';
+  created_at: string;
+}
+
 export interface VehicleOptions {
   brands: Brand[];
   colors: Color[];
   features: Feature[];
+  serviceTypes?: ServiceType[];
 }
 
 export interface VehicleImage {
