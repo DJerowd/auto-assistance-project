@@ -26,4 +26,7 @@ router.get("/users", adminController.getUsers);
 router.patch("/users/:id/role", adminController.updateUserRole);
 router.delete("/users/:id", adminController.deleteUser);
 
+router.get("/vehicles", adminController.getAllVehicles);
+router.delete("/vehicles/:id", adminController.deleteVehicle);
+
 module.exports = router;

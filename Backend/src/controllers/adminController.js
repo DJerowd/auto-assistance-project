@@ -1,4 +1,5 @@
 const adminModel = require("../models/adminModel");
+const vehicleModel = require("../models/vehicleModel");
 
 const adminController = {
   async createBrand(req, res, next) {
@@ -131,7 +132,8 @@ const adminController = {
 
   async getUsers(req, res, next) {
     try {
-      const users = await adminModel.getAllUsers();
+      const { search } = req.query;
+      const users = await adminModel.getAllUsers(search);
       res.status(200).json(users);
     } catch (error) {
       next(error);
@@ -160,6 +162,52 @@ const adminController = {
       }
       await adminModel.deleteUser(id);
       res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getAllVehicles(req, res, next) {
+    try {
+      const { page, limit, ownerEmail, model } = req.query;
+      const result = await vehicleModel.findAll({
+        page: page ? parseInt(page) : 1,
+        limit: limit ? parseInt(limit) : 20,
+        ownerEmail,
+        model,
+      });
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async deleteVehicle(req, res, next) {
+    try {
+      const { id } = req.params;
+      await vehicleModel.delete(id);
+      const vehicleImageModel = require("../models/vehicleImageModel");
+      const reminderModel = require("../models/reminderModel");
+      const maintenanceModel = require("../models/maintenanceModel");
+      const fs = require("fs").promises;
+      const path = require("path");
+      const connection = await pool.getConnection();
+      await connection.beginTransaction();
+      const { images } = await vehicleImageModel.deleteByVehicleId(
+        id,
+        connection
+      );
+      for (const image of images) {
+        try {
+          const imagePath = path.join(__dirname, "..", "..", image.image_path);
+          await fs.unlink(imagePath);
+        } catch (e) {}
+      }
+      await reminderModel.deleteByVehicleId(id, connection);
+      await maintenanceModel.deleteByVehicleId(id, connection);
+      await vehicleModel.delete(id, connection);
+      await connection.commit();
+      res.status(200).json({ message: "Vehicle deleted by admin." });
     } catch (error) {
       next(error);
     }

@@ -175,6 +175,50 @@ const vehicleModel = {
     };
   },
 
+  async findAll(options = {}) {
+    const {
+      page = 1,
+      limit = 20,
+      ownerEmail = null,
+      model = null,
+    } = options;
+    const offset = (page - 1) * limit;
+    let whereClause = "WHERE 1=1";
+    const params = [];
+    if (model) {
+      whereClause += ` AND v.model LIKE ?`;
+      params.push(`%${model}%`);
+    }
+    if (ownerEmail) {
+      whereClause += ` AND u.email LIKE ?`;
+      params.push(`%${ownerEmail}%`);
+    }
+    const countSql = `
+      SELECT COUNT(*) as total 
+      FROM vehicles v 
+      JOIN users u ON v.user_id = u.id 
+      ${whereClause}
+    `;
+    const [countResult] = await pool.query(countSql, params);
+    const totalItems = countResult[0].total;
+    const totalPages = Math.ceil(totalItems / limit);
+    const dataSql = `
+      SELECT v.*, u.email as owner_email, u.name as owner_name, b.name as brand_name
+      FROM vehicles v
+      JOIN users u ON v.user_id = u.id
+      LEFT JOIN brands b ON v.brand_id = b.id
+      ${whereClause}
+      ORDER BY v.created_at DESC
+      LIMIT ? OFFSET ?
+    `;
+    params.push(limit, offset);
+    const [vehicles] = await pool.query(dataSql, params);
+    return {
+      data: vehicles,
+      pagination: { totalItems, totalPages, currentPage: page, limit },
+    };
+  },
+
   async getUserFilterOptions(userId) {
     const brandsSql = `
       SELECT DISTINCT b.id, b.name

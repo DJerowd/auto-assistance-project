@@ -2,26 +2,26 @@ const pool = require("../config/database");
 
 const adminModel = {
   async createItem(table, name, extraData = {}) {
-    const allowedTables = ['brands', 'colors', 'features', 'service_types'];
+    const allowedTables = ["brands", "colors", "features", "service_types"];
     if (!allowedTables.includes(table)) throw new Error("Invalid table name");
     let sql = `INSERT INTO ${table} (name) VALUES (?)`;
     let params = [name];
-    if (table === 'colors' && extraData.hex) {
-        sql = `INSERT INTO colors (name, hex) VALUES (?, ?)`;
-        params = [name, extraData.hex];
+    if (table === "colors" && extraData.hex) {
+      sql = `INSERT INTO colors (name, hex) VALUES (?, ?)`;
+      params = [name, extraData.hex];
     }
     const [result] = await pool.query(sql, params);
     return { id: result.insertId, name, ...extraData };
   },
 
   async updateItem(table, id, name, extraData = {}) {
-    const allowedTables = ['brands', 'colors', 'features', 'service_types'];
+    const allowedTables = ["brands", "colors", "features", "service_types"];
     if (!allowedTables.includes(table)) throw new Error("Invalid table name");
     let sql = `UPDATE ${table} SET name = ?`;
     let params = [name];
-    if (table === 'colors' && extraData.hex) {
-        sql += `, hex = ?`;
-        params.push(extraData.hex);
+    if (table === "colors" && extraData.hex) {
+      sql += `, hex = ?`;
+      params.push(extraData.hex);
     }
     sql += ` WHERE id = ?`;
     params.push(id);
@@ -30,16 +30,22 @@ const adminModel = {
   },
 
   async deleteItem(table, id) {
-    const allowedTables = ['brands', 'colors', 'features', 'service_types'];
+    const allowedTables = ["brands", "colors", "features", "service_types"];
     if (!allowedTables.includes(table)) throw new Error("Invalid table name");
     const sql = `DELETE FROM ${table} WHERE id = ?`;
     const [result] = await pool.query(sql, [id]);
     return result.affectedRows;
   },
 
-  async getAllUsers() {
-    const sql = "SELECT id, name, email, role, created_at FROM users ORDER BY name ASC";
-    const [rows] = await pool.query(sql);
+  async getAllUsers(search = "") {
+    let sql = "SELECT id, name, email, role, created_at FROM users";
+    const params = [];
+    if (search) {
+      sql += " WHERE name LIKE ? OR email LIKE ?";
+      params.push(`%${search}%`, `%${search}%`);
+    }
+    sql += " ORDER BY name ASC";
+    const [rows] = await pool.query(sql, params);
     return rows;
   },
 
@@ -53,7 +59,7 @@ const adminModel = {
     const sql = "DELETE FROM users WHERE id = ?";
     const [result] = await pool.query(sql, [userId]);
     return result.affectedRows;
-  }
+  },
 };
 
 module.exports = adminModel;

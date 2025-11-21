@@ -1,4 +1,5 @@
 import apiClient from "../config/api";
+import type { PaginatedResponse, AdminVehicle } from "../types";
 
 export const createBrand = async (name: string) => {
   const response = await apiClient.post("/admin/brands", { name });
@@ -52,16 +53,34 @@ export const deleteServiceType = async (id: number) => {
   await apiClient.delete(`/admin/service-types/${id}`);
 };
 
-export const getAllUsers = async () => {
-    const response = await apiClient.get("/admin/users");
-    return response.data;
+export const getAllUsers = async (search = "") => {
+  const response = await apiClient.get("/admin/users", {
+    params: { search },
+  });
+  return response.data;
 };
 
-export const updateUserRole = async (id: number, role: 'ADMIN' | 'USER') => {
-    const response = await apiClient.patch(`/admin/users/${id}/role`, { role });
-    return response.data;
+export const updateUserRole = async (id: number, role: "ADMIN" | "USER") => {
+  const response = await apiClient.patch(`/admin/users/${id}/role`, { role });
+  return response.data;
 };
 
 export const deleteUser = async (id: number) => {
-    await apiClient.delete(`/admin/users/${id}`);
+  await apiClient.delete(`/admin/users/${id}`);
+};
+
+export const getAllVehicles = async (
+  page = 1,
+  limit = 20,
+  ownerEmail = "",
+  model = ""
+): Promise<PaginatedResponse<AdminVehicle>> => {
+  const response = await apiClient.get("/admin/vehicles", {
+    params: { page, limit, ownerEmail, model },
+  });
+  return response.data;
+};
+
+export const deleteVehicleAdmin = async (id: number) => {
+  await apiClient.delete(`/admin/vehicles/${id}`);
 };

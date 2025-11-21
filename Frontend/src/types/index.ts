@@ -109,6 +109,11 @@ export interface Vehicle {
   has_pending_reminders: boolean;
 }
 
+export interface AdminVehicle extends Vehicle {
+    owner_email: string;
+    owner_name: string;
+}
+
 export type VehicleFormData = Omit<
   Vehicle,
   | "id"
