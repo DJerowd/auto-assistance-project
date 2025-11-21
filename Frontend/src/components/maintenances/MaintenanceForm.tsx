@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Input } from "../ui/Input";
 import { InputNumber } from "../ui/InputNumber";
 import { Button } from "../ui/Button";
-import type { Maintenance, MaintenanceFormData } from "../../types";
+import { getVehicleOptions } from "../../services/optionsService";
+import type {
+  Maintenance,
+  MaintenanceFormData,
+  ServiceType,
+} from "../../types";
 
 interface MaintenanceFormProps {
   onSubmit: (data: MaintenanceFormData) => void;
@@ -19,18 +24,31 @@ const MaintenanceForm = ({
 }: MaintenanceFormProps) => {
   const [formData, setFormData] = useState<MaintenanceFormData>({
     service_type: "",
-    maintenance_date: new Date().toISOString().split("T")[0], // Data de hoje
+    maintenance_date: new Date().toISOString().split("T")[0],
     mileage: 0,
     cost: 0,
     service_provider: "",
     notes: "",
   });
 
+  const [serviceTypes, setServiceTypes] = useState<ServiceType[]>([]);
+
+  useEffect(() => {
+    const fetchTypes = async () => {
+      try {
+        const data = await getVehicleOptions();
+        setServiceTypes(data.serviceTypes || []);
+      } catch (error) {
+        console.error("Failed to load service types", error);
+      }
+    };
+    fetchTypes();
+  }, []);
+
   useEffect(() => {
     if (initialData) {
       setFormData({
         service_type: initialData.service_type,
-        // Formata a data para YYYY-MM-DD para o input date
         maintenance_date: new Date(initialData.maintenance_date)
           .toISOString()
           .split("T")[0],
@@ -71,7 +89,14 @@ const MaintenanceForm = ({
             onChange={handleChange}
             required
             placeholder="Ex: Troca de Óleo"
+            list="service-types-list"
+            autoComplete="off"
           />
+          <datalist id="service-types-list">
+            {serviceTypes.map((type) => (
+              <option key={type.id} value={type.name} />
+            ))}
+          </datalist>
         </div>
         <div>
           <label className="block text-sm font-medium mb-1 dark:text-gray-300">

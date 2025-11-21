@@ -97,7 +97,11 @@ const VehicleForm = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let finalValue = value;
+    if (name === "license_plate") {
+      finalValue = value.toUpperCase();
+    }
+    setFormData((prev) => ({ ...prev, [name]: finalValue }));
   };
 
   const handleSelectChange =

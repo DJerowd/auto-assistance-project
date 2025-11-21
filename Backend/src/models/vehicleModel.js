@@ -39,6 +39,7 @@ const vehicleModel = {
       nickname,
       features,
     } = vehicleData;
+    const formattedPlate = license_plate ? license_plate.toUpperCase() : license_plate;
     const sql = `
       INSERT INTO vehicles (user_id, brand_id, color_id, license_plate, model, version, year_of_manufacture, year_model, current_mileage, nickname)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -47,7 +48,7 @@ const vehicleModel = {
       userId,
       brand_id,
       color_id,
-      license_plate,
+      formattedPlate,
       model,
       version,
       year_of_manufacture,
@@ -62,6 +63,7 @@ const vehicleModel = {
     return {
       id: vehicleId,
       ...vehicleData,
+      license_plate: formattedPlate,
       user_id: userId,
       is_favorite: 0,
       has_pending_reminders: false,
@@ -283,6 +285,7 @@ const vehicleModel = {
       nickname,
       features,
     } = vehicleData;
+    const formattedPlate = license_plate ? license_plate.toUpperCase() : license_plate;
     const sql = `
       UPDATE vehicles
       SET brand_id = ?, color_id = ?, license_plate = ?, model = ?, version = ?, year_of_manufacture = ?, year_model = ?, current_mileage = ?, nickname = ?
@@ -291,7 +294,7 @@ const vehicleModel = {
     const [result] = await connection.query(sql, [
       brand_id,
       color_id,
-      license_plate,
+      formattedPlate,
       model,
       version,
       year_of_manufacture,
