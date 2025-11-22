@@ -31,6 +31,7 @@ import Modal from "../components/ui/modal/Modal";
 import ConfirmDialog from "../components/ui/modal/ConfirmDialog";
 import VehicleForm from "../components/vehicles/VehicleForm";
 import ManageImagesModal from "../components/vehicles/ManageImagesModal";
+import { useToastStore } from "../store/toastStore";
 import { cn } from "../lib/utils";
 
 const DEFAULT_VEHICLE_IMG = "http://localhost:8800/public/default-vehicle.png";
@@ -38,6 +39,7 @@ const DEFAULT_VEHICLE_IMG = "http://localhost:8800/public/default-vehicle.png";
 const VehicleDetailPage = () => {
   const { vehicleId } = useParams<{ vehicleId: string }>();
   const navigate = useNavigate();
+  const addToast = useToastStore((state) => state.addToast);
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,10 +100,15 @@ const VehicleDetailPage = () => {
     setIsSubmitting(true);
     try {
       await updateVehicle(vehicle.id, data);
+      addToast({
+        type: "success",
+        message: "Informações atualizadas com sucesso!",
+      });
       handleCloseModals();
       handleDataUpdate();
     } catch (err) {
       console.error("Failed to save vehicle", err);
+      addToast({ type: "error", message: "Erro ao salvar alterações." });
     } finally {
       setIsSubmitting(false);
     }
@@ -112,10 +119,12 @@ const VehicleDetailPage = () => {
     setIsSubmitting(true);
     try {
       await deleteVehicle(vehicle.id);
+      addToast({ type: "success", message: "Veículo excluído com sucesso." });
       handleCloseModals();
       navigate("/vehicles");
     } catch (err) {
       console.error("Failed to delete vehicle", err);
+      addToast({ type: "error", message: "Erro ao excluir veículo." });
     } finally {
       setIsSubmitting(false);
     }
@@ -128,6 +137,7 @@ const VehicleDetailPage = () => {
       await toggleVehicleFavorite(vehicle.id);
     } catch (err) {
       console.error("Failed to toggle favorite", err);
+      addToast({ type: "error", message: "Erro ao alterar favorito." });
       setVehicle({ ...vehicle, is_favorite: !vehicle.is_favorite });
     }
   };
@@ -299,7 +309,11 @@ const VehicleDetailPage = () => {
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {vehicle.features.map((feature) => (
-                      <Badge key={feature.id} variant="default" className="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-200 hover:dark:bg-indigo-800">
+                      <Badge
+                        key={feature.id}
+                        variant="default"
+                        className="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-200 hover:dark:bg-indigo-800"
+                      >
                         {feature.name}
                       </Badge>
                     ))}

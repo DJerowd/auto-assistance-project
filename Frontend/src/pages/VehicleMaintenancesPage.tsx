@@ -32,11 +32,13 @@ import Spinner from "../components/ui/Spinner";
 import Modal from "../components/ui/modal/Modal";
 import ConfirmDialog from "../components/ui/modal/ConfirmDialog";
 import MaintenanceForm from "../components/maintenances/MaintenanceForm";
+import { useToastStore } from "../store/toastStore";
 import { MoneyIcon } from "../components/icons/MoneyIcon";
 
 const VehicleMaintenancesPage = () => {
   const { vehicleId } = useParams<{ vehicleId: string }>();
   const navigate = useNavigate();
+  const addToast = useToastStore((state) => state.addToast);
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [maintenanceResponse, setMaintenanceResponse] =
@@ -62,6 +64,7 @@ const VehicleMaintenancesPage = () => {
       setMaintenanceResponse(maintenanceData);
     } catch (error) {
       console.error("Failed to load data", error);
+      addToast({ type: "error", message: "Falha ao carregar manutenções." });
     } finally {
       setIsLoading(false);
     }
@@ -98,9 +101,11 @@ const VehicleMaintenancesPage = () => {
     try {
       if (selectedMaintenance) {
         await updateMaintenance(selectedMaintenance.id, data);
+        addToast({ type: "success", message: "Manutenção atualizada!" });
         fetchData();
       } else {
         await createMaintenance(Number(vehicleId), data);
+        addToast({ type: "success", message: "Manutenção registrada!" });
         if (currentPage !== 1) {
           setCurrentPage(1);
         } else {
@@ -110,6 +115,7 @@ const VehicleMaintenancesPage = () => {
       handleCloseModals();
     } catch (error) {
       console.error("Failed to save maintenance", error);
+      addToast({ type: "error", message: "Erro ao salvar manutenção." });
     } finally {
       setIsSubmitting(false);
     }
@@ -120,6 +126,7 @@ const VehicleMaintenancesPage = () => {
     setIsSubmitting(true);
     try {
       await deleteMaintenance(selectedMaintenance.id);
+      addToast({ type: "success", message: "Manutenção excluída." });
       handleCloseModals();
       if (maintenanceResponse?.data.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
@@ -128,6 +135,7 @@ const VehicleMaintenancesPage = () => {
       }
     } catch (error) {
       console.error("Failed to delete maintenance", error);
+      addToast({ type: "error", message: "Erro ao excluir manutenção." });
     } finally {
       setIsSubmitting(false);
     }

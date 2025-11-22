@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout";
+import { ToastContainer } from "./components/ui/ToastContainer";
 
 import AdminRoute from "./components/AdminRoute";
 import AdminPage from "./pages/AdminPage";
@@ -16,6 +17,7 @@ import ProfilePage from "./pages/ProfilePage";
 function App() {
   return (
     <Router>
+      <ToastContainer />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

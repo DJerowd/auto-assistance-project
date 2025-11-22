@@ -5,6 +5,7 @@ import { Button } from "../ui/Button";
 import { changePassword } from "../../services/profileService";
 import { EyeIcon } from "../icons/EyeIcon";
 import { EyeOffIcon } from "../icons/EyeOffIcon";
+import { useToastStore } from "../../store/toastStore";
 
 interface ChangePasswordFormProps {
   onSuccess: () => void;
@@ -20,6 +21,7 @@ const ChangePasswordForm = ({
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const addToast = useToastStore((state) => state.addToast);
 
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
@@ -29,8 +31,8 @@ const ChangePasswordForm = ({
     e.preventDefault();
     setIsUpdatingPassword(true);
     setMessage({ type: "", text: "" });
-
     if (newPassword !== confirmNewPassword) {
+      addToast({ type: "warning", message: "As novas senhas não coincidem." });
       setMessage({
         type: "error",
         text: "As novas senhas não coincidem.",
@@ -38,19 +40,20 @@ const ChangePasswordForm = ({
       setIsUpdatingPassword(false);
       return;
     }
-
     try {
       await changePassword({
         currentPassword,
         newPassword,
         confirmNewPassword,
       });
+      addToast({ type: "success", message: "Senha alterada com sucesso!" });
       onSuccess();
     } catch (err) {
       let msg = "Erro ao alterar senha.";
       if (err instanceof AxiosError && err.response) {
         msg = err.response.data.message || msg;
       }
+      addToast({ type: "error", message: msg });
       setMessage({ type: "error", text: msg });
     } finally {
       setIsUpdatingPassword(false);
@@ -98,7 +101,7 @@ const ChangePasswordForm = ({
           {showNew ? <EyeOffIcon /> : <EyeIcon />}
         </button>
       </div>
-      
+
       <div className="relative">
         <label className="block text-sm font-medium mb-1 dark:text-gray-300">
           Confirmar Nova Senha

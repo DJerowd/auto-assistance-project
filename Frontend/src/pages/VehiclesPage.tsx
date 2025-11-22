@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/Select";
+import { useToastStore } from "../store/toastStore";
 import type {
   Vehicle,
   VehicleFormData,
@@ -42,6 +43,8 @@ import { cn } from "../lib/utils";
 const DEFAULT_VEHICLE_IMG = "http://localhost:8800/public/default-vehicle.png";
 
 const VehiclesPage = () => {
+  const addToast = useToastStore((state) => state.addToast);
+
   // Dados
   const [vehiclesResponse, setVehiclesResponse] =
     useState<PaginatedResponse<Vehicle> | null>(null);
@@ -86,7 +89,7 @@ const VehiclesPage = () => {
   }, []);
 
   useEffect(() => {
-     fetchFilterOptions();
+    fetchFilterOptions();
   }, [fetchFilterOptions]);
 
   const fetchVehicles = useCallback(async () => {
@@ -146,6 +149,7 @@ const VehiclesPage = () => {
     setFormError(null);
     try {
       await createVehicle(data);
+      addToast({ type: "success", message: "Veículo cadastrado com sucesso!" });
       handleCloseModals();
       fetchFilterOptions();
       if (currentPage !== 1 || debouncedQuery !== "" || showFavorites) {
@@ -158,12 +162,15 @@ const VehiclesPage = () => {
         fetchVehicles();
       }
     } catch (err) {
-      console.error("Failed to save vehicle", err);
+      console.error(err);
+      let msg = "Erro ao cadastrar veículo.";
       if (err instanceof AxiosError && err.response) {
-        setFormError(err.response.data.message || "Ocorreu um erro ao salvar.");
+        msg = err.response.data.message || msg;
+        setFormError(msg);
       } else {
-        setFormError("Ocorreu um erro desconhecido.");
+        setFormError(msg);
       }
+      addToast({ type: "error", message: msg });
     } finally {
       setIsSubmitting(false);
     }
@@ -184,7 +191,8 @@ const VehiclesPage = () => {
       }
       await toggleVehicleFavorite(vehicle.id);
     } catch (err) {
-      console.error("Failed to toggle favorite", err);
+      console.log(err);
+      addToast({ type: "error", message: "Erro ao alterar favorito." });
       fetchVehicles();
     }
   };

@@ -3,6 +3,7 @@ import { AxiosError } from "axios";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import { updateProfile } from "../../services/profileService";
+import { useToastStore } from "../../store/toastStore";
 
 interface UserProfile {
   id: number;
@@ -25,6 +26,7 @@ const UpdateProfileForm = ({
   const [email, setEmail] = useState(currentUser.email);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const addToast = useToastStore((state) => state.addToast);
 
   useEffect(() => {
     setName(currentUser.name);
@@ -38,13 +40,14 @@ const UpdateProfileForm = ({
 
     try {
       const { user } = await updateProfile({ name, email });
+      addToast({ type: "success", message: "Perfil atualizado com sucesso!" });
       onSuccess(user);
     } catch (err) {
       let msg = "Erro ao atualizar perfil.";
       if (err instanceof AxiosError && err.response) {
         msg = err.response.data.message || msg;
       }
-      setMessage({ type: "error", text: msg });
+      addToast({ type: "error", message: msg });
     } finally {
       setIsUpdatingProfile(false);
     }
@@ -63,7 +66,7 @@ const UpdateProfileForm = ({
           required
         />
       </div>
-      
+
       <div>
         <label className="block text-sm font-medium mb-1 dark:text-gray-300">
           Email

@@ -33,6 +33,7 @@ import ProgressBar from "../components/ui/ProgressBar";
 import Modal from "../components/ui/modal/Modal";
 import ConfirmDialog from "../components/ui/modal/ConfirmDialog";
 import ReminderForm from "../components/reminders/ReminderForm";
+import { useToastStore } from "../store/toastStore";
 
 const calculateRemainingDays = (dateStr: string) => {
   const today = new Date();
@@ -53,6 +54,7 @@ const calculateRemainingKm = (current: number, target: number) => {
 const VehicleRemindersPage = () => {
   const { vehicleId } = useParams<{ vehicleId: string }>();
   const navigate = useNavigate();
+  const addToast = useToastStore((state) => state.addToast);
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [reminderResponse, setReminderResponse] =
@@ -79,6 +81,7 @@ const VehicleRemindersPage = () => {
       setReminderResponse(reminderData);
     } catch (error) {
       console.error("Failed to load data", error);
+      addToast({ type: "error", message: "Erro ao carregar lembretes." });
     } finally {
       setIsLoading(false);
     }
@@ -115,9 +118,11 @@ const VehicleRemindersPage = () => {
     try {
       if (selectedReminder) {
         await updateReminder(selectedReminder.id, data);
+        addToast({ type: "success", message: "Lembrete atualizado!" });
         fetchData();
       } else {
         await createReminder(Number(vehicleId), data);
+        addToast({ type: "success", message: "Lembrete criado!" });
         if (currentPage !== 1) {
           setCurrentPage(1);
         } else {
@@ -127,6 +132,7 @@ const VehicleRemindersPage = () => {
       handleCloseModals();
     } catch (error) {
       console.error("Failed to save reminder", error);
+      addToast({ type: "error", message: "Erro ao salvar lembrete." });
     } finally {
       setIsSubmitting(false);
     }
@@ -137,6 +143,7 @@ const VehicleRemindersPage = () => {
     setIsSubmitting(true);
     try {
       await deleteReminder(selectedReminder.id);
+      addToast({ type: "success", message: "Lembrete excluído." });
       handleCloseModals();
       if (reminderResponse?.data.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
@@ -145,6 +152,7 @@ const VehicleRemindersPage = () => {
       }
     } catch (error) {
       console.error("Failed to delete reminder", error);
+      addToast({ type: "error", message: "Erro ao excluir lembrete." });
     } finally {
       setIsSubmitting(false);
     }

@@ -38,6 +38,7 @@ import {
   SelectValue,
 } from "../components/ui/Select";
 import Spinner from "../components/ui/Spinner";
+import { useToastStore } from "../store/toastStore";
 import type {
   Brand,
   Color,
@@ -51,6 +52,7 @@ const AdminPage = () => {
   const [activeTab, setActiveTab] = useState<
     "brands" | "colors" | "features" | "serviceTypes" | "users" | "vehicles"
   >("brands");
+  const addToast = useToastStore((state) => state.addToast);
 
   // Datas
   const [data, setData] = useState<{
@@ -133,17 +135,19 @@ const AdminPage = () => {
           await updateColor(editingId, newItemName, newItemHex);
         if (activeTab === "serviceTypes")
           await updateServiceType(editingId, newItemName);
+        addToast({ type: "success", message: "Item atualizado com sucesso!" });
       } else {
         if (activeTab === "brands") await createBrand(newItemName);
         if (activeTab === "features") await createFeature(newItemName);
         if (activeTab === "colors") await createColor(newItemName, newItemHex);
         if (activeTab === "serviceTypes") await createServiceType(newItemName);
+        addToast({ type: "success", message: "Item adicionado com sucesso!" });
       }
       cancelEdit();
       fetchData();
     } catch (error) {
       console.error(error);
-      alert("Erro ao salvar item.");
+      addToast({ type: "error", message: "Erro ao salvar item." });
     } finally {
       setIsSaving(false);
     }
@@ -178,10 +182,14 @@ const AdminPage = () => {
       if (activeTab === "serviceTypes") await deleteServiceType(itemToDelete);
       if (activeTab === "users") await deleteUser(itemToDelete);
       if (activeTab === "vehicles") await deleteVehicleAdmin(itemToDelete);
+      addToast({ type: "success", message: "Item deletado com sucesso!" });
       fetchData();
     } catch (error) {
       console.error(error);
-      alert("Erro ao deletar. Verifique se o item está em uso.");
+      addToast({
+        type: "error",
+        message: "Erro ao deletar. Verifique se o item está em uso.",
+      });
     } finally {
       setIsDeleting(false);
       setIsConfirmOpen(false);
@@ -195,10 +203,14 @@ const AdminPage = () => {
   ) => {
     try {
       await updateUserRole(userId, newRole);
+      addToast({
+        type: "warning",
+        message: "Permissão de usuário atualizada com sucesso!",
+      });
       fetchData();
     } catch (error) {
       console.error(error);
-      alert("Erro ao atualizar permissão.");
+      addToast({ type: "error", message: "Erro ao atualizar permissão." });
     }
   };
 
@@ -394,7 +406,7 @@ const AdminPage = () => {
     }
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto px-4">
         {data[activeTab as keyof typeof data].map((item) => (
           <div
             key={item.id}

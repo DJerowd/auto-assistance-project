@@ -11,6 +11,7 @@ import { StarIcon } from "../icons/StarIcon";
 import { TrashIcon } from "../icons/TrashIcon";
 import Spinner from "../ui/Spinner";
 import ConfirmDialog from "../ui/modal/ConfirmDialog";
+import { useToastStore } from "../../store/toastStore";
 import type { Vehicle, VehicleImage } from "../../types";
 
 interface ManageImagesModalProps {
@@ -29,6 +30,7 @@ const ManageImagesModal = ({
   const [images, setImages] = useState<VehicleImage[]>(vehicle?.images || []);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const addToast = useToastStore((state) => state.addToast);
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [imageToDelete, setImageToDelete] = useState<number | null>(null);
@@ -45,9 +47,11 @@ const ManageImagesModal = ({
     setIsUploading(true);
     try {
       await uploadVehicleImages(vehicle.id, files);
+      addToast({ type: "success", message: "Imagens enviadas com sucesso!" });
       onUpdate();
     } catch (error) {
       console.error("Upload failed", error);
+      addToast({ type: "error", message: "Falha no upload das imagens." });
     } finally {
       setIsUploading(false);
       onClose();
@@ -57,9 +61,11 @@ const ManageImagesModal = ({
   const handleSetPrimary = async (imageId: number) => {
     try {
       await setPrimaryVehicleImage(imageId);
+      addToast({ type: "warning", message: "Imagem principal atualizada." });
       onUpdate();
     } catch (error) {
       console.error("Failed to set primary image", error);
+      addToast({ type: "error", message: "Erro ao definir imagem principal." });
     }
     onClose();
   };
@@ -73,11 +79,13 @@ const ManageImagesModal = ({
     if (!imageToDelete) return;
     try {
       await deleteVehicleImage(imageToDelete);
+      addToast({ type: "success", message: "Imagem excluída." });
       onUpdate();
       setIsConfirmOpen(false);
       onClose();
     } catch (error) {
       console.error("Failed to delete image", error);
+      addToast({ type: "error", message: "Erro ao excluir imagem." });
       setIsConfirmOpen(false);
     }
   };
