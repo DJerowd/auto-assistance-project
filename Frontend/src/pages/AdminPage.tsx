@@ -253,7 +253,7 @@ const AdminPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b dark:border-gray-700">
+                <tr className="border-b border-gray-300 dark:border-gray-600">
                   <th className="p-3 text-sm font-semibold dark:text-gray-300">
                     Nome
                   </th>
@@ -273,7 +273,7 @@ const AdminPage = () => {
                   users.map((user) => (
                     <tr
                       key={user.id}
-                      className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                      className="border-b border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/50"
                     >
                       <td className="p-3 text-sm dark:text-gray-300">
                         {user.name}
@@ -329,7 +329,7 @@ const AdminPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b dark:border-gray-700">
+                <tr className="border-b border-gray-300 dark:border-gray-600">
                   <th className="p-3 text-sm font-semibold dark:text-gray-300">
                     ID
                   </th>
@@ -351,7 +351,7 @@ const AdminPage = () => {
                 {vehicles.map((v) => (
                   <tr
                     key={v.id}
-                    className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    className="border-b border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/50"
                   >
                     <td className="p-3 text-sm dark:text-gray-300">{v.id}</td>
                     <td className="p-3 text-sm dark:text-gray-300">
@@ -410,7 +410,7 @@ const AdminPage = () => {
         {data[activeTab as keyof typeof data].map((item) => (
           <div
             key={item.id}
-            className="flex justify-between items-center p-3 border rounded dark:border-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800"
+            className="flex justify-between items-center p-3 border border-gray-300 dark:border-gray-600 rounded dark:border-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:border-indigo-300 transition-colors"
           >
             <div className="flex items-center gap-3 min-w-0 flex-1">
               {activeTab === "colors" && (

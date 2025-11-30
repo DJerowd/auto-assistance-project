@@ -41,7 +41,7 @@ const Sidebar = () => {
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
+        <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-600">
           <h2
             className="font-bold text-lg dark:text-white truncate"
             title={`Olá, ${user?.name}`}
@@ -95,7 +95,7 @@ const Sidebar = () => {
           </ul>
         </nav>
 
-        <div className="p-4 border-t dark:border-gray-700 space-y-4">
+        <div className="p-4 border-t border-gray-300 dark:border-gray-600 space-y-4">
           {/* <div className="flex justify-between items-center">
             <span className="text-sm dark:text-gray-300">Mudar Tema</span>
             <ThemeSwitch />

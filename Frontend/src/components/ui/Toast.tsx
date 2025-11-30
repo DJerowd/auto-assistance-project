@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useToastStore, type Toast as ToastType } from "../../store/toastStore";
 import { CheckCircleIcon } from "../icons/CheckCircleIcon";
 import { XCircleIcon } from "../icons/XCircleIcon";
-import { InfoIcon } from '../icons/InfoIcon';
-import { WarningIcon } from '../icons/WarningIcon';
+import { InfoIcon } from "../icons/InfoIcon";
+import { WarningIcon } from "../icons/WarningIcon";
 import { CloseIcon } from "../icons/CloseIcon";
+import { cn } from "../../lib/utils";
 
 const icons = {
   success: <CheckCircleIcon className="w-6 h-6 text-green-500" />,
@@ -29,21 +30,35 @@ interface ToastProps {
 
 export const Toast = ({ toast }: ToastProps) => {
   const removeToast = useToastStore((state) => state.removeToast);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      removeToast(toast.id);
+    }, 300);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      removeToast(toast.id);
+      handleClose();
     }, toast.duration || 4000);
-
     return () => clearTimeout(timer);
-  }, [toast.id, toast.duration, removeToast]);
+  }, [toast.id, toast.duration]);
 
   return (
     <div
-      className={`flex items-center w-full max-w-xs p-4 mb-2 text-gray-500 bg-gray-200 rounded-lg shadow-lg dark:text-gray-400 dark:bg-gray-800 border-l-4 transform transition-all duration-300 ease-in-out hover:scale-105 animate-slide-in ${
-        styles[toast.type]
-      }`}
+      className={cn(
+        "flex items-center w-full max-w-xs p-4 mb-2 text-gray-500 bg-white rounded-lg shadow-lg dark:text-gray-400 dark:bg-gray-800 border-l-4 transform transition-all duration-300 ease-in-out hover:scale-105",
+        styles[toast.type],
+        isClosing ? "animate-slide-out" : "animate-slide-in"
+      )}
       role="alert"
+      onAnimationEnd={() => {
+        if (isClosing) {
+          removeToast(toast.id);
+        }
+      }}
     >
       <div className="inline-flex items-center justify-center flex-shrink-0 w-8 h-8">
         {icons[toast.type]}
@@ -54,7 +69,7 @@ export const Toast = ({ toast }: ToastProps) => {
       <button
         type="button"
         className="ml-auto -mx-1.5 -my-1.5 bg-transparent text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-700 transition-colors"
-        onClick={() => removeToast(toast.id)}
+        onClick={handleClose}
         aria-label="Fechar"
       >
         <CloseIcon size={16} />

@@ -61,7 +61,7 @@ const ManageImagesModal = ({
   const handleSetPrimary = async (imageId: number) => {
     try {
       await setPrimaryVehicleImage(imageId);
-      addToast({ type: "warning", message: "Imagem principal atualizada." });
+      addToast({ type: "success", message: "Imagem principal atualizada." });
       onUpdate();
     } catch (error) {
       console.error("Failed to set primary image", error);

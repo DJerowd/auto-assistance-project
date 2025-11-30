@@ -93,6 +93,7 @@ const RegisterPage = () => {
                 required
                 autoFocus
                 autoComplete="name"
+                className="border-gray-300 dark:border-gray-600"
               />
             </div>
 
@@ -112,6 +113,7 @@ const RegisterPage = () => {
                 onChange={handleChange}
                 required
                 autoComplete="email"
+                className="border-gray-300 dark:border-gray-600"
               />
             </div>
 
@@ -132,6 +134,7 @@ const RegisterPage = () => {
                   onChange={handleChange}
                   required
                   autoComplete="new-password"
+                  className="border-gray-300 dark:border-gray-600"
                 />
                 <button
                   type="button"

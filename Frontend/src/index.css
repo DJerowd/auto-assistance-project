@@ -10,6 +10,7 @@ input[type="number"] {
 }
 
 @layer utilities {
+  /* Animações de Overlay */
   @keyframes overlayShow {
     from {
       opacity: 0;
@@ -18,7 +19,16 @@ input[type="number"] {
       opacity: 1;
     }
   }
+  @keyframes overlayHide {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
 
+  /* Animações de Conteúdo */
   @keyframes contentShow {
     from {
       opacity: 0;
@@ -29,15 +39,18 @@ input[type="number"] {
       transform: translate(-50%, -50%) scale(1);
     }
   }
-
-  .animate-overlay-show {
-    animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  @keyframes contentHide {
+    from {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translate(-50%, -48%) scale(0.96);
+    }
   }
 
-  .animate-content-show {
-    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
+  /* Animações de Slide */
   @keyframes slideIn {
     from {
       transform: translateX(100%);
@@ -48,8 +61,51 @@ input[type="number"] {
       opacity: 1;
     }
   }
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  /* Fade In Up (Páginas) */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Classes Utilitárias */
+  .animate-overlay-show {
+    animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-overlay-hide {
+    animation: overlayHide 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-content-show {
+    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-content-hide {
+    animation: contentHide 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
 
   .animate-slide-in {
     animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-slide-out {
+    animation: slideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .animate-fade-in-up {
+    animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 }

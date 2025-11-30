@@ -161,13 +161,13 @@ const VehicleRemindersPage = () => {
   const getStatusClass = (status: Reminder["status"]) => {
     switch (status) {
       case "PENDING":
-        return "border-yellow-500";
+        return "border-yellow-500 dark:border-yellow-500";
       case "COMPLETED":
-        return "border-green-500";
+        return "border-green-500 dark:border-green-500";
       case "CANCELLED":
-        return "border-red-500";
+        return "border-red-500 dark:border-red-500";
       default:
-        return "border-gray-300";
+        return "border-gray-300 dark:border-gray-600";
     }
   };
 

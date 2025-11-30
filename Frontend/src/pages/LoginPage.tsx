@@ -109,6 +109,7 @@ const LoginPage = () => {
                 required
                 autoFocus
                 autoComplete="email"
+                className="border-gray-300 dark:border-gray-600"
               />
             </div>
 
@@ -129,6 +130,7 @@ const LoginPage = () => {
                   onChange={handleChange}
                   required
                   autoComplete="current-password"
+                  className="border-gray-300 dark:border-gray-600"
                 />
                 <button
                   type="button"
