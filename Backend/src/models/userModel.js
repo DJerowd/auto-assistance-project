@@ -28,30 +28,37 @@ const userModel = {
   },
 
   async findById(userId) {
-    const sql = 'SELECT id, role, name, email, created_at, updated_at FROM users WHERE id = ?';
+    const sql =
+      "SELECT id, role, name, email, profile_image, created_at, updated_at FROM users WHERE id = ?";
     const [rows] = await pool.query(sql, [userId]);
     return rows[0];
   },
 
   async update(userId, userData, connection = pool) {
     const { name, email } = userData;
-    const sql = 'UPDATE users SET name = ?, email = ? WHERE id = ?';
+    const sql = "UPDATE users SET name = ?, email = ? WHERE id = ?";
     try {
       const [result] = await connection.query(sql, [name, email, userId]);
       return result.affectedRows;
     } catch (error) {
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new Error('Email is already in use by another account.');
+      if (error.code === "ER_DUP_ENTRY") {
+        throw new Error("Email is already in use by another account.");
       }
       throw error;
     }
   },
 
   async updatePassword(userId, newPasswordHash, connection = pool) {
-    const sql = 'UPDATE users SET password = ? WHERE id = ?';
+    const sql = "UPDATE users SET password = ? WHERE id = ?";
     const [result] = await connection.query(sql, [newPasswordHash, userId]);
     return result.affectedRows;
-  }
+  },
+
+  async updateProfileImage(userId, imagePath, connection = pool) {
+    const sql = "UPDATE users SET profile_image = ? WHERE id = ?";
+    const [result] = await connection.query(sql, [imagePath, userId]);
+    return result.affectedRows;
+  },
 };
 
 module.exports = userModel;

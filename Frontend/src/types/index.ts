@@ -71,7 +71,8 @@ export interface AdminUser {
   id: number;
   name: string;
   email: string;
-  role: 'ADMIN' | 'USER';
+  role: "ADMIN" | "USER";
+  profile_image?: string | null;
   created_at: string;
 }
 
@@ -110,8 +111,8 @@ export interface Vehicle {
 }
 
 export interface AdminVehicle extends Vehicle {
-    owner_email: string;
-    owner_name: string;
+  owner_email: string;
+  owner_name: string;
 }
 
 export type VehicleFormData = Omit<

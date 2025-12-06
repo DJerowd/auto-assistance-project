@@ -1,6 +1,9 @@
-const userModel = require('../models/userModel');
-const bcrypt = require('bcryptjs');
+const userModel = require("../models/userModel");
+const bcrypt = require("bcryptjs");
 const pool = require("../config/database");
+const fs = require("fs");
+const path = require("path");
+const sharp = require("sharp");
 
 const profileController = {
   async getProfile(req, res, next) {
@@ -38,7 +41,9 @@ const profileController = {
       await userModel.update(userId, dataToUpdate, connection);
       const updatedUser = await userModel.findById(userId);
       await connection.commit();
-      res.status(200).json({ message: 'Profile updated successfully!', user: updatedUser });
+      res
+        .status(200)
+        .json({ message: "Profile updated successfully!", user: updatedUser });
     } catch (error) {
       if (connection) await connection.rollback();
       if (error.message.includes("Email is already in use")) {
@@ -63,7 +68,10 @@ const profileController = {
         error.statusCode = 404;
         throw error;
       }
-      const isPasswordValid = await userModel.comparePassword(currentPassword, user.password);
+      const isPasswordValid = await userModel.comparePassword(
+        currentPassword,
+        user.password
+      );
       if (!isPasswordValid) {
         const error = new Error("Invalid current password.");
         error.statusCode = 401;
@@ -73,14 +81,77 @@ const profileController = {
       const newPasswordHash = await bcrypt.hash(newPassword, salt);
       await userModel.updatePassword(userId, newPasswordHash, connection);
       await connection.commit();
-      res.status(200).json({ message: 'Password changed successfully.' });
+      res.status(200).json({ message: "Password changed successfully." });
     } catch (error) {
       if (connection) await connection.rollback();
       next(error);
     } finally {
       if (connection) connection.release();
     }
-  }
+  },
+  
+  async uploadAvatar(req, res, next) {
+    let connection;
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided." });
+      }
+      const userId = req.user.userId;
+      const user = await userModel.findById(userId);
+      if (user.profile_image) {
+        const oldPath = path.join(__dirname, "..", "..", user.profile_image);
+        if (fs.existsSync(oldPath)) {
+          fs.unlink(oldPath, (err) => {
+            if (err) console.error(err);
+          });
+        }
+      }
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const newFilename = `avatar-${userId}-${uniqueSuffix}.webp`;
+      const newPath = path.join("public", "uploads", newFilename);
+
+      await sharp(req.file.buffer)
+        .resize(300, 300, { fit: "cover" })
+        .toFormat("webp", { quality: 90 })
+        .toFile(newPath);
+      const dbPath = `public/uploads/${newFilename}`;
+      connection = await pool.getConnection();
+      await userModel.updateProfileImage(userId, dbPath, connection);
+      const fullUrl = `${process.env.APP_URL}/${dbPath}`;
+      res.status(200).json({
+        message: "Profile image updated.",
+        profile_image: fullUrl,
+        path: dbPath,
+      });
+    } catch (error) {
+      next(error);
+    } finally {
+      if (connection) connection.release();
+    }
+  },
+
+  async deleteAvatar(req, res, next) {
+    let connection;
+    try {
+      const userId = req.user.userId;
+      const user = await userModel.findById(userId);
+      if (user.profile_image) {
+        const oldPath = path.join(__dirname, "..", "..", user.profile_image);
+        if (fs.existsSync(oldPath)) {
+          fs.unlink(oldPath, (err) => {
+            if (err) console.error(err);
+          });
+        }
+      }
+      connection = await pool.getConnection();
+      await userModel.updateProfileImage(userId, null, connection);
+      res.status(200).json({ message: "Profile image removed." });
+    } catch (error) {
+      next(error);
+    } finally {
+      if (connection) connection.release();
+    }
+  },
 };
 
 module.exports = profileController;
