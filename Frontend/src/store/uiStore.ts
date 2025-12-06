@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-type Theme = 'light' | 'dark';
+type Theme = "light" | "dark";
 
 interface UiState {
   theme: Theme;
@@ -14,17 +14,22 @@ interface UiState {
 export const useUiStore = create<UiState>()(
   persist(
     (set) => ({
-      theme: 'light',
+      theme:
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light",
       isMenuOpen: false,
-      toggleTheme: () => set((state) => ({
-        theme: state.theme === 'light' ? 'dark' : 'light',
-      })),
+      toggleTheme: () =>
+        set((state) => ({
+          theme: state.theme === "light" ? "dark" : "light",
+        })),
       toggleMenu: () => set((state) => ({ isMenuOpen: !state.isMenuOpen })),
       closeMenu: () => set({ isMenuOpen: false }),
     }),
     {
-      name: 'ui-storage', 
-      partialize: (state) => ({ theme: state.theme }), 
+      name: "ui-storage",
+      partialize: (state) => ({ theme: state.theme }),
     }
   )
 );

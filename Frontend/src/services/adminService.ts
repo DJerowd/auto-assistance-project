@@ -1,5 +1,5 @@
 import apiClient from "../config/api";
-import type { PaginatedResponse, AdminVehicle } from "../types";
+import type { PaginatedResponse, AdminUser, AdminVehicle } from "../types";
 
 export const createBrand = async (name: string) => {
   const response = await apiClient.post("/admin/brands", { name });
@@ -53,9 +53,13 @@ export const deleteServiceType = async (id: number) => {
   await apiClient.delete(`/admin/service-types/${id}`);
 };
 
-export const getAllUsers = async (search = "") => {
+export const getAllUsers = async (
+  search = "", 
+  page = 1, 
+  limit = 10
+): Promise<PaginatedResponse<AdminUser>> => {
   const response = await apiClient.get("/admin/users", {
-    params: { search },
+    params: { search, page, limit },
   });
   return response.data;
 };

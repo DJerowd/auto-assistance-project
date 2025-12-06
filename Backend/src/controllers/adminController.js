@@ -132,9 +132,13 @@ const adminController = {
 
   async getUsers(req, res, next) {
     try {
-      const { search } = req.query;
-      const users = await adminModel.getAllUsers(search);
-      res.status(200).json(users);
+      const { search, page, limit } = req.query;
+      const result = await adminModel.getAllUsers(
+        search,
+        page ? parseInt(page) : 1,
+        limit ? parseInt(limit) : 10
+      );
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }

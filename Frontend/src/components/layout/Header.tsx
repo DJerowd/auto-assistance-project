@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useUiStore } from "../../store/uiStore";
 import { MenuIcon } from "../icons/MenuIcon";
 
@@ -15,9 +16,15 @@ const Header = () => {
           <MenuIcon size={24} />
         </button>
 
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-          Auto Assistance
-        </h1>
+        <Link
+          to="/"
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+        >
+          <img src="/logo.svg" alt="Logo" className="h-8 w-8" />
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+            Auto Assistance
+          </h1>
+        </Link>
       </div>
     </header>
   );

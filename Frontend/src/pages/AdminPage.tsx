@@ -70,6 +70,8 @@ const AdminPage = () => {
   const [vehiclePage, setVehiclePage] = useState(1);
   const [vehicleTotalPages, setVehicleTotalPages] = useState(1);
   const [userSearch, setUserSearch] = useState("");
+  const [userPage, setUserPage] = useState(1);
+  const [userTotalPages, setUserTotalPages] = useState(1);
 
   // Form states
   const [newItemName, setNewItemName] = useState("");
@@ -87,8 +89,9 @@ const AdminPage = () => {
     setIsFetching(true);
     try {
       if (activeTab === "users") {
-        const usersData = await getAllUsers(userSearch);
-        setUsers(usersData);
+        const res = await getAllUsers(userSearch, userPage, 10);
+        setUsers(res.data);
+        setUserTotalPages(res.pagination.totalPages);
       } else if (activeTab === "vehicles") {
         const res = await getAllVehicles(
           vehiclePage,
@@ -121,7 +124,19 @@ const AdminPage = () => {
     }, 500);
     cancelEdit();
     return () => clearTimeout(timer);
-  }, [activeTab, vehiclePage, vehicleSearch, vehicleOwner, userSearch]);
+  }, [
+    activeTab,
+    vehiclePage,
+    vehicleSearch,
+    vehicleOwner,
+    userSearch,
+    userPage,
+  ]);
+
+  useEffect(() => {
+    if (activeTab === "users") setUserPage(1);
+    if (activeTab === "vehicles") setVehiclePage(1);
+  }, [userSearch, vehicleSearch, vehicleOwner, activeTab]);
 
   const handleSave = async () => {
     if (!newItemName) return;
@@ -320,6 +335,30 @@ const AdminPage = () => {
               </tbody>
             </table>
           </div>
+
+          {userTotalPages > 1 && (
+            <div className="flex justify-center gap-4 mt-4">
+              <Button
+                variant="outline"
+                disabled={userPage === 1}
+                onClick={() => setUserPage((p) => Math.max(1, p - 1))}
+              >
+                Anterior
+              </Button>
+              <span className="text-sm self-center text-gray-500 dark:text-gray-400">
+                Página {userPage} de {userTotalPages}
+              </span>
+              <Button
+                variant="outline"
+                disabled={userPage === userTotalPages}
+                onClick={() =>
+                  setUserPage((p) => Math.min(userTotalPages, p + 1))
+                }
+              >
+                Próxima
+              </Button>
+            </div>
+          )}
         </>
       );
     }

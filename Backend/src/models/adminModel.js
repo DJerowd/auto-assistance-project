@@ -37,16 +37,30 @@ const adminModel = {
     return result.affectedRows;
   },
 
-  async getAllUsers(search = "") {
-    let sql = "SELECT id, name, email, role, created_at FROM users";
+  async getAllUsers(search = "", page = 1, limit = 10) {
+    const offset = (page - 1) * limit;
     const params = [];
+    let whereClause = "";
     if (search) {
-      sql += " WHERE name LIKE ? OR email LIKE ?";
+      whereClause = " WHERE name LIKE ? OR email LIKE ?";
       params.push(`%${search}%`, `%${search}%`);
     }
-    sql += " ORDER BY name ASC";
-    const [rows] = await pool.query(sql, params);
-    return rows;
+    const countSql = `SELECT COUNT(*) as total FROM users ${whereClause}`;
+    const [countResult] = await pool.query(countSql, params);
+    const totalItems = countResult[0].total;
+    const totalPages = Math.ceil(totalItems / limit);
+    let dataSql = `SELECT id, name, email, role, created_at FROM users ${whereClause} ORDER BY name ASC LIMIT ? OFFSET ?`;
+    const dataParams = [...params, parseInt(limit), parseInt(offset)];
+    const [rows] = await pool.query(dataSql, dataParams);
+    return {
+      data: rows,
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: parseInt(page),
+        limit: parseInt(limit),
+      },
+    };
   },
 
   async updateUserRole(userId, newRole) {

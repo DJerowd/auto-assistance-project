@@ -5,28 +5,26 @@ import { ToastContainer } from "./components/ui/ToastContainer";
 
 import AdminRoute from "./components/AdminRoute";
 import AdminPage from "./pages/AdminPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import VehiclesPage from "./pages/VehiclesPage";
 import VehicleDetailPage from "./pages/VehicleDetailPage";
 import VehicleMaintenancesPage from "./pages/VehicleMaintenancesPage";
 import VehicleRemindersPage from "./pages/VehicleRemindersPage";
 import ProfilePage from "./pages/ProfilePage";
+import HomePage from "./pages/HomePage";
 
 function App() {
   return (
     <Router>
       <ToastContainer />
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/" element={<HomePage />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             <Route element={<AdminRoute />}>
                <Route path="/admin" element={<AdminPage />} />
             </Route>
-            <Route path="/" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/vehicles" element={<VehiclesPage />} />
             <Route path="/vehicles/:vehicleId" element={<VehicleDetailPage />} />
             <Route path="/vehicles/:vehicleId/maintenances" element={<VehicleMaintenancesPage />} />

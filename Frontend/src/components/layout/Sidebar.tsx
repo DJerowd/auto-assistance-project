@@ -11,7 +11,7 @@ import { LogoutIcon } from "../icons/LogoutIcon";
 import { Button } from "../ui/Button";
 
 const navLinks = [
-  { name: "Dashboard", path: "/", icon: <DashboardIcon size={20} /> },
+  { name: "Dashboard", path: "/dashboard", icon: <DashboardIcon size={20} /> },
   { name: "Meus Veículos", path: "/vehicles", icon: <CarIcon size={20} /> },
   { name: "Meu Perfil", path: "/profile", icon: <UserIcon size={20} /> },
 ];
@@ -24,7 +24,7 @@ const Sidebar = () => {
   const handleLogout = () => {
     closeMenu();
     logout();
-    navigate("/login");
+    navigate("/");
   };
 
   return (
