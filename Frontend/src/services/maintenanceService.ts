@@ -5,6 +5,24 @@ import type {
   PaginatedResponse,
 } from "../types";
 
+export interface MaintenanceFilterOptions {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  order?: string;
+  service_type?: string;
+  vehicle_model?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export const getAllMaintenances = async (
+  options: MaintenanceFilterOptions = {}
+) => {
+  const response = await apiClient.get("/maintenances", { params: options });
+  return response.data;
+};
+
 export const getVehicleMaintenances = async (
   vehicleId: number,
   page = 1,

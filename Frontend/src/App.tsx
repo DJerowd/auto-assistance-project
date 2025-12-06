@@ -12,6 +12,8 @@ import VehicleMaintenancesPage from "./pages/VehicleMaintenancesPage";
 import VehicleRemindersPage from "./pages/VehicleRemindersPage";
 import ProfilePage from "./pages/ProfilePage";
 import HomePage from "./pages/HomePage";
+import MaintenancesPage from "./pages/MaintenancesPage";
+import RemindersPage from "./pages/RemindersPage";
 
 function App() {
   return (
@@ -22,10 +24,12 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             <Route element={<AdminRoute />}>
-               <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin" element={<AdminPage />} />
             </Route>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/vehicles" element={<VehiclesPage />} />
+            <Route path="/maintenances" element={<MaintenancesPage />} />
+            <Route path="/reminders" element={<RemindersPage />} />
             <Route path="/vehicles/:vehicleId" element={<VehicleDetailPage />} />
             <Route path="/vehicles/:vehicleId/maintenances" element={<VehicleMaintenancesPage />} />
             <Route path="/vehicles/:vehicleId/reminders" element={<VehicleRemindersPage />} />

@@ -26,6 +26,73 @@ const maintenanceModel = {
     return { id: result.insertId, ...maintenanceData, vehicle_id: vehicleId };
   },
 
+  async findByUserId(userId, options = {}) {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = "maintenance_date",
+      order = "DESC",
+      service_type = null,
+      vehicle_model = null,
+      startDate = null,
+      endDate = null,
+    } = options;
+    const offset = (page - 1) * limit;
+    const allowedSortBy = [
+      "maintenance_date",
+      "cost",
+      "service_type",
+      "vehicle_model",
+    ];
+    const safeSortBy = allowedSortBy.includes(sortBy)
+      ? sortBy
+      : "maintenance_date";
+    const sortColumn =
+      safeSortBy === "vehicle_model" ? "v.model" : `m.${safeSortBy}`;
+    const safeOrder = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
+    let whereClause = "WHERE v.user_id = ?";
+    const params = [userId];
+    if (service_type) {
+      whereClause += " AND m.service_type LIKE ?";
+      params.push(`%${service_type}%`);
+    }
+    if (vehicle_model) {
+      whereClause += " AND v.model LIKE ?";
+      params.push(`%${vehicle_model}%`);
+    }
+    if (startDate) {
+      whereClause += " AND m.maintenance_date >= ?";
+      params.push(startDate);
+    }
+    if (endDate) {
+      whereClause += " AND m.maintenance_date <= ?";
+      params.push(endDate);
+    }
+    const countSql = `
+      SELECT COUNT(*) as total 
+      FROM maintenances m
+      JOIN vehicles v ON m.vehicle_id = v.id
+      ${whereClause}
+    `;
+    const [countResult] = await pool.query(countSql, params);
+    const totalItems = countResult[0].total;
+    const totalPages = Math.ceil(totalItems / limit);
+    const dataSql = `
+      SELECT m.*, v.model as vehicle_model, v.license_plate, v.nickname
+      FROM maintenances m
+      JOIN vehicles v ON m.vehicle_id = v.id
+      ${whereClause}
+      ORDER BY ${sortColumn} ${safeOrder}
+      LIMIT ? OFFSET ?
+    `;
+    params.push(limit, offset);
+    const [rows] = await pool.query(dataSql, params);
+    return {
+      data: rows,
+      pagination: { totalItems, totalPages, currentPage: page, limit },
+    };
+  },
+
   async findByVehicleId(vehicleId, options = {}) {
     const {
       page = 1,

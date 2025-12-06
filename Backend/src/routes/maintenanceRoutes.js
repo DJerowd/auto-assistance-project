@@ -7,6 +7,8 @@ const { maintenanceRules } = require("../middlewares/validators/maintenanceValid
 
 router.use(authMiddleware);
 
+router.get("/", maintenanceController.getMyMaintenances);
+
 router
   .route("/:id")
   .get(maintenanceController.getMaintenanceById)

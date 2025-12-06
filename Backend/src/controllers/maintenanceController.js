@@ -41,6 +41,35 @@ const maintenanceController = {
     }
   },
 
+  async getMyMaintenances(req, res, next) {
+    try {
+      const userId = req.user.userId;
+      const {
+        page,
+        limit,
+        sortBy,
+        order,
+        service_type,
+        vehicle_model,
+        startDate,
+        endDate,
+      } = req.query;
+      const result = await maintenanceModel.findByUserId(userId, {
+        page: page ? parseInt(page) : 1,
+        limit: limit ? parseInt(limit) : 10,
+        sortBy,
+        order,
+        service_type,
+        vehicle_model,
+        startDate,
+        endDate,
+      });
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async getVehicleMaintenances(req, res, next) {
     try {
       const { vehicleId } = req.params;
@@ -53,7 +82,13 @@ const maintenanceController = {
         error.statusCode = 403;
         throw error;
       }
-      const { page = 1, limit = 10, sortBy = "created_at", order = "DESC", service_type } = req.query;
+      const {
+        page = 1,
+        limit = 10,
+        sortBy = "created_at",
+        order = "DESC",
+        service_type,
+      } = req.query;
       const maintenancesResult = await maintenanceModel.findByVehicleId(
         vehicleId,
         {

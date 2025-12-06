@@ -32,12 +32,37 @@ const reminderController = {
         throw error;
       }
       const newReminder = await reminderModel.create(req.body, vehicleId);
-      res
-        .status(201)
-        .json({
-          message: "Reminder created successfully!",
-          reminder: newReminder,
-        });
+      res.status(201).json({
+        message: "Reminder created successfully!",
+        reminder: newReminder,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getMyReminders(req, res, next) {
+    try {
+      const userId = req.user.userId;
+      const {
+        page,
+        limit,
+        sortBy,
+        order,
+        status,
+        service_type,
+        vehicle_model,
+      } = req.query;
+      const result = await reminderModel.findByUserId(userId, {
+        page: page ? parseInt(page) : 1,
+        limit: limit ? parseInt(limit) : 10,
+        sortBy,
+        order,
+        status,
+        service_type,
+        vehicle_model,
+      });
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }
@@ -55,8 +80,20 @@ const reminderController = {
         error.statusCode = 403;
         throw error;
       }
-      const { page = 1, limit = 10, sortBy = "created_at", order = "DESC", status } = req.query;
-      const remindersResult = await reminderModel.findByVehicleId(vehicleId, { page: page ? parseInt(page) : 1, limit: limit ? parseInt(limit) : 10, sortBy, order, status });
+      const {
+        page = 1,
+        limit = 10,
+        sortBy = "created_at",
+        order = "DESC",
+        status,
+      } = req.query;
+      const remindersResult = await reminderModel.findByVehicleId(vehicleId, {
+        page: page ? parseInt(page) : 1,
+        limit: limit ? parseInt(limit) : 10,
+        sortBy,
+        order,
+        status,
+      });
       res.status(200).json(remindersResult);
     } catch (error) {
       next(error);
@@ -82,12 +119,10 @@ const reminderController = {
       await checkReminderOwnership(id, userId);
       await reminderModel.update(id, req.body);
       const updatedReminder = await reminderModel.findById(id);
-      res
-        .status(200)
-        .json({
-          message: "Reminder updated successfully!",
-          reminder: updatedReminder,
-        });
+      res.status(200).json({
+        message: "Reminder updated successfully!",
+        reminder: updatedReminder,
+      });
     } catch (error) {
       next(error);
     }

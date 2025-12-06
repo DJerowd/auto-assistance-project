@@ -1,6 +1,21 @@
 import apiClient from "../config/api";
 import type { ReminderFormData, Reminder, PaginatedResponse } from "../types";
 
+export interface ReminderFilterOptions {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  order?: string;
+  status?: string;
+  service_type?: string;
+  vehicle_model?: string;
+}
+
+export const getAllReminders = async (options: ReminderFilterOptions = {}) => {
+  const response = await apiClient.get("/reminders", { params: options });
+  return response.data;
+};
+
 export const getVehicleReminders = async (
   vehicleId: number,
   page = 1,

@@ -7,6 +7,8 @@ const { reminderRules } = require("../middlewares/validators/reminderValidator")
 
 router.use(authMiddleware);
 
+router.get("/", reminderController.getMyReminders);
+
 router
   .route("/:id")
   .get(reminderController.getReminderById)

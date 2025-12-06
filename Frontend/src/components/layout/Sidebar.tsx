@@ -7,12 +7,16 @@ import { CarIcon } from "../icons/CarIcon";
 import { UserIcon } from "../icons/UserIcon";
 import { SettingsIcon } from "../icons/SettingsIcon";
 import { LogoutIcon } from "../icons/LogoutIcon";
+import { MaintenanceIcon } from "../icons/MaintenanceIcon";
+import { BellIcon } from "../icons/BellIcon";
 // import ThemeSwitch from "../ui/ThemeSwitch";
 import { Button } from "../ui/Button";
 
 const navLinks = [
   { name: "Dashboard", path: "/dashboard", icon: <DashboardIcon size={20} /> },
   { name: "Meus Veículos", path: "/vehicles", icon: <CarIcon size={20} /> },
+  { name: "Manutenções", path: "/maintenances", icon: <MaintenanceIcon size={20} /> },
+  { name: "Lembretes", path: "/reminders", icon: <BellIcon size={20} /> },
   { name: "Meu Perfil", path: "/profile", icon: <UserIcon size={20} /> },
 ];
 
@@ -74,7 +78,7 @@ const Sidebar = () => {
               </li>
             ))}
 
-            {user?.role === 'ADMIN' && (
+            {user?.role === "ADMIN" && (
               <li>
                 <NavLink
                   to="/admin"
@@ -88,7 +92,7 @@ const Sidebar = () => {
                   }
                 >
                   <SettingsIcon size={20} />
-                  <span>Administração</span> 
+                  <span>Administração</span>
                 </NavLink>
               </li>
             )}
