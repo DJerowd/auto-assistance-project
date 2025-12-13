@@ -49,6 +49,7 @@ export interface DashboardData {
 export interface Brand {
   id: number;
   name: string;
+  logo_url?: string | null;
 }
 
 export interface Color {
@@ -96,6 +97,7 @@ export interface Vehicle {
   model: string;
   version: string;
   brand_name: string;
+  brand_logo_url?: string | null;
   color_name: string;
   license_plate: string;
   year_of_manufacture: number | string;

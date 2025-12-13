@@ -1,6 +1,14 @@
 const pool = require("../config/database");
 
 const adminModel = {
+  async getItemById(table, id) {
+    const allowedTables = ["brands", "colors", "features", "service_types"];
+    if (!allowedTables.includes(table)) throw new Error("Invalid table name");
+    const sql = `SELECT * FROM ${table} WHERE id = ?`;
+    const [rows] = await pool.query(sql, [id]);
+    return rows[0];
+  },
+
   async createItem(table, name, extraData = {}) {
     const allowedTables = ["brands", "colors", "features", "service_types"];
     if (!allowedTables.includes(table)) throw new Error("Invalid table name");
@@ -9,6 +17,9 @@ const adminModel = {
     if (table === "colors" && extraData.hex) {
       sql = `INSERT INTO colors (name, hex) VALUES (?, ?)`;
       params = [name, extraData.hex];
+    } else if (table === "brands" && extraData.logo_path) {
+      sql = `INSERT INTO brands (name, logo_path) VALUES (?, ?)`;
+      params = [name, extraData.logo_path];
     }
     const [result] = await pool.query(sql, params);
     return { id: result.insertId, name, ...extraData };
@@ -22,6 +33,11 @@ const adminModel = {
     if (table === "colors" && extraData.hex) {
       sql += `, hex = ?`;
       params.push(extraData.hex);
+    } else if (table === "brands") {
+      if (extraData.logo_path !== undefined) {
+        sql += `, logo_path = ?`;
+        params.push(extraData.logo_path);
+      }
     }
     sql += ` WHERE id = ?`;
     params.push(id);

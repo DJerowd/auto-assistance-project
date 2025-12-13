@@ -1,12 +1,52 @@
 const adminModel = require("../models/adminModel");
 const vehicleModel = require("../models/vehicleModel");
+const fs = require("fs");
+const path = require("path");
+const sharp = require("sharp");
+
+const processBrandLogo = async (file) => {
+  const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+  const newFilename = `brand-${uniqueSuffix}.webp`;
+  const newPath = path.join("public", "uploads", newFilename);
+  const dir = path.dirname(newPath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  await sharp(file.buffer)
+    .resize(200, 200, {
+      fit: "contain",
+      background: { r: 255, g: 255, b: 255, alpha: 0 },
+    })
+    .toFormat("webp", { quality: 90 })
+    .toFile(newPath);
+  return `public/uploads/${newFilename}`;
+};
+
+const deleteFile = (relativePath) => {
+  if (!relativePath) return;
+  const fullPath = path.join(__dirname, "..", "..", relativePath);
+  if (fs.existsSync(fullPath)) {
+    fs.unlink(fullPath, (err) => {
+      if (err) console.error(err);
+    });
+  }
+};
 
 const adminController = {
   async createBrand(req, res, next) {
     try {
       const { name } = req.body;
       if (!name) return res.status(400).json({ message: "Name is required" });
-      const newItem = await adminModel.createItem("brands", name);
+      let logoPath = null;
+      if (req.file) {
+        logoPath = await processBrandLogo(req.file);
+      }
+      const newItem = await adminModel.createItem("brands", name, {
+        logo_path: logoPath,
+      });
+      if (newItem.logo_path) {
+        newItem.logo_url = `${process.env.APP_URL}/${newItem.logo_path}`;
+      }
       res.status(201).json(newItem);
     } catch (error) {
       next(error);
@@ -17,8 +57,21 @@ const adminController = {
       const { id } = req.params;
       const { name } = req.body;
       if (!name) return res.status(400).json({ message: "Name is required" });
-      await adminModel.updateItem("brands", id, name);
-      res.status(200).json({ message: "Brand updated successfully" });
+      let extraData = {};
+      if (req.file) {
+        const oldBrand = await adminModel.getItemById("brands", id);
+        if (oldBrand && oldBrand.logo_path) {
+          deleteFile(oldBrand.logo_path);
+        }
+        extraData.logo_path = await processBrandLogo(req.file);
+      }
+      await adminModel.updateItem("brands", id, name, extraData);
+      res
+        .status(200)
+        .json({
+          message: "Brand updated successfully",
+          logo_path: extraData.logo_path,
+        });
     } catch (error) {
       next(error);
     }
@@ -26,6 +79,10 @@ const adminController = {
   async deleteBrand(req, res, next) {
     try {
       const { id } = req.params;
+      const brand = await adminModel.getItemById("brands", id);
+      if (brand && brand.logo_path) {
+        deleteFile(brand.logo_path);
+      }
       await adminModel.deleteItem("brands", id);
       res.status(200).json({ message: "Brand deleted" });
     } catch (error) {
@@ -193,25 +250,38 @@ const adminController = {
       const vehicleImageModel = require("../models/vehicleImageModel");
       const reminderModel = require("../models/reminderModel");
       const maintenanceModel = require("../models/maintenanceModel");
+      const pool = require("../config/database");
       const fs = require("fs").promises;
       const path = require("path");
-      const connection = await pool.getConnection();
-      await connection.beginTransaction();
-      const { images } = await vehicleImageModel.deleteByVehicleId(
-        id,
-        connection
-      );
-      for (const image of images) {
-        try {
-          const imagePath = path.join(__dirname, "..", "..", image.image_path);
-          await fs.unlink(imagePath);
-        } catch (e) {}
+      const connection = await require("../config/database").getConnection();
+      try {
+        await connection.beginTransaction();
+        const { images } = await vehicleImageModel.deleteByVehicleId(
+          id,
+          connection
+        );
+        for (const image of images) {
+          try {
+            const imagePath = path.join(
+              __dirname,
+              "..",
+              "..",
+              image.image_path
+            );
+            await fs.unlink(imagePath);
+          } catch (e) {}
+        }
+        await reminderModel.deleteByVehicleId(id, connection);
+        await maintenanceModel.deleteByVehicleId(id, connection);
+        await vehicleModel.delete(id, connection);
+        await connection.commit();
+        res.status(200).json({ message: "Vehicle deleted by admin." });
+      } catch (err) {
+        await connection.rollback();
+        throw err;
+      } finally {
+        connection.release();
       }
-      await reminderModel.deleteByVehicleId(id, connection);
-      await maintenanceModel.deleteByVehicleId(id, connection);
-      await vehicleModel.delete(id, connection);
-      await connection.commit();
-      res.status(200).json({ message: "Vehicle deleted by admin." });
     } catch (error) {
       next(error);
     }

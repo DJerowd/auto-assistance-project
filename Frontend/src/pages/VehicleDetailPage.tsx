@@ -25,6 +25,7 @@ import { MaintenanceIcon } from "../components/icons/MaintenanceIcon";
 import { BellIcon } from "../components/icons/BellIcon";
 import { SpeedometerIcon } from "../components/icons/SpeedometerIcon";
 import { StarIcon } from "../components/icons/StarIcon";
+import { CarIcon } from "../components/icons/CarIcon";
 import { Badge } from "../components/ui/Badge";
 import Spinner from "../components/ui/Spinner";
 import Modal from "../components/ui/modal/Modal";
@@ -174,6 +175,47 @@ const VehicleDetailPage = () => {
                 className="w-full h-full object-cover"
               />
             </div>
+
+            <div className="absolute top-3 left-3 z-10">
+              <div className="w-16 h-16 bg-white/40 dark:bg-gray-900/40 rounded-full p-1 shadow-lg flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100">
+                {vehicle.brand_logo_url ? (
+                  <img
+                    src={vehicle.brand_logo_url}
+                    alt={`Logo ${vehicle.brand_name}`}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <CarIcon
+                    className="text-gray-500 dark:text-gray-400"
+                    size={28}
+                  />
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleFavorite();
+              }}
+              className="absolute top-3 right-3 z-20 p-2 rounded-full bg-white/40 dark:bg-black/40 text-gray-600  dark:text-gray-300 hover:text-yellow-500 hover:bg-gray-100/40 dark:hover:bg-gray-700/40 shadow-sm transition-all duration-300 opacity-0 group-hover:opacity-100"
+              title={
+                vehicle.is_favorite
+                  ? "Remover dos favoritos"
+                  : "Adicionar aos favoritos"
+              }
+            >
+              <StarIcon
+                size={24}
+                className={cn(
+                  "transition-colors",
+                  vehicle.is_favorite
+                    ? "text-yellow-500 fill-yellow-500"
+                    : "text-gray-400 dark:text-gray-500"
+                )}
+              />
+            </button>
+
             {vehicle.images.length > 1 && (
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent transition-all duration-300 opacity-0 group-hover:opacity-100">
                 <div className="flex gap-2 overflow-x-auto pb-2">
@@ -203,35 +245,13 @@ const VehicleDetailPage = () => {
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <div>
-                    <CardTitle className="text-2xl flex items-center gap-2">
-                      {vehicle.nickname || vehicle.model}
-                    </CardTitle>
-                    <CardDescription>
-                      {vehicle.version || "Versão não informada"}
-                    </CardDescription>
-                  </div>
-
-                  <button
-                    onClick={handleToggleFavorite}
-                    className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    title={
-                      vehicle.is_favorite
-                        ? "Remover dos favoritos"
-                        : "Adicionar aos favoritos"
-                    }
-                  >
-                    <StarIcon
-                      size={24}
-                      className={cn(
-                        "transition-colors",
-                        vehicle.is_favorite
-                          ? "text-yellow-500 fill-yellow-500"
-                          : "text-gray-400 dark:text-gray-500"
-                      )}
-                    />
-                  </button>
+                <div>
+                  <CardTitle className="text-2xl flex items-center gap-2">
+                    {vehicle.nickname || vehicle.model}
+                  </CardTitle>
+                  <CardDescription>
+                    {vehicle.version || "Versão não informada"}
+                  </CardDescription>
                 </div>
 
                 <div className="flex space-x-2">
@@ -261,7 +281,8 @@ const VehicleDetailPage = () => {
                   <span className="text-gray-500 dark:text-gray-400 col-span-1">
                     Marca:
                   </span>
-                  <span className="font-medium dark:text-white col-span-2">
+
+                  <span className="font-medium dark:text-white">
                     {vehicle.brand_name || "N/I"}
                   </span>
                 </li>

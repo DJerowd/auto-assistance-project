@@ -2,9 +2,12 @@ const pool = require("../config/database");
 
 const dataLoaderModel = {
   async getBrands() {
-    const sql = "SELECT id, name FROM brands ORDER BY name ASC";
+    const sql = "SELECT id, name, logo_path FROM brands ORDER BY name ASC";
     const [rows] = await pool.query(sql);
-    return rows;
+    return rows.map((r) => ({
+      ...r,
+      logo_url: r.logo_path ? `${process.env.APP_URL}/${r.logo_path}` : null,
+    }));
   },
 
   async getColors() {

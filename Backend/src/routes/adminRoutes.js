@@ -3,11 +3,12 @@ const router = express.Router();
 const adminController = require("../controllers/adminController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const adminMiddleware = require("../middlewares/adminMiddleware");
+const upload = require("../config/multerConfig");
 
 router.use(authMiddleware, adminMiddleware);
 
-router.post("/brands", adminController.createBrand);
-router.put("/brands/:id", adminController.updateBrand);
+router.post("/brands", upload.single("logo"), adminController.createBrand);
+router.put("/brands/:id", upload.single("logo"), adminController.updateBrand);
 router.delete("/brands/:id", adminController.deleteBrand);
 
 router.post("/colors", adminController.createColor);

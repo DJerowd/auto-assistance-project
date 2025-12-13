@@ -248,7 +248,7 @@ const vehicleModel = {
 
   async findById(vehicleId) {
     const vehicleSql = `
-      SELECT v.*, b.name as brand_name, c.name as color_name,
+      SELECT v.*, b.name as brand_name, b.logo_path as brand_logo_path, c.name as color_name,
       (SELECT COUNT(*) FROM reminders r WHERE r.vehicle_id = v.id AND r.status = 'PENDING') > 0 as has_pending_reminders
       FROM vehicles v
       LEFT JOIN brands b ON v.brand_id = b.id
@@ -265,6 +265,11 @@ const vehicleModel = {
         ...img,
         url: `${process.env.APP_URL}/${img.image_path.replace(/\\/g, "/")}`,
       }));
+      if (vehicle.brand_logo_path) {
+        vehicle.brand_logo_url = `${process.env.APP_URL}/${vehicle.brand_logo_path}`;
+      } else {
+        vehicle.brand_logo_url = null;
+      }
       vehicle.is_favorite = Boolean(vehicle.is_favorite);
       vehicle.has_pending_reminders = Boolean(vehicle.has_pending_reminders);
       vehicle.features = await this._getVehicleFeatures(vehicleId, pool);

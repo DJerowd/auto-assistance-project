@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getVehicleOptions } from "../services/optionsService";
 import {
   createBrand,
@@ -29,6 +29,7 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { TrashIcon } from "../components/icons/TrashIcon";
 import { EditIcon } from "../components/icons/EditIcon";
+import { UploadIcon } from "../components/icons/UploadIcon";
 import ConfirmDialog from "../components/ui/modal/ConfirmDialog";
 import {
   Select,
@@ -79,6 +80,9 @@ const AdminPage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
+
+  // File states
+  const brandFileRef = useRef<HTMLInputElement>(null);
 
   // Confirm Dialog states
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -136,14 +140,21 @@ const AdminPage = () => {
   useEffect(() => {
     if (activeTab === "users") setUserPage(1);
     if (activeTab === "vehicles") setVehiclePage(1);
-  }, [userSearch, vehicleSearch, vehicleOwner, activeTab]);
+  }, [activeTab]);
 
   const handleSave = async () => {
     if (!newItemName) return;
     setIsSaving(true);
     try {
       if (editingId) {
-        if (activeTab === "brands") await updateBrand(editingId, newItemName);
+        if (activeTab === "brands") {
+          const formData = new FormData();
+          formData.append("name", newItemName);
+          if (brandFileRef.current?.files?.[0]) {
+            formData.append("logo", brandFileRef.current.files[0]);
+          }
+          await updateBrand(editingId, formData);
+        }
         if (activeTab === "features")
           await updateFeature(editingId, newItemName);
         if (activeTab === "colors")
@@ -152,7 +163,14 @@ const AdminPage = () => {
           await updateServiceType(editingId, newItemName);
         addToast({ type: "success", message: "Item atualizado com sucesso!" });
       } else {
-        if (activeTab === "brands") await createBrand(newItemName);
+        if (activeTab === "brands") {
+          const formData = new FormData();
+          formData.append("name", newItemName);
+          if (brandFileRef.current?.files?.[0]) {
+            formData.append("logo", brandFileRef.current.files[0]);
+          }
+          await createBrand(formData);
+        }
         if (activeTab === "features") await createFeature(newItemName);
         if (activeTab === "colors") await createColor(newItemName, newItemHex);
         if (activeTab === "serviceTypes") await createServiceType(newItemName);
@@ -174,6 +192,7 @@ const AdminPage = () => {
     if (activeTab === "colors") {
       setNewItemHex((item as Color).hex || "#000000");
     }
+    if (brandFileRef.current) brandFileRef.current.value = "";
   };
 
   const cancelEdit = () => {
@@ -259,7 +278,7 @@ const AdminPage = () => {
         <>
           <div className="mb-6 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
             <Input
-              placeholder="Buscar usuário por nome ou email..."
+              placeholder="Buscar usuário..."
               value={userSearch}
               onChange={(e) => setUserSearch(e.target.value)}
             />
@@ -365,6 +384,18 @@ const AdminPage = () => {
     if (activeTab === "vehicles") {
       return (
         <>
+          <div className="flex flex-col md:flex-row gap-4 mb-6 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <Input
+              placeholder="Buscar por modelo..."
+              value={vehicleSearch}
+              onChange={(e) => setVehicleSearch(e.target.value)}
+            />
+            <Input
+              placeholder="Filtrar por dono..."
+              value={vehicleOwner}
+              onChange={(e) => setVehicleOwner(e.target.value)}
+            />
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -449,7 +480,7 @@ const AdminPage = () => {
         {data[activeTab as keyof typeof data].map((item) => (
           <div
             key={item.id}
-            className="flex justify-between items-center p-3 border border-gray-300 dark:border-gray-600 rounded dark:border-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:border-indigo-300 transition-colors"
+            className="flex justify-between items-center p-3 border rounded border-gray-300 dark:border-gray-600 dark:text-gray-200 bg-white dark:bg-gray-800 hover:border-indigo-300 transition-colors"
           >
             <div className="flex items-center gap-3 min-w-0 flex-1">
               {activeTab === "colors" && (
@@ -457,6 +488,13 @@ const AdminPage = () => {
                   className="w-6 h-6 rounded-full border border-gray-300 flex-shrink-0"
                   style={{ backgroundColor: (item as Color).hex }}
                 ></div>
+              )}
+              {activeTab === "brands" && (item as Brand).logo_url && (
+                <img
+                  src={(item as Brand).logo_url!}
+                  alt="logo"
+                  className="w-8 h-8 object-contain"
+                />
               )}
               <span className="truncate block" title={item.name}>
                 {item.name}
@@ -538,7 +576,7 @@ const AdminPage = () => {
                 <label className="text-sm dark:text-gray-300 font-medium mb-1 block">
                   {editingId
                     ? `Editando ${getTabLabel()}`
-                    : `Nova ${getTabLabel()}`}
+                    : `Adicionar ${getTabLabel()}`}
                 </label>
                 <Input
                   value={newItemName}
@@ -546,6 +584,36 @@ const AdminPage = () => {
                   placeholder="Nome..."
                 />
               </div>
+
+              {activeTab === "brands" && (
+                <div className="w-full md:w-auto">
+                  <label className="text-sm dark:text-gray-300 font-medium mb-1 block">
+                    Logo (Opcional)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => brandFileRef.current?.click()}
+                      className="flex items-center gap-2 px-3 py-2 border rounded-md bg-white dark:bg-gray-700 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                    >
+                      <UploadIcon
+                        size={18}
+                        className="text-gray-500 dark:text-gray-400"
+                      />
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        Escolher Imagem
+                      </span>
+                    </button>
+                    <input
+                      type="file"
+                      ref={brandFileRef}
+                      className="hidden"
+                      accept="image/png, image/jpeg, image/webp"
+                    />
+                  </div>
+                </div>
+              )}
+
               {activeTab === "colors" && (
                 <div>
                   <label className="text-sm dark:text-gray-300 font-medium mb-1 block">
@@ -566,6 +634,7 @@ const AdminPage = () => {
                   </div>
                 </div>
               )}
+
               <div className="flex gap-2 w-full md:w-auto">
                 {editingId && (
                   <Button
@@ -584,21 +653,6 @@ const AdminPage = () => {
                   {editingId ? "Atualizar" : "Adicionar"}
                 </Button>
               </div>
-            </div>
-          )}
-
-          {activeTab === "vehicles" && (
-            <div className="flex flex-col md:flex-row gap-4 mb-6 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-              <Input
-                placeholder="Buscar por modelo..."
-                value={vehicleSearch}
-                onChange={(e) => setVehicleSearch(e.target.value)}
-              />
-              <Input
-                placeholder="Filtrar por email do dono..."
-                value={vehicleOwner}
-                onChange={(e) => setVehicleOwner(e.target.value)}
-              />
             </div>
           )}
 
