@@ -8,8 +8,8 @@ import { MaintenanceIcon } from "../components/icons/MaintenanceIcon";
 import { CalendarIcon } from "../components/icons/CalendarIcon";
 import { MoneyIcon } from "../components/icons/MoneyIcon";
 import { FilterIcon } from "../components/icons/FilterIcon";
+import { Skeleton } from "../components/ui/Skeleton";
 import Drawer from "../components/ui/Drawer";
-import Spinner from "../components/ui/Spinner";
 import type { Maintenance, PaginatedResponse } from "../types";
 
 interface MaintenanceWithVehicle extends Maintenance {
@@ -73,8 +73,26 @@ const AllMaintenancesPage = () => {
       </div>
 
       {isLoading && !data ? (
-        <div className="h-64">
-          <Spinner />
+        <div className="grid gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between gap-4"
+            >
+              <div className="space-y-3 flex-1">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-6 w-48" />
+                  <Skeleton className="h-5 w-24 rounded-full" />{" "}
+                </div>
+                <div className="flex gap-4">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+              <Skeleton className="h-9 w-32 self-start md:self-center" />{" "}
+            </div>
+          ))}
         </div>
       ) : (
         <div className="grid gap-4">

@@ -13,6 +13,7 @@ import {
   deleteProfileImage,
 } from "../services/profileService";
 import { useAuthStore } from "../store/authStore";
+import { Skeleton } from "../components/ui/Skeleton";
 import Spinner from "../components/ui/Spinner";
 import Modal from "../components/ui/modal/Modal";
 import { UserIcon } from "../components/icons/UserIcon";
@@ -126,8 +127,33 @@ const ProfilePage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <Spinner />
+      <div className="space-y-6">
+         <Skeleton className="h-8 w-48" />
+         <div className="grid grid-cols-1 gap-6">
+            {/* Card Foto */}
+            <div className="flex flex-col items-center space-y-4 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md bg-white dark:bg-gray-800">
+               <Skeleton className="w-64 h-64 rounded-full" />
+               <div className="space-y-2 text-center">
+                  <Skeleton className="h-6 w-32 mx-auto" />
+                  <Skeleton className="h-4 w-24 mx-auto" />
+               </div>
+            </div>
+            
+            {/* Card Detalhes */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+               <div className="flex justify-between mb-6">
+                  <Skeleton className="h-6 w-32" />
+                  <div className="flex gap-2">
+                     <Skeleton className="h-9 w-20" />
+                     <Skeleton className="h-9 w-20" />
+                  </div>
+               </div>
+               <div className="grid grid-cols-1 gap-4">
+                  <Skeleton className="h-20 w-full rounded-lg" />
+                  <Skeleton className="h-20 w-full rounded-lg" />
+               </div>
+            </div>
+         </div>
       </div>
     );
   }
@@ -155,9 +181,9 @@ const ProfilePage = () => {
         <div className="grid grid-cols-1 gap-6">
           <Card className="flex flex-col items-center justify-center p-6 space-y-4">
             <div className="relative group">
-              <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-gray-100 dark:border-gray-700 shadow-md">
+              <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-gray-100 dark:border-gray-700 shadow-md bg-gray-100 dark:bg-gray-800">
                 {isUploading ? (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-800">
+                  <div className="w-full h-full flex items-center justify-center">
                     <Spinner />
                   </div>
                 ) : user.profile_image ? (
@@ -167,7 +193,7 @@ const ProfilePage = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-500 dark:text-indigo-300">
+                  <div className="w-full h-full flex items-center justify-center bg-indigo-100 dark:bg-indigo-900 text-indigo-500 dark:text-indigo-300">
                     <UserIcon size={128} />
                   </div>
                 )}
@@ -238,7 +264,7 @@ const ProfilePage = () => {
             <CardContent>
               <div className="space-y-4 mt-2">
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Nome Completo
                     </label>
@@ -247,7 +273,7 @@ const ProfilePage = () => {
                     </p>
                   </div>
                   
-                  <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Email
                     </label>

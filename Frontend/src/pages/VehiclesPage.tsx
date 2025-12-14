@@ -18,7 +18,7 @@ import { Button } from "../components/ui/Button";
 import { StarIcon } from "../components/icons/StarIcon";
 import { FilterIcon } from "../components/icons/FilterIcon";
 import { BellIcon } from "../components/icons/BellIcon";
-import Spinner from "../components/ui/Spinner";
+import { Skeleton } from "../components/ui/Skeleton";
 import Modal from "../components/ui/modal/Modal";
 import Drawer from "../components/ui/Drawer";
 import VehicleForm from "../components/vehicles/VehicleForm";
@@ -231,6 +231,47 @@ const VehiclesPage = () => {
   const pagination = vehiclesResponse?.pagination;
   const nextYear = new Date().getFullYear() + 1;
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <Skeleton className="h-8 w-48" />
+
+          <div className="w-full md:w-auto flex flex-1 justify-end gap-2">
+            <Skeleton className="h-10 w-full md:w-64" />
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-32" />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div
+              key={i}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden"
+            >
+              <Skeleton className="h-36 w-full" />
+
+              <div className="p-4 space-y-2">
+                <div className="flex items-start">
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-40" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Skeleton className="h-4 flex-1" />
+                  <Skeleton className="h-4 flex-1" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -256,12 +297,6 @@ const VehiclesPage = () => {
           </Button>
         </div>
       </div>
-
-      {isLoading && !vehiclesResponse && (
-        <div className="flex justify-center items-center h-64">
-          <Spinner />
-        </div>
-      )}
 
       {error && <p className="text-red-500 text-center">{error}</p>}
 

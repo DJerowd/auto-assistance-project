@@ -8,7 +8,7 @@ import {
   CardTitle,
   CardDescription,
 } from "../components/ui/Card";
-import Spinner from "../components/ui/Spinner";
+import { Skeleton } from "../components/ui/Skeleton";
 import type { DashboardData } from "../types";
 
 const DashboardPage = () => {
@@ -32,8 +32,26 @@ const DashboardPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <Spinner />
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-4 w-24" />
+              </div>
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-64 w-full rounded-xl" />
+          <Skeleton className="h-64 w-full rounded-xl" />
+        </div>
       </div>
     );
   }
