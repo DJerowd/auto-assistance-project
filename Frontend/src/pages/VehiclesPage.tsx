@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from "../components/ui/Select";
 import { useToastStore } from "../store/toastStore";
+import { useDebounce } from "../hooks/useDebounce";
 import type {
   Vehicle,
   VehicleFormData,
@@ -49,6 +50,14 @@ const VehiclesPage = () => {
   const [vehiclesResponse, setVehiclesResponse] =
     useState<PaginatedResponse<Vehicle> | null>(null);
 
+  // UI
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -61,7 +70,7 @@ const VehiclesPage = () => {
 
   // Filtros Selecionados
   const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 500);
   const [showFavorites, setShowFavorites] = useState(false);
   const [sortBy, setSortBy] = useState("created_at");
   const [order, setOrder] = useState("DESC");
@@ -69,14 +78,6 @@ const VehiclesPage = () => {
   const [minYear, setMinYear] = useState<number | undefined>(undefined);
   const [maxYear, setMaxYear] = useState<number | undefined>(undefined);
   const [showPendingReminders, setShowPendingReminders] = useState(false);
-
-  // UI
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
 
   // Carregar os filtros disponíveis
   const fetchFilterOptions = useCallback(async () => {
@@ -99,7 +100,7 @@ const VehiclesPage = () => {
       const response = await getVehicles({
         page: currentPage,
         limit: 10,
-        model: debouncedQuery,
+        model: debouncedSearch,
         favorites: showFavorites,
         sortBy,
         order,
@@ -116,7 +117,7 @@ const VehiclesPage = () => {
     }
   }, [
     currentPage,
-    debouncedQuery,
+    debouncedSearch,
     showFavorites,
     sortBy,
     order,
@@ -125,14 +126,6 @@ const VehiclesPage = () => {
     maxYear,
     showPendingReminders,
   ]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchTerm);
-      setCurrentPage(1);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
 
   useEffect(() => {
     fetchVehicles();
@@ -152,7 +145,7 @@ const VehiclesPage = () => {
       addToast({ type: "success", message: "Veículo cadastrado com sucesso!" });
       handleCloseModals();
       fetchFilterOptions();
-      if (currentPage !== 1 || debouncedQuery !== "" || showFavorites) {
+      if (currentPage !== 1 || debouncedSearch !== "" || showFavorites) {
         setCurrentPage(1);
         setSearchTerm("");
         setShowFavorites(false);
@@ -243,7 +236,7 @@ const VehiclesPage = () => {
             <Skeleton className="h-10 w-32" />
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           {Array.from({ length: 10 }).map((_, i) => (
             <div
@@ -269,6 +262,14 @@ const VehiclesPage = () => {
           ))}
         </div>
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="p-4">
+        <p className="text-red-500 text-center">{error}</p>
+      </Card>
     );
   }
 
@@ -298,12 +299,10 @@ const VehiclesPage = () => {
         </div>
       </div>
 
-      {error && <p className="text-red-500 text-center">{error}</p>}
-
       {!isLoading && vehicles.length === 0 && (
         <Card>
           <CardContent className="pt-6 text-center text-gray-600 dark:text-gray-400">
-            {debouncedQuery ||
+            {debouncedSearch ||
             showFavorites ||
             showPendingReminders ||
             selectedBrand !== "all" ||
@@ -329,7 +328,7 @@ const VehiclesPage = () => {
                 <Card className="overflow-hidden flex flex-col relative h-full hover:border-indigo-300 transition-colors">
                   {vehicle.has_pending_reminders && (
                     <div
-                      className="absolute top-2 left-2 z-10 p-1.5 rounded-full bg-red-500/90 text-white shadow-sm backdrop-blur-sm"
+                      className="absolute top-2 left-2 z-10 p-1.5 rounded-full bg-red-500/90 text-white shadow-md backdrop-blur-sm animate-pulse"
                       title="Lembretes Pendentes"
                     >
                       <BellIcon size={16} />
@@ -407,10 +406,11 @@ const VehiclesPage = () => {
         </div>
       )}
 
+      {/* Drawer de Filtros Avançados */}
       <Drawer
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
-        title="Filtros e Ordenação"
+        title="Filtros Avançados"
       >
         <div className="space-y-6">
           <div>
@@ -588,6 +588,7 @@ const VehiclesPage = () => {
         </div>
       </Drawer>
 
+      {/* Modal de Criação */}
       <Modal
         isOpen={isFormModalOpen}
         onClose={handleCloseModals}

@@ -50,6 +50,14 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
     setIsLoading(true);
     try {
       const { token, user } = await loginUser(credentials);
+      if (user.profile_image && !user.profile_image.startsWith("http")) {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL.replace("/api", "");
+        user.profile_image = `${baseUrl}/${
+          user.profile_image.startsWith("/")
+            ? user.profile_image.slice(1)
+            : user.profile_image
+        }`;
+      }
       setToken(token);
       setUser(user);
       onSuccess();

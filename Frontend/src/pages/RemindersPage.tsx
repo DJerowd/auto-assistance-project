@@ -28,6 +28,7 @@ const AllRemindersPage = () => {
   const [data, setData] =
     useState<PaginatedResponse<ReminderWithVehicle> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const [page, setPage] = useState(1);
@@ -46,8 +47,8 @@ const AllRemindersPage = () => {
         vehicle_model: vehicleModel,
       });
       setData(response as unknown as PaginatedResponse<ReminderWithVehicle>);
-    } catch (error) {
-      console.error(error);
+    } catch {
+      setError("Não foi possível carregar seus lembretes.");
     } finally {
       setIsLoading(false);
     }
@@ -65,6 +66,14 @@ const AllRemindersPage = () => {
     setPage(1);
     setIsFilterOpen(false);
   };
+
+  if (error) {
+    return (
+      <Card className="p-4">
+        <p className="text-red-500 text-center">{error}</p>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">

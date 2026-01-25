@@ -60,6 +60,7 @@ const authController = {
           email: user.email,
           name: user.name,
           role: user.role,
+          profile_image: user.profile_image,
         },
       });
     } catch (error) {

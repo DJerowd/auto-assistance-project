@@ -38,7 +38,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/Select";
-import Spinner from "../components/ui/Spinner";
 import { useToastStore } from "../store/toastStore";
 import type {
   Brand,
@@ -48,6 +47,7 @@ import type {
   AdminUser,
   AdminVehicle,
 } from "../types";
+import { Skeleton } from "../components/ui/Skeleton";
 
 const AdminPage = () => {
   const [activeTab, setActiveTab] = useState<
@@ -267,9 +267,63 @@ const AdminPage = () => {
 
   const renderContent = () => {
     if (isFetching) {
+      if (activeTab === "users" || activeTab === "vehicles") {
+        return (
+          <div className="space-y-4 animate-pulse">
+            {/* Filtros */}
+            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 mb-6">
+               <Skeleton className="h-10 w-full" />
+            </div>
+            {/* Cabeçalho da Tabela */}
+            <div className="flex gap-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+               <Skeleton className="h-6 w-1/4" />
+               <Skeleton className="h-6 w-1/4" />
+               <Skeleton className="h-6 w-1/4" />
+               <Skeleton className="h-6 w-1/4" />
+            </div>
+            {/* Linhas da Tabela */}
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex gap-4 py-3 border-b border-gray-100 dark:border-gray-800 items-center">
+                 <div className="w-1/4 flex items-center gap-2">
+                    {activeTab === "users" && <Skeleton className="h-8 w-8 rounded-full" />}
+                    <Skeleton className="h-4 w-32" />
+                 </div>
+                 <Skeleton className="h-4 w-1/4" />
+                 <Skeleton className="h-4 w-1/4" />
+                 <div className="w-1/4 flex justify-end">
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                 </div>
+              </div>
+            ))}
+          </div>
+        );
+      }
+      // Skeleton para Grid (Marcas, Cores, etc.)
       return (
-        <div className="flex justify-center items-center h-64">
-          <Spinner />
+        <div className="space-y-6 animate-pulse">
+           {/* Formulário Superior */}
+           <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 flex gap-4 items-end">
+              <div className="flex-1 space-y-2">
+                 <Skeleton className="h-4 w-24" />
+                 <Skeleton className="h-10 w-full" />
+              </div>
+              <Skeleton className="h-10 w-24" />
+           </div>
+           {/* Grid de Itens */}
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="flex justify-between items-center p-3 border rounded border-gray-200 dark:border-gray-700">
+                   <div className="flex items-center gap-3">
+                      {activeTab === 'colors' && <Skeleton className="h-6 w-6 rounded-full" />}
+                      <Skeleton className="h-4 w-24" />
+                   </div>
+                   <div className="flex gap-2">
+                      <Skeleton className="h-8 w-8 rounded-md" />
+                      <Skeleton className="h-8 w-8 rounded-md" />
+                   </div>
+                </div>
+              ))}
+           </div>
         </div>
       );
     }
@@ -570,7 +624,7 @@ const AdminPage = () => {
         </CardHeader>
 
         <CardContent>
-          {activeTab !== "users" && activeTab !== "vehicles" && (
+          {activeTab !== "users" && activeTab !== "vehicles" && !isFetching && (
             <div className="flex flex-col md:flex-row gap-4 mb-6 items-end bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
               <div className="flex-1 w-full">
                 <label className="text-sm dark:text-gray-300 font-medium mb-1 block">

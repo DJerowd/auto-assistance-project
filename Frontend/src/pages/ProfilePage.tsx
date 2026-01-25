@@ -128,41 +128,43 @@ const ProfilePage = () => {
   if (isLoading) {
     return (
       <div className="space-y-6">
-         <Skeleton className="h-8 w-48" />
-         <div className="grid grid-cols-1 gap-6">
-            {/* Card Foto */}
-            <div className="flex flex-col items-center space-y-4 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md bg-white dark:bg-gray-800">
-               <Skeleton className="w-64 h-64 rounded-full" />
-               <div className="space-y-2 text-center">
-                  <Skeleton className="h-6 w-32 mx-auto" />
-                  <Skeleton className="h-4 w-24 mx-auto" />
-               </div>
+        <Skeleton className="h-8 w-48" />
+        <div className="grid grid-cols-1 gap-6">
+          {/* Card Foto */}
+          <div className="flex flex-col items-center space-y-4 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md bg-white dark:bg-gray-800">
+            <Skeleton className="w-64 h-64 rounded-full" />
+            <div className="space-y-2 text-center">
+              <Skeleton className="h-6 w-32 mx-auto" />
+              <Skeleton className="h-4 w-24 mx-auto" />
             </div>
-            
-            {/* Card Detalhes */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-               <div className="flex justify-between mb-6">
-                  <Skeleton className="h-6 w-32" />
-                  <div className="flex gap-2">
-                     <Skeleton className="h-9 w-20" />
-                     <Skeleton className="h-9 w-20" />
-                  </div>
-               </div>
-               <div className="grid grid-cols-1 gap-4">
-                  <Skeleton className="h-20 w-full rounded-lg" />
-                  <Skeleton className="h-20 w-full rounded-lg" />
-               </div>
+          </div>
+
+          {/* Card Detalhes */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between mb-6">
+              <Skeleton className="h-6 w-32" />
+              <div className="flex gap-2">
+                <Skeleton className="h-9 w-20" />
+                <Skeleton className="h-9 w-20" />
+              </div>
             </div>
-         </div>
+            <div className="grid grid-cols-1 gap-4">
+              <Skeleton className="h-20 w-full rounded-lg" />
+              <Skeleton className="h-20 w-full rounded-lg" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error || !user) {
     return (
-      <p className="text-red-500 text-center">
-        {error || "Usuário não encontrado."}
-      </p>
+      <Card className="p-4">
+        <p className="text-red-500 text-center">
+          {error || "Usuário não encontrado."}
+        </p>
+      </Card>
     );
   }
 
@@ -272,7 +274,7 @@ const ProfilePage = () => {
                       {user.name}
                     </p>
                   </div>
-                  
+
                   <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Email

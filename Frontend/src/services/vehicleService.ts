@@ -13,6 +13,7 @@ interface GetVehiclesOptions {
   favorites?: boolean;
   sortBy?: string;
   order?: string;
+  search?: string;
   brandId?: string;
   minYear?: number;
   maxYear?: number;
@@ -22,31 +23,31 @@ interface GetVehiclesOptions {
 export const getVehicles = async (
   options: GetVehiclesOptions = {}
 ): Promise<PaginatedResponse<Vehicle>> => {
-  const { 
-    page = 1, 
-    limit = 10, 
-    model = "", 
-    favorites = false, 
-    sortBy = "created_at", 
+  const {
+    page = 1,
+    limit = 10,
+    model = options.search,
+    favorites = false,
+    sortBy = "created_at",
     order = "DESC",
     brandId,
     minYear,
     maxYear,
-    pendingReminders 
+    pendingReminders,
   } = options;
 
   const response = await apiClient.get("/vehicles", {
-    params: { 
-      page, 
-      limit, 
-      model, 
-      favorites, 
-      sortBy, 
+    params: {
+      page,
+      limit,
+      model,
+      favorites,
+      sortBy,
       order,
       brandId,
       minYear,
       maxYear,
-      pendingReminders
+      pendingReminders,
     },
   });
   return response.data;

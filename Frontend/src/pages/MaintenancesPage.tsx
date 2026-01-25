@@ -20,6 +20,7 @@ const AllMaintenancesPage = () => {
   const [data, setData] =
     useState<PaginatedResponse<MaintenanceWithVehicle> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const [page, setPage] = useState(1);
@@ -40,8 +41,8 @@ const AllMaintenancesPage = () => {
         endDate: endDate || undefined,
       });
       setData(response as unknown as PaginatedResponse<MaintenanceWithVehicle>);
-    } catch (error) {
-      console.error(error);
+    } catch {
+      setError("Não foi possível carregar suas manutenções.");
     } finally {
       setIsLoading(false);
     }
@@ -61,6 +62,14 @@ const AllMaintenancesPage = () => {
     setIsFilterOpen(false);
   };
 
+  if (error) {
+    return (
+      <Card className="p-4">
+        <p className="text-red-500 text-center">{error}</p>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -74,7 +83,7 @@ const AllMaintenancesPage = () => {
 
       {isLoading && !data ? (
         <div className="grid gap-4">
-          {Array.from({ length: 5 }).map((_, i) => (
+          {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
               className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between gap-4"

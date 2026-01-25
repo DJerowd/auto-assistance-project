@@ -56,7 +56,13 @@ const DashboardPage = () => {
     );
   }
 
-  if (error) return <div className="p-6 text-red-500 text-center">{error}</div>;
+  if (error) {
+    return (
+      <Card className="p-4">
+        <p className="text-red-500 text-center">{error}</p>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-8">

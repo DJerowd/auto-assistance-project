@@ -8,9 +8,12 @@ const Header = () => {
   const { toggleMenu } = useUiStore();
   const { user } = useAuthStore();
 
-  const getImageUrl = (path: string) => {
+  const getImageUrl = (path: string | null | undefined) => {
+    if (!path) return null;
     if (path.startsWith("http")) return path;
-    return `${import.meta.env.VITE_API_BASE_URL.replace("/api", "")}/${path}`;
+    const baseUrl = import.meta.env.VITE_API_BASE_URL.replace("/api", "");
+    const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+    return `${baseUrl}/${cleanPath}`;
   };
 
   return (
@@ -47,7 +50,7 @@ const Header = () => {
             <div className="w-9 h-9 rounded-full overflow-hidden border border-gray-300 dark:border-gray-500 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
               {user.profile_image ? (
                 <img
-                  src={getImageUrl(user.profile_image)}
+                  src={getImageUrl(user.profile_image) || ""}
                   alt={user.name}
                   className="w-full h-full object-cover"
                 />
