@@ -37,7 +37,7 @@ const DashboardPage = () => {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4"
+              className="bg-secondary/50 p-4 rounded-xl shadow-sm border border-input space-y-4"
             >
               <div className="flex items-center justify-between">
                 <Skeleton className="h-4 w-24" />
@@ -59,7 +59,7 @@ const DashboardPage = () => {
   if (error) {
     return (
       <Card className="p-4">
-        <p className="text-red-500 text-center">{error}</p>
+        <p className="text-destructive text-center">{error}</p>
       </Card>
     );
   }
@@ -70,45 +70,45 @@ const DashboardPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader>
-            <CardDescription>Total de Veículos</CardDescription>
-            <CardTitle className="text-3xl">
+            <CardTitle>Total de Veículos</CardTitle>
+            <CardDescription className="text-3xl">
               {data?.kpi.totalVehicles}
-            </CardTitle>
+            </CardDescription>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Lembretes Pendentes</CardDescription>
-            <CardTitle className="text-3xl">
+            <CardTitle>Lembretes Pendentes</CardTitle>
+            <CardDescription className="text-3xl">
               {data?.kpi.pendingReminders}
-            </CardTitle>
+            </CardDescription>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Custo Anual (Manutenção)</CardDescription>
-            <CardTitle className="text-3xl">
+            <CardTitle>Custo Anual (Manutenção)</CardTitle>
+            <CardDescription className="text-3xl">
               {data?.kpi.totalCostLastYear.toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL",
               })}
-            </CardTitle>
+            </CardDescription>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Próximo Lembrete</CardDescription>
-            <CardTitle className="truncate">
+            <CardTitle>Próximo Lembrete</CardTitle>
+            <CardDescription className="truncate">
               {data?.kpi.nextReminder?.service_type ||
                 "Nenhum lembrete próximo"}
-            </CardTitle>
-            <CardTitle className="truncate">
+            </CardDescription>
+            <CardDescription className="truncate">
               {data?.kpi.nextReminder
                 ? new Date(
                     data.kpi.nextReminder.date_threshold
                   ).toLocaleDateString()
                 : ""}
-            </CardTitle>
+            </CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -124,7 +124,7 @@ const DashboardPage = () => {
               {data?.charts.maintenanceCostByMonth.map((item) => (
                 <li
                   key={item.month}
-                  className="text-sm dark:text-white flex justify-between"
+                  className="text-sm text-foreground flex justify-between"
                 >
                   <span>{item.month}:</span>
                   <span className="font-mono">
@@ -147,7 +147,7 @@ const DashboardPage = () => {
               {data?.charts.maintenancesByType.map((item) => (
                 <li
                   key={item.service_type}
-                  className="text-sm dark:text-white flex justify-between"
+                  className="text-sm text-foreground flex justify-between"
                 >
                   <span>{item.service_type}:</span>
                   <span className="font-bold">{item.count}</span>

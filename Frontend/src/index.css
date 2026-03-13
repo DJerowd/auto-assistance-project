@@ -1,5 +1,146 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-bg-start: var(--bg-start);
+  --color-bg-end: var(--bg-end);
+
+  --color-background: var(--bg-color);
+  --color-foreground: var(--text-color);
+  --color-active-foreground: var(--active-text-color);
+  
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+
+  /* NOVAS CORES DO BOTÃO */
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-hover: var(--destructive-hover);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-success: var(--success);
+  --color-success-hover: var(--success-hover);
+  --color-success-foreground: var(--success-foreground);
+
+  --color-warning: var(--warning);
+  --color-warning-hover: var(--warning-hover);
+  --color-warning-foreground: var(--warning-foreground);
+
+  --color-pending: var(--pending);
+  --color-pending-hover: var(--pending-hover);
+  --color-pending-foreground: var(--pending-foreground);
+
+  --color-info: var(--info);
+  --color-info-hover: var(--info-hover);
+  --color-info-foreground: var(--info-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+@layer base {
+  :root {
+    /* Tema Claro */
+    --bg-start: #f4f4f5; 
+    --bg-end: #e4e4e7;
+
+    --bg-color: #ffffff;
+    --text-color: #09090b;
+    --active-text-color: #d97706;
+    
+    --primary: #6c757d;
+    --primary-hover: #5f676e;
+    --primary-foreground: #18181b;
+
+    --secondary: #f4f4f5;
+    --secondary-hover: #e4e4e7;
+    --secondary-foreground: #27272a;
+
+    --destructive: #ef4444;
+    --destructive-hover: #dc2626;
+    --destructive-foreground: #ffffff;
+
+    --success: #10b981;
+    --success-hover: #059669;
+    --success-foreground: #ffffff;
+
+    --warning: #f59e0b;
+    --warning-hover: #d97706;
+    --warning-foreground: #ffffff;
+
+    --pending: #f97316;
+    --pending-hover: #ea580c;
+    --pending-foreground: #ffffff;
+
+    --info: #3b82f6;
+    --info-hover: #2563eb;
+    --info-foreground: #ffffff;
+
+    --accent: #f4f4f5;
+    --accent-foreground: #09090b;
+
+    --input: #e4e4e7;
+    --ring: #18181b;
+  }
+
+  :root.dark {
+    /* Tema Escuro */
+    --bg-start: #131515; 
+    --bg-end: #090b0a;
+    
+    --bg-color: #09090b; 
+    --text-color: #d7d9d9;
+    --active-text-color: #fdcb2f;
+    
+    --primary: #8c8c8c;
+    --primary-hover: #b2b2b2;
+    --primary-foreground: #ffffff;
+
+    --secondary: #252726;
+    --secondary-hover: #303332;
+    --secondary-foreground: #cac7bf;
+
+    --destructive: #eb0205;
+    --destructive-hover: #c71012;
+    --destructive-foreground: #fafafa;
+
+    --success: #059669;
+    --success-hover: #10b981;
+    --success-foreground: #ffffff;
+
+    --warning: #d97706;
+    --warning-hover: #f59e0b;
+    --warning-foreground: #ffffff;
+
+    --pending: #ea580c;
+    --pending-hover: #f97316;
+    --pending-foreground: #ffffff;
+
+    --info: #2563eb;
+    --info-hover: #3b82f6;
+    --info-foreground: #ffffff;
+
+    --accent: #413f3f; 
+    --accent-foreground: #b3afaf;
+
+    --input: #27272a;
+    --ring: #fdcb2f;
+  }
+  
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;

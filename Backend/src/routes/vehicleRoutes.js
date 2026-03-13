@@ -21,7 +21,11 @@ router
   .put(vehicleRules(), validate, vehicleController.updateVehicle)
   .delete(vehicleController.deleteVehicle);
 
+router.get("/friend/:userId", vehicleController.getFriendVehicles);
+
 router.patch("/:id/favorite", vehicleController.toggleFavorite);
+
+router.patch("/:id/share", vehicleController.toggleShare);
 
 router.use("/:vehicleId", vehicleSubRoutes);
 

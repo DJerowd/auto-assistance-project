@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { cn } from '../../lib/utils';
-import { Input } from './Input';
-import type { InputProps } from './Input';
+import * as React from "react";
+import { cn } from "../../lib/utils";
+import { Input } from "./Input";
+import type { InputProps } from "./Input";
 
 interface InputNumberProps extends InputProps {
   onValueChange: (value: number) => void;
@@ -18,18 +18,18 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
     return (
       <div className="relative flex items-center">
         <Input
-          type='number'
-          className={cn('pr-12 appearance: textfield', className)}
+          type="number"
+          className={cn("pr-12 appearance: textfield", className)}
           ref={ref}
           value={value}
           onChange={(e) => onValueChange(e.target.valueAsNumber || 0)}
           {...props}
         />
-        <div className="absolute right-1 flex h-full items-center">
+        <div className="absolute right-1 flex h-full items-center gap-1 pr-1">
           <button
             type="button"
             onClick={() => handleStep(-1)}
-            className="text-indigo-500 hover:text-gray-800 dark:hover:text-gray-200 h-6 w-6"
+            className="text-foreground/50 hover:text-foreground hover:bg-accent rounded h-6 w-6 flex items-center justify-center transition-colors"
             tabIndex={-1}
             aria-label="Diminuir"
           >
@@ -38,7 +38,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
           <button
             type="button"
             onClick={() => handleStep(1)}
-            className="text-indigo-500 hover:text-gray-800 dark:hover:text-gray-200 h-6 w-6"
+            className="text-foreground/50 hover:text-foreground hover:bg-accent rounded h-6 w-6 flex items-center justify-center transition-colors"
             tabIndex={-1}
             aria-label="Aumentar"
           >
@@ -47,8 +47,8 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
         </div>
       </div>
     );
-  }
+  },
 );
-InputNumber.displayName = 'InputNumber';
+InputNumber.displayName = "InputNumber";
 
 export { InputNumber };

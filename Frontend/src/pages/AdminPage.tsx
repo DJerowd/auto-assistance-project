@@ -101,7 +101,7 @@ const AdminPage = () => {
           vehiclePage,
           10,
           vehicleOwner,
-          vehicleSearch
+          vehicleSearch,
         );
         setVehicles(res.data);
         setVehicleTotalPages(res.pagination.totalPages);
@@ -233,7 +233,7 @@ const AdminPage = () => {
 
   const handleRoleChange = async (
     userId: number,
-    newRole: "ADMIN" | "USER"
+    newRole: "ADMIN" | "USER",
   ) => {
     try {
       await updateUserRole(userId, newRole);
@@ -271,28 +271,33 @@ const AdminPage = () => {
         return (
           <div className="space-y-4 animate-pulse">
             {/* Filtros */}
-            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 mb-6">
-               <Skeleton className="h-10 w-full" />
+            <div className="bg-secondary/50 p-4 rounded-lg border border-input mb-6">
+              <Skeleton className="h-10 w-full" />
             </div>
             {/* Cabeçalho da Tabela */}
-            <div className="flex gap-4 border-b border-gray-200 dark:border-gray-700 pb-2">
-               <Skeleton className="h-6 w-1/4" />
-               <Skeleton className="h-6 w-1/4" />
-               <Skeleton className="h-6 w-1/4" />
-               <Skeleton className="h-6 w-1/4" />
+            <div className="flex gap-4 border-b border-input pb-2">
+              <Skeleton className="h-6 w-1/4" />
+              <Skeleton className="h-6 w-1/4" />
+              <Skeleton className="h-6 w-1/4" />
+              <Skeleton className="h-6 w-1/4" />
             </div>
             {/* Linhas da Tabela */}
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex gap-4 py-3 border-b border-gray-100 dark:border-gray-800 items-center">
-                 <div className="w-1/4 flex items-center gap-2">
-                    {activeTab === "users" && <Skeleton className="h-8 w-8 rounded-full" />}
-                    <Skeleton className="h-4 w-32" />
-                 </div>
-                 <Skeleton className="h-4 w-1/4" />
-                 <Skeleton className="h-4 w-1/4" />
-                 <div className="w-1/4 flex justify-end">
-                    <Skeleton className="h-8 w-8 rounded-md" />
-                 </div>
+              <div
+                key={i}
+                className="flex gap-4 py-3 border-b border-input items-center"
+              >
+                <div className="w-1/4 flex items-center gap-2">
+                  {activeTab === "users" && (
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                  )}
+                  <Skeleton className="h-4 w-32" />
+                </div>
+                <Skeleton className="h-4 w-1/4" />
+                <Skeleton className="h-4 w-1/4" />
+                <div className="w-1/4 flex justify-end">
+                  <Skeleton className="h-8 w-8 rounded-md" />
+                </div>
               </div>
             ))}
           </div>
@@ -301,36 +306,41 @@ const AdminPage = () => {
       // Skeleton para Grid (Marcas, Cores, etc.)
       return (
         <div className="space-y-6 animate-pulse">
-           {/* Formulário Superior */}
-           <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 flex gap-4 items-end">
-              <div className="flex-1 space-y-2">
-                 <Skeleton className="h-4 w-24" />
-                 <Skeleton className="h-10 w-full" />
-              </div>
-              <Skeleton className="h-10 w-24" />
-           </div>
-           {/* Grid de Itens */}
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="flex justify-between items-center p-3 border rounded border-gray-200 dark:border-gray-700">
-                   <div className="flex items-center gap-3">
-                      {activeTab === 'colors' && <Skeleton className="h-6 w-6 rounded-full" />}
-                      <Skeleton className="h-4 w-24" />
-                   </div>
-                   <div className="flex gap-2">
-                      <Skeleton className="h-8 w-8 rounded-md" />
-                      <Skeleton className="h-8 w-8 rounded-md" />
-                   </div>
+          {/* Formulário Superior */}
+          <div className="bg-secondary/50 p-4 rounded-lg border border-input flex gap-4 items-end">
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <Skeleton className="h-10 w-24" />
+          </div>
+          {/* Grid de Itens */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex justify-between items-center p-3 border rounded border-input"
+              >
+                <div className="flex items-center gap-3">
+                  {activeTab === "colors" && (
+                    <Skeleton className="h-6 w-6 rounded-full" />
+                  )}
+                  <Skeleton className="h-4 w-24" />
                 </div>
-              ))}
-           </div>
+                <div className="flex gap-2">
+                  <Skeleton className="h-8 w-8 rounded-md" />
+                  <Skeleton className="h-8 w-8 rounded-md" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       );
     }
     if (activeTab === "users") {
       return (
         <>
-          <div className="mb-6 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="mb-6 bg-secondary/50 p-4 rounded-lg border border-input">
             <Input
               placeholder="Buscar usuário..."
               value={userSearch}
@@ -341,17 +351,17 @@ const AdminPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-300 dark:border-gray-600">
-                  <th className="p-3 text-sm font-semibold dark:text-gray-300">
+                <tr className="border-b border-input">
+                  <th className="p-3 text-sm font-semibold text-foreground">
                     Nome
                   </th>
-                  <th className="p-3 text-sm font-semibold dark:text-gray-300">
+                  <th className="p-3 text-sm font-semibold text-foreground">
                     Email
                   </th>
-                  <th className="p-3 text-sm font-semibold dark:text-gray-300">
+                  <th className="p-3 text-sm font-semibold text-foreground">
                     Permissão
                   </th>
-                  <th className="p-3 text-sm font-semibold dark:text-gray-300 text-right">
+                  <th className="p-3 text-sm font-semibold text-foreground text-right">
                     Ações
                   </th>
                 </tr>
@@ -361,12 +371,12 @@ const AdminPage = () => {
                   users.map((user) => (
                     <tr
                       key={user.id}
-                      className="border-b border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                      className="border-b border-input hover:bg-secondary/50 transition-colors"
                     >
-                      <td className="p-3 text-sm dark:text-gray-300">
+                      <td className="p-3 text-sm text-foreground">
                         {user.name}
                       </td>
-                      <td className="p-3 text-sm dark:text-gray-300">
+                      <td className="p-3 text-sm text-foreground">
                         {user.email}
                       </td>
                       <td className="p-3">
@@ -390,7 +400,7 @@ const AdminPage = () => {
                       <td className="p-3 text-right">
                         <button
                           onClick={() => openDeleteConfirm(user.id)}
-                          className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          className="text-destructive hover:text-destructive-hover p-2 rounded-full hover:bg-destructive/10 transition-colors"
                           title="Excluir Usuário"
                         >
                           <TrashIcon size={18} />
@@ -400,7 +410,10 @@ const AdminPage = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="p-4 text-center text-gray-500">
+                    <td
+                      colSpan={4}
+                      className="p-4 text-center text-secondary-foreground"
+                    >
                       Nenhum usuário encontrado.
                     </td>
                   </tr>
@@ -418,7 +431,7 @@ const AdminPage = () => {
               >
                 Anterior
               </Button>
-              <span className="text-sm self-center text-gray-500 dark:text-gray-400">
+              <span className="text-sm self-center text-secondary-foreground">
                 Página {userPage} de {userTotalPages}
               </span>
               <Button
@@ -438,7 +451,7 @@ const AdminPage = () => {
     if (activeTab === "vehicles") {
       return (
         <>
-          <div className="flex flex-col md:flex-row gap-4 mb-6 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col md:flex-row gap-4 mb-6 bg-secondary/50 p-4 rounded-lg border border-input">
             <Input
               placeholder="Buscar por modelo..."
               value={vehicleSearch}
@@ -453,20 +466,20 @@ const AdminPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-300 dark:border-gray-600">
-                  <th className="p-3 text-sm font-semibold dark:text-gray-300">
+                <tr className="border-b border-input">
+                  <th className="p-3 text-sm font-semibold text-foreground">
                     ID
                   </th>
-                  <th className="p-3 text-sm font-semibold dark:text-gray-300">
+                  <th className="p-3 text-sm font-semibold text-foreground">
                     Modelo
                   </th>
-                  <th className="p-3 text-sm font-semibold dark:text-gray-300">
+                  <th className="p-3 text-sm font-semibold text-foreground">
                     Placa
                   </th>
-                  <th className="p-3 text-sm font-semibold dark:text-gray-300">
+                  <th className="p-3 text-sm font-semibold text-foreground">
                     Dono
                   </th>
-                  <th className="p-3 text-sm font-semibold dark:text-gray-300 text-right">
+                  <th className="p-3 text-sm font-semibold text-foreground text-right">
                     Ações
                   </th>
                 </tr>
@@ -475,19 +488,19 @@ const AdminPage = () => {
                 {vehicles.map((v) => (
                   <tr
                     key={v.id}
-                    className="border-b border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    className="border-b border-input hover:bg-secondary/50 transition-colors"
                   >
-                    <td className="p-3 text-sm dark:text-gray-300">{v.id}</td>
-                    <td className="p-3 text-sm dark:text-gray-300">
+                    <td className="p-3 text-sm text-foreground">{v.id}</td>
+                    <td className="p-3 text-sm text-foreground">
                       {v.brand_name} - {v.model} ({v.year_model})
                     </td>
-                    <td className="p-3 text-sm dark:text-gray-300">
+                    <td className="p-3 text-sm text-foreground">
                       {v.license_plate}
                     </td>
-                    <td className="p-3 text-sm dark:text-gray-300">
+                    <td className="p-3 text-sm text-foreground">
                       <div className="flex flex-col">
                         <span className="font-medium">{v.owner_name}</span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-secondary-foreground">
                           {v.owner_email}
                         </span>
                       </div>
@@ -495,7 +508,7 @@ const AdminPage = () => {
                     <td className="p-3 text-right">
                       <button
                         onClick={() => openDeleteConfirm(v.id)}
-                        className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        className="text-destructive hover:text-destructive-hover p-2 rounded-full hover:bg-destructive/10 transition-colors"
                         title="Excluir Veículo"
                       >
                         <TrashIcon size={18} />
@@ -514,7 +527,7 @@ const AdminPage = () => {
             >
               Anterior
             </Button>
-            <span className="text-sm self-center text-gray-500">
+            <span className="text-sm self-center text-secondary-foreground">
               Página {vehiclePage} de {vehicleTotalPages}
             </span>
             <Button
@@ -534,12 +547,12 @@ const AdminPage = () => {
         {data[activeTab as keyof typeof data].map((item) => (
           <div
             key={item.id}
-            className="flex justify-between items-center p-3 border rounded border-gray-300 dark:border-gray-600 dark:text-gray-200 bg-white dark:bg-gray-800 hover:border-indigo-300 transition-colors"
+            className="flex justify-between items-center p-3 border rounded border-input text-foreground bg-background hover:border-primary/50 transition-colors"
           >
             <div className="flex items-center gap-3 min-w-0 flex-1">
               {activeTab === "colors" && (
                 <div
-                  className="w-6 h-6 rounded-full border border-gray-300 flex-shrink-0"
+                  className="w-6 h-6 rounded-full border border-input flex-shrink-0"
                   style={{ backgroundColor: (item as Color).hex }}
                 ></div>
               )}
@@ -558,14 +571,14 @@ const AdminPage = () => {
             <div className="flex gap-1 flex-shrink-0 ml-2">
               <button
                 onClick={() => startEdit(item)}
-                className="text-blue-500 hover:text-blue-700 p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                className="text-info hover:text-info-hover p-2 rounded-full hover:bg-info-hover/10 transition-colors"
                 title="Editar"
               >
                 <EditIcon size={18} />
               </button>
               <button
                 onClick={() => openDeleteConfirm(item.id)}
-                className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                className="text-destructive hover:text-destructive-hover p-2 rounded-full hover:bg-destructive-hover/10 transition-colors"
                 title="Excluir"
               >
                 <TrashIcon size={18} />
@@ -579,11 +592,11 @@ const AdminPage = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold dark:text-white">
+      <h2 className="text-2xl font-bold text-foreground">
         Administração do Sistema
       </h2>
 
-      <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700 pb-2 overflow-x-auto">
+      <div className="flex gap-2 border-b border-input pb-2 overflow-x-auto">
         {(
           [
             "brands",
@@ -599,21 +612,21 @@ const AdminPage = () => {
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded-md capitalize whitespace-nowrap transition-colors ${
               activeTab === tab
-                ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-white"
-                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                ? "bg-primary/10 text-primary font-medium"
+                : "text-secondary-foreground hover:bg-accent"
             }`}
           >
             {tab === "serviceTypes"
               ? "Tipos de Serviço"
               : tab === "users"
-              ? "Usuários"
-              : tab === "vehicles"
-              ? "Veículos"
-              : tab === "brands"
-              ? "Marcas"
-              : tab === "colors"
-              ? "Cores"
-              : "Opcionais"}
+                ? "Usuários"
+                : tab === "vehicles"
+                  ? "Veículos"
+                  : tab === "brands"
+                    ? "Marcas"
+                    : tab === "colors"
+                      ? "Cores"
+                      : "Opcionais"}
           </button>
         ))}
       </div>
@@ -625,9 +638,9 @@ const AdminPage = () => {
 
         <CardContent>
           {activeTab !== "users" && activeTab !== "vehicles" && !isFetching && (
-            <div className="flex flex-col md:flex-row gap-4 mb-6 items-end bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col md:flex-row gap-4 mb-6 items-end bg-secondary/50 p-4 rounded-lg border border-input">
               <div className="flex-1 w-full">
-                <label className="text-sm dark:text-gray-300 font-medium mb-1 block">
+                <label className="text-sm text-foreground font-medium mb-1 block">
                   {editingId
                     ? `Editando ${getTabLabel()}`
                     : `Adicionar ${getTabLabel()}`}
@@ -641,22 +654,20 @@ const AdminPage = () => {
 
               {activeTab === "brands" && (
                 <div className="w-full md:w-auto">
-                  <label className="text-sm dark:text-gray-300 font-medium mb-1 block">
+                  <label className="text-sm text-foreground font-medium mb-1 block">
                     Logo (Opcional)
                   </label>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => brandFileRef.current?.click()}
-                      className="flex items-center gap-2 px-3 py-2 border rounded-md bg-white dark:bg-gray-700 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 border rounded-md bg-secondary border-input hover:bg-secondary-hover transition-colors"
                     >
                       <UploadIcon
                         size={18}
-                        className="text-gray-500 dark:text-gray-400"
+                        className="text-secondary-foreground"
                       />
-                      <span className="text-sm text-gray-600 dark:text-gray-300">
-                        Escolher Imagem
-                      </span>
+                      <span className="text-sm ys">Escolher Imagem</span>
                     </button>
                     <input
                       type="file"
@@ -670,7 +681,7 @@ const AdminPage = () => {
 
               {activeTab === "colors" && (
                 <div>
-                  <label className="text-sm dark:text-gray-300 font-medium mb-1 block">
+                  <label className="text-sm text-foreground font-medium mb-1 block">
                     Cor (Hex)
                   </label>
                   <div className="flex gap-2">
@@ -678,7 +689,7 @@ const AdminPage = () => {
                       type="color"
                       value={newItemHex}
                       onChange={(e) => setNewItemHex(e.target.value)}
-                      className="h-10 w-10 border rounded cursor-pointer"
+                      className="h-10 w-10 border border-input rounded-md cursor-pointer"
                     />
                     <Input
                       value={newItemHex}

@@ -21,14 +21,14 @@ const HomeHeader = ({ onOpenLogin, onOpenRegister }: HomeHeaderProps) => {
   const { user } = useAuthStore();
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-indigo-700 dark:bg-indigo-900 shadow-sm">
+    <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md text-primary-foreground border-b border-input shadow-sm transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link
           to="/"
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <img src="/logo.svg" alt="Auto Assistance Logo" className="h-8 w-8" />
-          <span className="text-xl font-bold text-gray-900 dark:text-white">
+          <span className="text-xl font-bold text-foreground">
             Auto Assistance
           </span>
         </Link>
@@ -36,25 +36,16 @@ const HomeHeader = ({ onOpenLogin, onOpenRegister }: HomeHeaderProps) => {
         <div className="flex items-center gap-4">
           {user ? (
             <Link to="/dashboard">
-              <Button className="dark:bg-indigo-500 dark:hover:bg-indigo-400">
+              <Button>
                 Ir para o Dashboard
               </Button>
             </Link>
           ) : (
             <>
-              <Button
-                variant="secondary"
-                className="dark:text-gray-100 dark:hover:bg-gray-500"
-                onClick={onOpenLogin}
-              >
+              <Button variant="secondary" onClick={onOpenLogin}>
                 Entrar
               </Button>
-              <Button
-                className="dark:bg-indigo-500 dark:hover:bg-indigo-400"
-                onClick={onOpenRegister}
-              >
-                Criar Conta
-              </Button>
+              <Button onClick={onOpenRegister}>Criar Conta</Button>
             </>
           )}
         </div>
@@ -72,20 +63,20 @@ const FeatureCard = ({
   title: string;
   description: string;
 }) => (
-  <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 hover:-translate-y-1 transition-transform duration-300">
-    <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4">
+  <div className="bg-background p-6 rounded-xl shadow-lg border border-input hover:-translate-y-1 transition-transform duration-300">
+    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center text-active-foreground mb-4">
       {icon}
     </div>
-    <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+    <h3 className="text-xl font-semibold mb-2 text-foreground">
       {title}
     </h3>
-    <p className="text-gray-600 dark:text-gray-400">{description}</p>
+    <p className="text-secondary-foreground">{description}</p>
   </div>
 );
 
 const HomePage = () => {
   const [activeModal, setActiveModal] = useState<"login" | "register" | null>(
-    null
+    null,
   );
   const addToast = useToastStore((state) => state.addToast);
 
@@ -102,25 +93,25 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col transition-colors duration-300">
       <HomeHeader onOpenLogin={openLogin} onOpenRegister={openRegister} />
 
       <main className="flex-grow pt-16">
         {/* Seção Hero */}
         <section className="relative overflow-hidden pt-20 pb-32 px-4 sm:px-6 lg:px-8">
           <div className="relative max-w-7xl mx-auto text-center z-10 animate-page-enter">
-            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-6">
+            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-6">
               Gerencie seus veículos com <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-hover">
                 inteligência e facilidade
               </span>
             </h1>
-            <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-400 mb-8">
+            <p className="mt-4 max-w-2xl mx-auto text-xl text-active-foreground/70 mb-8">
               Controle manutenções, acompanhe gastos e receba lembretes
               automáticos. Tudo o que você precisa para cuidar do seu carro em
               um só lugar.
             </p>
-            <div className="flex justify-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Button
                 size="lg"
                 className="px-8 text-lg h-12"
@@ -141,19 +132,19 @@ const HomePage = () => {
 
           {/* Blob Decorativo */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl opacity-30 dark:opacity-20 pointer-events-none -z-0">
-            <div className="absolute top-20 left-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
-            <div className="absolute top-20 right-20 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
+            <div className="absolute top-20 left-20 w-72 h-72 bg-primary rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
+            <div className="absolute top-20 right-20 w-72 h-72 bg-secondary rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
           </div>
         </section>
 
         {/* Seção de Funçoes */}
-        <section className="py-20 bg-white dark:bg-gray-900">
+        <section className="py-20 bg-secondary/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl font-bold text-foreground">
                 Tudo sob controle
               </h2>
-              <p className="mt-4 text-gray-500 dark:text-gray-400">
+              <p className="mt-4 text-secondary-foreground">
                 Funcionalidades pensadas para facilitar a vida de quem ama seu
                 carro.
               </p>
@@ -179,12 +170,12 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* Benefits/CTA Section */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-950">
+        {/* Benefits / CTA Section */}
+        <section className="py-20 bg-background">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="text-left space-y-4">
-                <h3 className="text-2xl font-bold dark:text-white">
+                <h3 className="text-2xl font-bold text-foreground">
                   Por que usar o Auto Assistance?
                 </h3>
                 <ul className="space-y-3">
@@ -196,25 +187,22 @@ const HomePage = () => {
                   ].map((item, index) => (
                     <li
                       key={index}
-                      className="flex items-center gap-2 text-gray-600 dark:text-gray-300"
+                      className="flex items-center gap-2 text-secondary-foreground"
                     >
-                      <CheckCircleIcon className="text-green-500" size={20} />
+                      <CheckCircleIcon className="text-active-foreground" size={20} />
                       {item}
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="flex flex-col justify-center items-center p-8 bg-gray-900 rounded-2xl text-white shadow-xl">
+              <div className="flex flex-col justify-center items-center p-8 bg-secondary rounded-2xl text-secondary-foreground shadow-xl">
                 <h3 className="text-2xl font-bold mb-2">
                   Pronto para começar?
                 </h3>
                 <p className="mb-6 opacity-90">
                   Crie sua conta em menos de 1 minuto.
                 </p>
-                <Button
-                  className="w-full font-bold"
-                  onClick={openRegister}
-                >
+                <Button className="w-full font-bold" onClick={openRegister}>
                   Criar Conta Grátis
                 </Button>
               </div>

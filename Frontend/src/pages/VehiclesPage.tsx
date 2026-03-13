@@ -16,6 +16,7 @@ import {
 import { PlusIcon } from "../components/icons/PlusIcon";
 import { Button } from "../components/ui/Button";
 import { StarIcon } from "../components/icons/StarIcon";
+import { SharedIcon } from "../components/icons/SharedIcon";
 import { FilterIcon } from "../components/icons/FilterIcon";
 import { BellIcon } from "../components/icons/BellIcon";
 import { Skeleton } from "../components/ui/Skeleton";
@@ -171,14 +172,14 @@ const VehiclesPage = () => {
 
   const handleToggleFavorite = async (
     e: React.MouseEvent,
-    vehicle: Vehicle
+    vehicle: Vehicle,
   ) => {
     e.preventDefault();
     e.stopPropagation();
     try {
       if (vehiclesResponse) {
         const updatedVehicles = vehiclesResponse.data.map((v) =>
-          v.id === vehicle.id ? { ...v, is_favorite: !v.is_favorite } : v
+          v.id === vehicle.id ? { ...v, is_favorite: !v.is_favorite } : v,
         );
         setVehiclesResponse({ ...vehiclesResponse, data: updatedVehicles });
       }
@@ -241,7 +242,7 @@ const VehiclesPage = () => {
           {Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden"
+              className="bg-background rounded-xl shadow-lg border border-input overflow-hidden"
             >
               <Skeleton className="h-36 w-full" />
 
@@ -268,7 +269,7 @@ const VehiclesPage = () => {
   if (error) {
     return (
       <Card className="p-4">
-        <p className="text-red-500 text-center">{error}</p>
+        <p className="text-destructive text-center">{error}</p>
       </Card>
     );
   }
@@ -276,7 +277,7 @@ const VehiclesPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-        <h2 className="text-2xl font-bold dark:text-white">Meus Veículos</h2>
+        <h2 className="text-2xl font-bold text-foreground">Meus Veículos</h2>
 
         <div className="w-full md:w-auto flex flex-1 justify-end gap-2">
           <div className="w-full md:w-64">
@@ -292,16 +293,21 @@ const VehiclesPage = () => {
             Filtros
           </Button>
 
-          <Button onClick={handleOpenAddModal} className="flex-shrink-0">
-            <PlusIcon className="mr-2 h-4 w-4" />{" "}
-            <span className="hidden md:inline">Adicionar</span>
+          <Button
+            onClick={handleOpenAddModal}
+            className="flex-shrink-0 relative group"
+          >
+            <PlusIcon className="mr-2 w-6 flex items-center justify-center absolute left-0 group-hover:w-[100%] z-10 duration-500" />{" "}
+            <span className="pl-4 hidden md:inline group-hover:text-transparent duration-200">
+              Adicionar
+            </span>
           </Button>
         </div>
       </div>
 
       {!isLoading && vehicles.length === 0 && (
         <Card>
-          <CardContent className="pt-6 text-center text-gray-600 dark:text-gray-400">
+          <CardContent className="pt-6 text-center text-secondary-foreground">
             {debouncedSearch ||
             showFavorites ||
             showPendingReminders ||
@@ -325,34 +331,8 @@ const VehiclesPage = () => {
                 key={vehicle.id}
                 className="block group"
               >
-                <Card className="overflow-hidden flex flex-col relative h-full hover:border-indigo-300 transition-colors">
-                  {vehicle.has_pending_reminders && (
-                    <div
-                      className="absolute top-2 left-2 z-10 p-1.5 rounded-full bg-red-500/90 text-white shadow-md backdrop-blur-sm animate-pulse"
-                      title="Lembretes Pendentes"
-                    >
-                      <BellIcon size={16} />
-                    </div>
-                  )}
-
-                  <button
-                    onClick={(e) => handleToggleFavorite(e, vehicle)}
-                    className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
-                    title={
-                      vehicle.is_favorite ? "Remover favorito" : "Favoritar"
-                    }
-                  >
-                    <StarIcon
-                      className={cn(
-                        "transition-colors",
-                        vehicle.is_favorite
-                          ? "text-yellow-400 fill-yellow-400"
-                          : "text-white"
-                      )}
-                    />
-                  </button>
-
-                  <div className="w-full h-38 bg-gray-800 relative">
+                <Card className="overflow-hidden flex flex-col relative h-full hover:border-primary/50 transition-colors">
+                  <div className="w-full h-38 bg-secondary relative">
                     <img
                       src={
                         primaryImage ? primaryImage.url : DEFAULT_VEHICLE_IMG
@@ -369,13 +349,59 @@ const VehiclesPage = () => {
                     >
                       {vehicle.nickname || vehicle.model}
                     </CardTitle>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                    <p className="text-sm text-secondary-foreground truncate">
                       {vehicle.brand_name || "N/I"} - {vehicle.model}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-foreground/60">
                       {vehicle.year_model} •{" "}
                       {vehicle.current_mileage.toLocaleString()} km
                     </p>
+
+                    <div className="flex items-center w-full gap-1">
+                      <button
+                        onClick={(e) => handleToggleFavorite(e, vehicle)}
+                        className="flex w-6 z-10 hover:animate-pulse transition-colors"
+                        title={
+                          vehicle.is_favorite ? "Remover favorito" : "Favoritar"
+                        }
+                      >
+                        <StarIcon
+                          size={18}
+                          className={cn(
+                            "transition-colors",
+                            vehicle.is_favorite
+                              ? "text-yellow-400 fill-yellow-400"
+                              : "text-foreground/40",
+                          )}
+                        />
+                      </button>
+
+                      <div
+                        className="flex w-6 z-10 hover:animate-pulse transition-colors"
+                        title={
+                          vehicle.share_with_friends ? "Visível Para Amigos" : "Invisível Para Amigos"
+                        }
+                      >
+                        <SharedIcon
+                          size={18}
+                          className={cn(
+                            "transition-colors",
+                            vehicle.share_with_friends
+                              ? "text-info fill-info"
+                              : "text-foreground/40",
+                          )}
+                        />
+                      </div>
+
+                      {vehicle.has_pending_reminders && (
+                        <div
+                          className="flex w-6 z-10 text-destructive animate-pulse transition-colors"
+                          title="Lembretes Pendentes"
+                        >
+                          <BellIcon size={18} fill="currentColor" />
+                        </div>
+                      )}
+                    </div>
                   </CardHeader>
                 </Card>
               </Link>
@@ -393,7 +419,7 @@ const VehiclesPage = () => {
           >
             Anterior
           </Button>
-          <span className="text-sm text-gray-700 dark:text-gray-300">
+          <span className="text-sm text-secondary-foreground">
             Página {pagination.currentPage} de {pagination.totalPages}
           </span>
           <Button
@@ -414,7 +440,7 @@ const VehiclesPage = () => {
       >
         <div className="space-y-6">
           <div>
-            <h3 className="text-sm font-medium mb-3 dark:text-gray-300">
+            <h3 className="text-sm font-medium mb-3 text-foreground">
               Estado
             </h3>
             <div className="space-y-2">
@@ -425,7 +451,7 @@ const VehiclesPage = () => {
                   "w-full justify-start",
                   showFavorites
                     ? "bg-yellow-50 border-yellow-200 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-500"
-                    : ""
+                    : "",
                 )}
               >
                 <StarIcon
@@ -433,7 +459,7 @@ const VehiclesPage = () => {
                     "mr-2 h-4 w-4",
                     showFavorites
                       ? "fill-yellow-500 text-yellow-500"
-                      : "text-gray-500"
+                      : "text-secondary-foreground",
                   )}
                 />
                 {showFavorites ? "Apenas Favoritos" : "Filtrar por Favoritos"}
@@ -448,14 +474,14 @@ const VehiclesPage = () => {
                 className={cn(
                   "w-full justify-start",
                   showPendingReminders
-                    ? "bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:text-red-500"
-                    : ""
+                    ? "bg-destructive/10 border-destructive/30 text-destructive"
+                    : "",
                 )}
               >
                 <BellIcon
                   className={cn(
                     "mr-2 h-4 w-4",
-                    showPendingReminders ? "text-red-500" : "text-gray-500"
+                    showPendingReminders ? "text-destructive" : "text-secondary-foreground",
                   )}
                 />
                 {showPendingReminders
@@ -465,10 +491,10 @@ const VehiclesPage = () => {
             </div>
           </div>
 
-          <div className="border-t dark:border-gray-700 my-4"></div>
+          <div className="border-t border-input my-4"></div>
 
           <div>
-            <h3 className="text-sm font-medium mb-3 dark:text-gray-300">
+            <h3 className="text-sm font-medium mb-3 text-foreground">
               Marca
             </h3>
             <Select
@@ -493,7 +519,7 @@ const VehiclesPage = () => {
           </div>
 
           <div>
-            <h3 className="text-sm font-medium mb-3 dark:text-gray-300">
+            <h3 className="text-sm font-medium mb-3 text-foreground">
               Ano (Modelo)
             </h3>
             <div className="flex gap-2">
@@ -519,7 +545,7 @@ const VehiclesPage = () => {
               />
             </div>
             {filterOptions.minYear && filterOptions.maxYear && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-secondary-foreground mt-1">
                 Faixa disponível: {filterOptions.minYear} -{" "}
                 {filterOptions.maxYear}
               </p>
@@ -529,7 +555,7 @@ const VehiclesPage = () => {
           <div className="border-t dark:border-gray-700 my-4"></div>
 
           <div>
-            <h3 className="text-sm font-medium mb-3 dark:text-gray-300">
+            <h3 className="text-sm font-medium mb-3 text-foreground">
               Ordenar por
             </h3>
             <div className="space-y-4">
@@ -576,7 +602,7 @@ const VehiclesPage = () => {
             </div>
           </div>
 
-          <div className="border-t dark:border-gray-700 my-4"></div>
+          <div className="border-t border-input my-4"></div>
 
           <Button
             variant="secondary"
@@ -595,7 +621,7 @@ const VehiclesPage = () => {
         title={"Adicionar Novo Veículo"}
       >
         {formError && (
-          <p className="text-red-500 text-center text-sm mb-4">{formError}</p>
+          <p className="text-destructive text-center text-sm mb-4">{formError}</p>
         )}
         <VehicleForm
           onSubmit={handleSaveVehicle}

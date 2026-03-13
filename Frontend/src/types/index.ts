@@ -77,6 +77,22 @@ export interface AdminUser {
   created_at: string;
 }
 
+export interface Friend {
+  friendship_id: number;
+  user_id: number;
+  name: string;
+  email: string;
+  profile_image?: string | null;
+}
+
+export interface FriendRequest {
+  friendship_id: number;
+  requester_id: number;
+  name: string;
+  email: string;
+  profile_image?: string | null;
+}
+
 export interface VehicleOptions {
   brands: Brand[];
   colors: Color[];
@@ -110,6 +126,7 @@ export interface Vehicle {
   color_id: number | string;
   is_favorite: boolean;
   has_pending_reminders: boolean;
+  share_with_friends?: boolean;
 }
 
 export interface AdminVehicle extends Vehicle {

@@ -32,7 +32,7 @@ const AllRemindersPage = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState<string>("PENDING");
+  const [status, setStatus] = useState<string>("ALL");
   const [serviceType, setServiceType] = useState("");
   const [vehicleModel, setVehicleModel] = useState("");
 
@@ -70,7 +70,7 @@ const AllRemindersPage = () => {
   if (error) {
     return (
       <Card className="p-4">
-        <p className="text-red-500 text-center">{error}</p>
+        <p className="text-destructive text-center">{error}</p>
       </Card>
     );
   }
@@ -78,7 +78,7 @@ const AllRemindersPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold dark:text-white">
+        <h2 className="text-2xl font-bold text-foreground">
           Todos os lembretes registrados
         </h2>
         <Button variant="outline" onClick={() => setIsFilterOpen(true)}>
@@ -87,7 +87,7 @@ const AllRemindersPage = () => {
       </div>
 
       {isLoading && !data ? (
-        <div className="h-64">
+        <div className="h-64 flex items-center justify-center">
           <Spinner />
         </div>
       ) : (
@@ -113,17 +113,16 @@ const AllRemindersPage = () => {
             return (
               <Card
                 key={item.id}
-                className="hover:border-indigo-300 transition-colors"
+                className="hover:border-primary/50 transition-colors"
               >
                 <CardContent className="p-4">
                   <div className="flex flex-col md:flex-row justify-between gap-4">
-                    {/* min-w-0 para permitir que o flex item encolha e quebre o texto */}
                     <div className="space-y-2 flex-grow min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-lg dark:text-white truncate">
+                        <h3 className="font-bold text-lg text-foreground truncate">
                           {item.service_type}
                         </h3>
-                        <span className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded-full dark:text-gray-300 whitespace-nowrap">
+                        <span className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded-full whitespace-nowrap">
                           {item.vehicle_model}
                         </span>
                         <div className="flex-shrink-0">
@@ -131,7 +130,7 @@ const AllRemindersPage = () => {
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex flex-wrap gap-4 text-sm text-secondary-foreground">
                         {item.date_threshold && (
                           <span className="flex items-center gap-1">
                             <CalendarIcon size={14} />
@@ -146,14 +145,14 @@ const AllRemindersPage = () => {
                         )}
                       </div>
                       {remainingInfo && (
-                        <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400 truncate">
+                        <p className="text-sm font-medium text-primary truncate">
                           {remainingInfo}
                         </p>
                       )}
 
                       {item.notes && (
                         <p
-                          className="text-sm italic text-gray-600 dark:text-gray-300 break-all line-clamp-4"
+                          className="text-sm italic text-foreground/70 break-all line-clamp-4"
                           title={item.notes}
                         >
                           "{item.notes}"
@@ -175,7 +174,7 @@ const AllRemindersPage = () => {
           })}
 
           {data?.data.length === 0 && (
-            <p className="text-center text-gray-500 py-8">
+            <p className="text-center text-secondary-foreground py-8">
               Nenhum lembrete encontrado.
             </p>
           )}
@@ -191,7 +190,7 @@ const AllRemindersPage = () => {
           >
             Anterior
           </Button>
-          <span className="self-center text-sm dark:text-gray-300">
+          <span className="self-center text-sm text-secondary-foreground">
             Página {page} de {data.pagination.totalPages}
           </span>
           <Button
@@ -213,7 +212,7 @@ const AllRemindersPage = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium dark:text-gray-300">
+            <label className="text-sm font-medium text-foreground">
               Status
             </label>
             <Select value={status} onValueChange={setStatus}>
@@ -229,7 +228,7 @@ const AllRemindersPage = () => {
             </Select>
           </div>
           <div>
-            <label className="text-sm font-medium dark:text-gray-300">
+            <label className="text-sm font-medium text-foreground">
               Veículo
             </label>
             <Input
@@ -238,7 +237,7 @@ const AllRemindersPage = () => {
             />
           </div>
           <div>
-            <label className="text-sm font-medium dark:text-gray-300">
+            <label className="text-sm font-medium text-foreground">
               Tipo
             </label>
             <Input

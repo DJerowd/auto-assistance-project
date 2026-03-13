@@ -24,13 +24,13 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
 
         <Dialog.Content
           className={cn(
-            "fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] border bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600 p-0 shadow-lg sm:rounded-lg duration-200 focus:outline-none flex flex-col max-h-[90vh]",
+            "fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] border bg-background border-input p-0 shadow-lg sm:rounded-lg duration-200 focus:outline-none flex flex-col max-h-[90vh]",
             "data-[state=open]:animate-content-show",
             "data-[state=closed]:animate-content-hide"
           )}
         >
-          <div className="flex justify-between items-center p-6 border-b border-gray-300 dark:border-gray-600 flex-shrink-0">
-            <Dialog.Title className="text-lg font-semibold dark:text-white">
+          <div className="flex justify-between items-center p-6 border-b border-input flex-shrink-0">
+            <Dialog.Title className="text-lg font-semibold text-foreground">
               {title}
             </Dialog.Title>
 
@@ -41,7 +41,7 @@ const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
               >
                 <CloseIcon
                   size={20}
-                  className="text-gray-600 dark:text-gray-300"
+                  className="text-foreground"
                 />
               </button>
             </Dialog.Close>

@@ -8,7 +8,7 @@ const ThemeSwitch = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+      className="p-2 rounded-full text-foreground/70 hover:text-foreground hover:bg-accent transition-colors"
       aria-label="Toggle theme"
     >
       {theme === "light" ? <MoonIcon size={20} /> : <SunIcon size={20} />}

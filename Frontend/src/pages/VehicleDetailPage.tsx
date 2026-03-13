@@ -5,6 +5,7 @@ import {
   updateVehicle,
   deleteVehicle,
   toggleVehicleFavorite,
+  toggleVehicleShare,
 } from "../services/vehicleService";
 import { getVehicleMaintenances } from "../services/maintenanceService";
 import { getVehicleReminders } from "../services/reminderService";
@@ -34,6 +35,8 @@ import VehicleForm from "../components/vehicles/VehicleForm";
 import ManageImagesModal from "../components/vehicles/ManageImagesModal";
 import { useToastStore } from "../store/toastStore";
 import { cn } from "../lib/utils";
+import { WarningIcon } from "../components/icons/WarningIcon";
+import { SharedIcon } from "../components/icons/SharedIcon";
 
 const DEFAULT_VEHICLE_IMG = "http://localhost:8800/public/default-vehicle.png";
 
@@ -143,6 +146,23 @@ const VehicleDetailPage = () => {
     }
   };
 
+  const handleToggleShare = async () => {
+    if (!vehicle) return;
+    const previousState = vehicle.share_with_friends;
+    setVehicle({ ...vehicle, share_with_friends: !previousState });
+    try {
+      await toggleVehicleShare(vehicle.id);
+      addToast({ 
+        type: "success", 
+        message: !previousState ? "Veículo visível para amigos!" : "Veículo oculto para amigos." 
+      });
+    } catch (err) {
+      console.error("Failed to toggle visibility", err);
+      addToast({ type: "error", message: "Erro ao alterar visibilidade." });
+      setVehicle({ ...vehicle, share_with_friends: previousState });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
@@ -158,16 +178,16 @@ const VehicleDetailPage = () => {
           </div>
 
           {/* Card de Detalhes */}
-          <div className="md:col-span-1 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4 h-full">
+          <div className="md:col-span-1 bg-background rounded-xl border border-input p-6 space-y-4 h-full">
             <div className="flex flex-wrap justify-between gap-2">
-              <Skeleton className="h-8 w-full mb-" />
-              <div className="flex gap-2">
-                <Skeleton className="h-8 w-8" />
-                <Skeleton className="h-8 w-8" />
+              <Skeleton className="h-8 w-full" />
+              <div className="flex gap-2 w-full">
+                <Skeleton className="h-8 flex-1" />
+                <Skeleton className="h-8 flex-1" />
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mt-6">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="flex justify-between">
                   <Skeleton className="h-4 w-24" />
@@ -180,13 +200,13 @@ const VehicleDetailPage = () => {
 
         {/* Bottom Grid Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+          <div className="bg-background rounded-xl border border-input p-6 space-y-4">
             <Skeleton className="h-6 w-32" />
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+          <div className="bg-background rounded-xl border border-input p-6 space-y-4">
             <Skeleton className="h-6 w-32" />
             <div className="flex justify-between items-center gap-4">
               <Skeleton className="h-4 w-full" />
@@ -195,7 +215,7 @@ const VehicleDetailPage = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-background rounded-xl border border-input p-6">
           <Skeleton className="h-4 w-32 mb-3" />
           <div className="flex flex-wrap gap-2">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -209,7 +229,7 @@ const VehicleDetailPage = () => {
 
   if (error || !vehicle) {
     return (
-      <p className="text-red-500 text-center">
+      <p className="text-destructive text-center">
         {error || "Veículo não encontrado."}
       </p>
     );
@@ -226,7 +246,7 @@ const VehicleDetailPage = () => {
         {/* Imagem Principal */}
         <div className="md:col-span-2">
           <Card className="overflow-hidden relative group h-full border-0 shadow-none bg-transparent">
-            <div className="aspect-video relative bg-gray-100 dark:bg-gray-800 sm:rounded-lg overflow-hidden cursor-pointer group shadow-lg border border-gray-200 dark:border-gray-700">
+            <div className="aspect-video relative bg-secondary sm:rounded-lg overflow-hidden cursor-pointer group shadow-lg border border-input">
               <img
                 src={selectedImage ? selectedImage.url : DEFAULT_VEHICLE_IMG}
                 alt={vehicle.model}
@@ -235,7 +255,7 @@ const VehicleDetailPage = () => {
             </div>
 
             <div className="absolute top-3 left-3 z-10">
-              <div className="w-16 h-16 bg-white/40 dark:bg-gray-900/40 rounded-full p-1 shadow-lg flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100">
+              <div className="w-16 h-16 bg-background/60 backdrop-blur-sm rounded-full p-1 shadow-lg flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100">
                 {vehicle.brand_logo_url ? (
                   <img
                     src={vehicle.brand_logo_url}
@@ -243,36 +263,10 @@ const VehicleDetailPage = () => {
                     className="w-full h-full object-contain"
                   />
                 ) : (
-                  <CarIcon
-                    className="text-gray-500 dark:text-gray-400"
-                    size={28}
-                  />
+                  <CarIcon className="text-foreground/60" size={28} />
                 )}
               </div>
             </div>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleToggleFavorite();
-              }}
-              className="absolute top-3 right-3 z-20 p-2 rounded-full bg-white/40 dark:bg-black/40 text-gray-600  dark:text-gray-300 hover:text-yellow-500 hover:bg-gray-100/40 dark:hover:bg-gray-700/40 shadow-sm transition-all duration-300 opacity-0 group-hover:opacity-100"
-              title={
-                vehicle.is_favorite
-                  ? "Remover dos favoritos"
-                  : "Adicionar aos favoritos"
-              }
-            >
-              <StarIcon
-                size={24}
-                className={cn(
-                  "transition-colors",
-                  vehicle.is_favorite
-                    ? "text-yellow-500 fill-yellow-500"
-                    : "text-gray-400 dark:text-gray-500"
-                )}
-              />
-            </button>
 
             {vehicle.images.length > 1 && (
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent transition-all duration-300 opacity-0 group-hover:opacity-100">
@@ -284,8 +278,8 @@ const VehicleDetailPage = () => {
                       className={cn(
                         "w-16 h-16 rounded-md overflow-hidden flex-shrink-0 border-2 transition-all",
                         selectedImage?.id === image.id
-                          ? "border-indigo-500"
-                          : "border-transparent hover:border-gray-400"
+                          ? "border-primary"
+                          : "border-transparent hover:border-foreground/50",
                       )}
                     >
                       <img
@@ -304,8 +298,8 @@ const VehicleDetailPage = () => {
         {/* Card de Detalhes */}
         <div className="md:col-span-1">
           <Card className="h-full">
-            <CardHeader>
-              <div className="flex flex-wrap justify-between items-center gap-2">
+            <CardHeader className="border-b border-input pb-4 mb-4">
+              <div className="flex flex-col gap-4">
                 <div>
                   <CardTitle className="text-2xl flex items-center gap-2">
                     {vehicle.nickname || vehicle.model}
@@ -315,72 +309,124 @@ const VehicleDetailPage = () => {
                   </CardDescription>
                 </div>
 
-                <div className="flex space-x-2">
+                <div className="flex space-x-2 w-full">
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     size="sm"
+                    className="flex-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleFavorite();
+                    }}
+                    title={
+                      vehicle.is_favorite
+                        ? "Remover dos favoritos"
+                        : "Adicionar aos favoritos"
+                    }
+                  >
+                    <StarIcon
+                      size={16}
+                      className={cn(
+                        "transition-colors",
+                        vehicle.is_favorite
+                          ? "text-warning fill-warning"
+                          : "text-foreground/50"
+                      )}
+                    />
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleShare();
+                    }}
+                    title={
+                      vehicle.share_with_friends
+                        ? "Tornar invisível para amigos"
+                        : "Compartilhar com amigos"
+                    }
+                  >
+                    <SharedIcon
+                      size={16}
+                      className={cn(
+                        "transition-colors",
+                        vehicle.share_with_friends
+                          ? "text-info fill-info"
+                          : "text-foreground/50"
+                      )}
+                    />
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
                     onClick={() => setIsFormModalOpen(true)}
                     title="Editar Informações"
                   >
-                    <EditIcon size={16} />
+                    <EditIcon size={16} className="text-foreground/80" />
                   </Button>
+                  
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     size="sm"
+                    className="flex-1"
                     onClick={() => setIsImagesModalOpen(true)}
                     title="Gerenciar Imagens"
                   >
-                    <ImageIcon size={16} />
+                    <ImageIcon size={16} className="text-foreground/80" />
                   </Button>
                 </div>
               </div>
             </CardHeader>
 
             <CardContent>
-              <ul className="space-y-2">
-                <li className="grid grid-cols-3 gap-4 border-b border-gray-100 dark:border-gray-700 pb-2">
-                  <span className="text-gray-500 dark:text-gray-400 col-span-1">
-                    Marca:
+              <ul className="space-y-3">
+                <li className="grid grid-cols-3 gap-4 border-b border-input pb-3">
+                  <span className="text-secondary-foreground col-span-1 text-sm font-medium">
+                    Marca
                   </span>
-
-                  <span className="text-sm font-medium dark:text-white col-span-2">
+                  <span className="text-sm font-medium text-foreground col-span-2">
                     {vehicle.brand_name || "N/I"}
                   </span>
                 </li>
 
-                <li className="grid grid-cols-3 gap-4 border-b border-gray-100 dark:border-gray-700 pb-2">
-                  <span className="text-sm text-gray-500 dark:text-gray-400 col-span-1">
+                <li className="grid grid-cols-3 gap-4 border-b border-input pb-3">
+                  <span className="text-sm text-secondary-foreground col-span-1 font-medium">
                     Placa
                   </span>
-                  <span className="text-sm font-medium dark:text-white col-span-2 uppercase">
+                  <span className="text-sm font-medium text-foreground col-span-2 uppercase">
                     {vehicle.license_plate}
                   </span>
                 </li>
 
-                <li className="grid grid-cols-3 gap-4 border-b border-gray-100 dark:border-gray-700 pb-2">
-                  <span className="text-sm text-gray-500 dark:text-gray-400 col-span-1">
+                <li className="grid grid-cols-3 gap-4 border-b border-input pb-3">
+                  <span className="text-sm text-secondary-foreground col-span-1 font-medium">
                     Cor
                   </span>
-                  <span className="text-sm font-medium dark:text-white col-span-2">
+                  <span className="text-sm font-medium text-foreground col-span-2">
                     {vehicle.color_name || "N/I"}
                   </span>
                 </li>
 
-                <li className="grid grid-cols-3 gap-4 border-b border-gray-100 dark:border-gray-700 pb-2">
-                  <span className="text-sm text-gray-500 dark:text-gray-400 col-span-1">
+                <li className="grid grid-cols-3 gap-4 border-b border-input pb-3">
+                  <span className="text-sm text-secondary-foreground col-span-1 font-medium">
                     Ano
                   </span>
-                  <span className="text-sm font-medium dark:text-white col-span-2">
+                  <span className="text-sm font-medium text-foreground col-span-2">
                     {vehicle.year_of_manufacture} / {vehicle.year_model}
                   </span>
                 </li>
 
-                <li className="pt-2 flex justify-between items-center">
-                  <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                <li className="pt-2 flex justify-between items-center bg-secondary p-3 rounded-lg mt-4">
+                  <span className="text-sm text-secondary-foreground flex items-center gap-2 font-medium">
                     <SpeedometerIcon size={16} /> Km Atual
                   </span>
-                  <span className="font-bold text-lg text-indigo-600 dark:text-indigo-400">
-                    {vehicle.current_mileage.toLocaleString("pt-BR")}
+                  <span className="font-bold text-lg text-primary">
+                    {vehicle.current_mileage.toLocaleString("pt-BR")} KM
                   </span>
                 </li>
               </ul>
@@ -399,12 +445,12 @@ const VehicleDetailPage = () => {
             <Button
               variant="outline"
               onClick={() => navigate(`/vehicles/${vehicle.id}/maintenances`)}
-              className="w-full flex items-center justify-between h-auto py-3"
+              className="w-full flex items-center justify-between h-auto py-3 hover:border-primary/50"
             >
               <span className="flex items-center gap-2">
                 <MaintenanceIcon size={18} /> Manutenções
               </span>
-              <span className="font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded-md text-xs">
+              <span className="font-medium text-info bg-info/10 px-2 py-1 rounded-md text-xs">
                 {counts.maintenances} Registros
               </span>
             </Button>
@@ -412,30 +458,31 @@ const VehicleDetailPage = () => {
             <Button
               variant="outline"
               onClick={() => navigate(`/vehicles/${vehicle.id}/reminders`)}
-              className="w-full flex items-center justify-between h-auto py-3"
+              className="w-full flex items-center justify-between h-auto py-3 hover:border-pending/50"
             >
               <span className="flex items-center gap-2">
                 <BellIcon size={18} /> Lembretes Pendentes
               </span>
-              <span className="font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 px-2 py-1 rounded-md text-xs">
+              <span className="font-medium text-pending bg-pending/10 px-2 py-1 rounded-md text-xs">
                 {counts.reminders} Pendentes
               </span>
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="h-full border-red-200 dark:border-red-900/30">
+        <Card className="h-full border-destructive/30 bg-destructive/5">
           <CardHeader>
-            <CardTitle className="text-lg text-red-600 dark:text-red-400">
+            <CardTitle className="text-lg text-destructive flex items-center gap-2">
+              <WarningIcon size={20} /> 
               Zona de Perigo
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h4 className="font-medium dark:text-white mb-1">
+              <h4 className="font-medium text-foreground mb-1">
                 Excluir Veículo
               </h4>
-              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+              <p className="text-sm text-secondary-foreground leading-relaxed">
                 Esta ação é permanente e excluirá todo o histórico.
               </p>
             </div>
@@ -452,9 +499,9 @@ const VehicleDetailPage = () => {
 
       <div className="gap-6">
         <Card className="h-full">
-          {vehicle.features && vehicle.features.length > 0 && (
+          {vehicle.features && vehicle.features.length > 0 ? (
             <div className="p-6">
-              <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">
+              <h4 className="text-sm font-semibold text-secondary-foreground uppercase mb-4">
                 Opcionais do veículo
               </h4>
               <div className="flex flex-wrap gap-2">
@@ -462,12 +509,16 @@ const VehicleDetailPage = () => {
                   <Badge
                     key={feature.id}
                     variant="default"
-                    className="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-200 hover:dark:bg-indigo-800"
+                    className="bg-secondary text-foreground border-input px-3 py-1.5 text-sm font-medium hover:bg-accent"
                   >
                     {feature.name}
                   </Badge>
                 ))}
               </div>
+            </div>
+          ) : (
+            <div className="p-6 text-center text-secondary-foreground">
+               Nenhum opcional registrado para este veículo.
             </div>
           )}
         </Card>

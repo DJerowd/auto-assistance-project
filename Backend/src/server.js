@@ -11,6 +11,7 @@ const vehicleRoutes = require("./routes/vehicleRoutes");
 const maintenanceRoutes = require("./routes/maintenanceRoutes");
 const reminderRoutes = require("./routes/reminderRoutes");
 const imageRoutes = require("./routes/imageRoutes");
+const friendshipRoutes = require("./routes/friendshipRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const dataLoaderRoutes = require('./routes/dataLoaderRoutes');
 const errorMiddleware = require("./middlewares/errorMiddleware");
@@ -33,6 +34,7 @@ app.use("/api/reminders", reminderRoutes);
 app.use("/api/images", imageRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use('/api/data', dataLoaderRoutes);
+app.use("/api/friendships", friendshipRoutes);
 
 app.use(errorMiddleware);
 

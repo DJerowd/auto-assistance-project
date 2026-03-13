@@ -80,7 +80,7 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
         <div>
           <label
             htmlFor="login-email"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            className="block text-sm font-medium text-foreground mb-1"
           >
             Email
           </label>
@@ -99,7 +99,7 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
         <div>
           <label
             htmlFor="login-password"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            className="block text-sm font-medium text-foreground mb-1"
           >
             Senha
           </label>
@@ -116,26 +116,26 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500"
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-foreground/50 hover:text-foreground/80 transition-colors"
             >
               {showPassword ? <EyeOffIcon /> : <EyeIcon />}
             </button>
           </InputWithIcon>
         </div>
 
-        {error && <p className="text-sm text-center text-red-600">{error}</p>}
+        {error && <p className="text-sm text-center text-destructive">{error}</p>}
 
         <Button type="submit" isLoading={isLoading} className="w-full">
           Entrar
         </Button>
       </form>
 
-      <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+      <div className="text-center text-sm text-secondary-foreground">
         Não tem uma conta?{" "}
         <button
           type="button"
           onClick={onSwitchToRegister}
-          className="font-medium text-indigo-600 hover:text-indigo-500 hover:underline"
+          className="font-medium text-primary hover:text-primary-hover hover:underline transition-colors"
         >
           Cadastre-se
         </button>

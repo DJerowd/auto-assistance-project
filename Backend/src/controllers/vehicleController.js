@@ -2,6 +2,7 @@ const vehicleModel = require("../models/vehicleModel");
 const maintenanceModel = require("../models/maintenanceModel");
 const reminderModel = require("../models/reminderModel");
 const vehicleImageModel = require("../models/vehicleImageModel");
+const friendshipModel = require("../models/friendshipModel");
 const pool = require("../config/database");
 const fs = require("fs").promises;
 const path = require("path");
@@ -31,7 +32,7 @@ const vehicleController = {
       const newVehicle = await vehicleModel.create(
         req.body,
         userId,
-        connection
+        connection,
       );
       await connection.commit();
       res.status(201).json({
@@ -85,8 +86,21 @@ const vehicleController = {
   async getFilters(req, res, next) {
     try {
       const userId = req.user.userId;
-      const filters = await vehicleModel.getUserFilterOptions(userId);
-      res.status(200).json(filters);
+      const vehicle = await vehicleModel.getUserFilterOptions(userId);
+      if (!vehicle) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+      const isOwner = vehicle.user_id === req.user.userId;
+      if (!isOwner) {
+        const areFriends = await friendshipModel.areFriends(
+          req.user.userId,
+          vehicle.user_id,
+        );
+        if (!areFriends || !vehicle.share_with_friends) {
+          return res.status(403).json({ message: "Access denied." });
+        }
+      }
+      res.status(200).json(vehicle);
     } catch (error) {
       next(error);
     }
@@ -94,10 +108,30 @@ const vehicleController = {
 
   async getVehicleById(req, res, next) {
     try {
-      const { id } = req.params;
+      const vehicleId = req.params.id;
       const userId = req.user.userId;
-      const vehicle = await checkVehicleOwnership(id, userId);
+      const vehicle = await checkVehicleOwnership(vehicleId, userId);
       res.status(200).json(vehicle);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getFriendVehicles(req, res, next) {
+    try {
+      const requesterId = req.user.userId;
+      const friendId = req.params.userId;
+      const areFriends = await friendshipModel.areFriends(
+        requesterId,
+        friendId,
+      );
+      if (!areFriends) {
+        return res
+          .status(403)
+          .json({ message: "You are not friends with this user." });
+      }
+      const vehicles = await vehicleModel.findSharedByUserId(friendId);
+      res.status(200).json(vehicles);
     } catch (error) {
       next(error);
     }
@@ -149,6 +183,24 @@ const vehicleController = {
     }
   },
 
+  async toggleShare(req, res, next) {
+    try {
+      const { id } = req.params;
+      const userId = req.user.userId;
+      await checkVehicleOwnership(id, userId);
+
+      await vehicleModel.toggleShare(id);
+      const updatedVehicle = await vehicleModel.findById(id);
+
+      res.status(200).json({
+        message: "Share visibility updated.",
+        vehicle: updatedVehicle,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async deleteVehicle(req, res, next) {
     let connection;
     try {
@@ -159,7 +211,7 @@ const vehicleController = {
       await checkVehicleOwnership(id, userId);
       const { images } = await vehicleImageModel.deleteByVehicleId(
         id,
-        connection
+        connection,
       );
       for (const image of images) {
         try {

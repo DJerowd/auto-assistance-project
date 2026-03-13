@@ -25,16 +25,16 @@ const Drawer = ({ isOpen, onClose, title, children }: DrawerProps) => {
       {/* Painel Lateral */}
       <div
         className={cn(
-          "fixed top-0 right-0 z-50 h-full w-80 bg-white dark:bg-gray-800 shadow-xl transform transition-transform duration-300 ease-in-out flex flex-col",
+          "fixed top-0 right-0 z-50 h-full w-80 bg-background border-l border-input shadow-xl transform transition-transform duration-300 ease-in-out flex flex-col",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         {/* Cabeçalho */}
-        <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
-          <h2 className="text-lg font-semibold dark:text-white">{title}</h2>
+        <div className="flex items-center justify-between p-4 border-b border-input">
+          <h2 className="text-lg font-semibold text-foreground">{title}</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-full text-foreground/70 hover:text-foreground hover:bg-accent transition-colors"
           >
             <CloseIcon size={20} />
           </button>

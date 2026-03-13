@@ -82,3 +82,8 @@ export const toggleVehicleFavorite = async (id: number) => {
   const response = await apiClient.patch(`/vehicles/${id}/favorite`);
   return response.data;
 };
+
+export const toggleVehicleShare = async (id: number): Promise<void> => {
+  const response = await apiClient.patch(`/vehicles/${id}/share`);
+  return response.data;
+};

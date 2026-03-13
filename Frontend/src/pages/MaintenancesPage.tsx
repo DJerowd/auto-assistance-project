@@ -65,7 +65,7 @@ const AllMaintenancesPage = () => {
   if (error) {
     return (
       <Card className="p-4">
-        <p className="text-red-500 text-center">{error}</p>
+        <p className="text-destructive text-center">{error}</p>
       </Card>
     );
   }
@@ -73,7 +73,7 @@ const AllMaintenancesPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold dark:text-white">
+        <h2 className="text-2xl font-bold text-foreground">
           Todas as manutenções registradas
         </h2>
         <Button variant="outline" onClick={() => setIsFilterOpen(true)}>
@@ -86,7 +86,7 @@ const AllMaintenancesPage = () => {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between gap-4"
+              className="bg-background p-4 rounded-xl border border-input flex flex-col md:flex-row justify-between gap-4"
             >
               <div className="space-y-3 flex-1">
                 <div className="flex items-center gap-3">
@@ -108,21 +108,21 @@ const AllMaintenancesPage = () => {
           {data?.data.map((item) => (
             <Card
               key={item.id}
-              className="hover:border-indigo-300 transition-colors"
+              className="hover:border-primary/50 transition-colors"
             >
               <CardContent className="p-4">
                 <div className="flex flex-col md:flex-row justify-between gap-4">
                   <div className="space-y-2 min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-lg dark:text-white truncate">
+                      <h3 className="font-bold text-lg text-active-foreground truncate">
                         {item.service_type}
                       </h3>
-                      <span className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded-full dark:text-gray-300 whitespace-nowrap">
+                      <span className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded-full whitespace-nowrap">
                         {item.vehicle_model}
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="flex flex-wrap gap-4 text-sm text-secondary-foreground">
                       <span className="flex items-center gap-1">
                         <CalendarIcon size={14} />
                         {new Date(item.maintenance_date).toLocaleDateString()}
@@ -143,7 +143,7 @@ const AllMaintenancesPage = () => {
 
                     {item.notes && (
                       <p
-                        className="text-sm italic text-gray-600 dark:text-gray-300 break-all line-clamp-4"
+                        className="text-sm italic text-foreground/70 break-all line-clamp-4"
                         title={item.notes}
                       >
                         "{item.notes}"
@@ -164,7 +164,7 @@ const AllMaintenancesPage = () => {
           ))}
 
           {data?.data.length === 0 && (
-            <p className="text-center text-gray-500 py-8">
+            <p className="text-center text-secondary-foreground py-8">
               Nenhuma manutenção encontrada.
             </p>
           )}
@@ -180,7 +180,7 @@ const AllMaintenancesPage = () => {
           >
             Anterior
           </Button>
-          <span className="self-center text-sm dark:text-gray-300">
+          <span className="self-center text-sm text-secondary-foreground">
             Página {page} de {data.pagination.totalPages}
           </span>
           <Button
@@ -202,7 +202,7 @@ const AllMaintenancesPage = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium dark:text-gray-300">
+            <label className="text-sm font-medium text-foreground">
               Veículo
             </label>
             <Input
@@ -211,7 +211,7 @@ const AllMaintenancesPage = () => {
             />
           </div>
           <div>
-            <label className="text-sm font-medium dark:text-gray-300">
+            <label className="text-sm font-medium text-foreground">
               Tipo
             </label>
             <Input
@@ -220,7 +220,7 @@ const AllMaintenancesPage = () => {
             />
           </div>
           <div>
-            <label className="text-sm font-medium dark:text-gray-300">
+            <label className="text-sm font-medium text-foreground">
               Início
             </label>
             <Input
@@ -230,7 +230,7 @@ const AllMaintenancesPage = () => {
             />
           </div>
           <div>
-            <label className="text-sm font-medium dark:text-gray-300">
+            <label className="text-sm font-medium text-foreground">
               Fim
             </label>
             <Input

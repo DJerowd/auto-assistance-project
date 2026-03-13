@@ -56,7 +56,7 @@ const UpdateProfileForm = ({
   return (
     <form className="space-y-4" onSubmit={handleUpdateProfile}>
       <div>
-        <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+        <label className="block text-sm font-medium mb-1 text-foreground">
           Nome
         </label>
         <Input
@@ -83,7 +83,7 @@ const UpdateProfileForm = ({
       {message.text && (
         <p
           className={`text-sm ${
-            message.type === "error" ? "text-red-600" : "text-green-600"
+            message.type === "error" ? "text-destructive" : "text-success"
           }`}
         >
           {message.text}

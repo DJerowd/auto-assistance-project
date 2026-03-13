@@ -7,9 +7,11 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
 export const StarIcon = ({ size = 20, ...props }: IconProps) => (
   <svg
     stroke="currentColor"
-    fill="currentColor"
-    strokeWidth="0"
+    fill="none"
+    strokeWidth="2"
     viewBox="0 0 24 24"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     height={size}
     width={size}
     {...props}

@@ -158,7 +158,7 @@ const VehicleMaintenancesPage = () => {
 
   if (isLoading && !maintenanceResponse) {
     return (
-      <div className="h-64">
+      <div className="h-64 flex items-center justify-center">
         <Spinner />
       </div>
     );
@@ -171,7 +171,7 @@ const VehicleMaintenancesPage = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold dark:text-white">Manutenções</h2>
+          <h2 className="text-2xl font-bold text-foreground">Manutenções</h2>
           <CardDescription>
             {vehicle?.nickname || vehicle?.model}
           </CardDescription>
@@ -187,11 +187,15 @@ const VehicleMaintenancesPage = () => {
         </div>
       </div>
 
-      {isLoading && <Spinner />}
+      {isLoading && (
+        <div className="flex justify-center">
+          <Spinner />
+        </div>
+      )}
 
       {!isLoading && maintenances.length === 0 ? (
         <Card>
-          <CardContent className="pt-6 text-center text-gray-600 dark:text-gray-400">
+          <CardContent className="pt-6 text-center text-secondary-foreground">
             Nenhuma manutenção registrada para este veículo.
           </CardContent>
         </Card>
@@ -200,9 +204,9 @@ const VehicleMaintenancesPage = () => {
           {maintenances.map((maintenance) => (
             <Card
               key={maintenance.id}
-              className="overflow-hidden flex flex-col"
+              className="overflow-hidden flex flex-col hover:border-primary/50 transition-colors"
             >
-              <CardHeader className="flex-row items-center justify-between">
+              <CardHeader className="flex-row items-center justify-between border-b border-input pb-2">
                 <CardTitle
                   className="truncate"
                   title={maintenance.service_type}
@@ -212,7 +216,9 @@ const VehicleMaintenancesPage = () => {
 
                 <div className="flex space-x-2 self-end md:self-center flex-shrink-0">
                   <Button
-                    variant="secondary"
+                    variant="ghost"
+                    className="text-foreground/70 hover:text-primary hover:bg-primary/10"
+                    size="sm"
                     onClick={() => handleOpenEditModal(maintenance)}
                     title="Editar"
                   >
@@ -220,7 +226,9 @@ const VehicleMaintenancesPage = () => {
                   </Button>
 
                   <Button
-                    variant="destructive"
+                    variant="ghost"
+                    className="text-foreground/70 hover:text-destructive hover:bg-destructive/10"
+                    size="sm"
                     onClick={() => handleOpenDeleteModal(maintenance)}
                     title="Excluir"
                   >
@@ -229,36 +237,41 @@ const VehicleMaintenancesPage = () => {
                 </div>
               </CardHeader>
 
-              <CardContent>
-                <div className="space-y-1">
-                  <div className="text-sm text-gray-500 dark:text-gray-400 flex flex-wrap gap-x-4 gap-y-1">
-                    <span className="flex items-center gap-1.5">
-                      <CalendarIcon size={14} />
+              <CardContent className="pt-4">
+                <div className="space-y-2">
+                  <div className="text-sm text-secondary-foreground flex flex-wrap gap-x-4 gap-y-2">
+                    <span className="flex items-center gap-1.5 bg-secondary px-2 py-1 rounded-md">
+                      <CalendarIcon size={14} className="text-foreground/50" />
                       {new Date(
-                        maintenance.maintenance_date
+                        maintenance.maintenance_date,
                       ).toLocaleDateString()}
                     </span>
-                    <span className="flex items-center gap-1.5">
-                      <SpeedometerIcon size={14} />
+                    <span className="flex items-center gap-1.5 bg-secondary px-2 py-1 rounded-md">
+                      <SpeedometerIcon
+                        size={14}
+                        className="text-foreground/50"
+                      />
                       {maintenance.mileage.toLocaleString("pt-BR")} km
                     </span>
-                    <span className="flex items-center gap-1.5">
-                      <MoneyIcon size={14} />
+                    <span className="flex items-center gap-1.5 bg-secondary px-2 py-1 rounded-md font-medium text-foreground">
+                      <MoneyIcon size={14} className="text-primary" />
                       R${" "}
                       {maintenance.cost.toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
+                        minimumFractionDigits: 2,
                       })}
                     </span>
                     {maintenance.service_provider && (
-                      <span className="flex items-center gap-1.5">
-                        <MaintenanceIcon size={14} />{" "}
+                      <span className="flex items-center gap-1.5 bg-secondary px-2 py-1 rounded-md">
+                        <MaintenanceIcon
+                          size={14}
+                          className="text-foreground/50"
+                        />{" "}
                         {maintenance.service_provider}
                       </span>
                     )}
                   </div>
                   {maintenance.notes && (
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 italic truncate">
+                    <p className="text-sm text-foreground/70 mt-2 italic truncate">
                       "{maintenance.notes}"
                     </p>
                   )}
@@ -278,7 +291,7 @@ const VehicleMaintenancesPage = () => {
           >
             Anterior
           </Button>
-          <span className="text-sm text-gray-700 dark:text-gray-300">
+          <span className="text-sm text-secondary-foreground">
             Página {pagination.currentPage} de {pagination.totalPages}
           </span>
           <Button

@@ -8,20 +8,17 @@ import { CloseIcon } from "../icons/CloseIcon";
 import { cn } from "../../lib/utils";
 
 const icons = {
-  success: <CheckCircleIcon className="w-6 h-6 text-green-500" />,
-  error: <XCircleIcon className="w-6 h-6 text-red-500" />,
-  info: <InfoIcon className="w-6 h-6 text-blue-500" />,
-  warning: <WarningIcon className="w-6 h-6 text-yellow-500" />
+  success: <CheckCircleIcon className="w-6 h-6 text-success" />,
+  error: <XCircleIcon className="w-6 h-6 text-destructive" />,
+  warning: <WarningIcon className="w-6 h-6 text-warning" />,
+  info: <InfoIcon className="w-6 h-6 text-info" />
 };
 
 const styles = {
-  success:
-    "border-green-500 bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-200",
-  error:
-    "border-red-500 bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-200",
-  info: "border-blue-500 bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-200",
-  warning:
-    "border-yellow-500 bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200",
+  success: "border-l-success",
+  error: "border-l-destructive",
+  warning: "border-l-warning",
+  info: "border-l-info"
 };
 
 interface ToastProps {
@@ -49,7 +46,7 @@ export const Toast = ({ toast }: ToastProps) => {
   return (
     <div
       className={cn(
-        "flex items-center w-full max-w-xs p-4 mb-2 text-gray-500 bg-white rounded-lg shadow-lg dark:text-gray-400 dark:bg-gray-800 border-l-4 transform transition-all duration-300 ease-in-out hover:scale-105",
+        "flex items-center w-full max-w-xs p-4 mb-2 bg-background text-foreground rounded-lg shadow-lg border border-input border-l-4 transform transition-all duration-300 ease-in-out hover:scale-105",
         styles[toast.type],
         isClosing ? "animate-slide-out" : "animate-slide-in"
       )}
@@ -68,7 +65,7 @@ export const Toast = ({ toast }: ToastProps) => {
       </div>
       <button
         type="button"
-        className="ml-auto -mx-1.5 -my-1.5 bg-transparent text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-700 transition-colors"
+        className="ml-auto -mx-1.5 -my-1.5 bg-transparent text-foreground/50 hover:text-foreground rounded-lg focus:ring-2 focus:ring-ring p-1.5 hover:bg-accent inline-flex items-center justify-center h-8 w-8 transition-colors"
         onClick={handleClose}
         aria-label="Fechar"
       >

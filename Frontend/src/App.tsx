@@ -11,6 +11,8 @@ import VehicleDetailPage from "./pages/VehicleDetailPage";
 import VehicleMaintenancesPage from "./pages/VehicleMaintenancesPage";
 import VehicleRemindersPage from "./pages/VehicleRemindersPage";
 import ProfilePage from "./pages/ProfilePage";
+import FriendsPage from "./pages/FriendsPage";
+import FriendGaragePage from "./pages/FriendGaragePage";
 import HomePage from "./pages/HomePage";
 import MaintenancesPage from "./pages/MaintenancesPage";
 import RemindersPage from "./pages/RemindersPage";
@@ -34,6 +36,8 @@ function App() {
             <Route path="/vehicles/:vehicleId/maintenances" element={<VehicleMaintenancesPage />} />
             <Route path="/vehicles/:vehicleId/reminders" element={<VehicleRemindersPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/friends" element={<FriendsPage />} />
+            <Route path="/friends/:friendId/garage" element={<FriendGaragePage />} />
           </Route>
         </Route>
       </Routes>

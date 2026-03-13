@@ -131,7 +131,7 @@ const ProfilePage = () => {
         <Skeleton className="h-8 w-48" />
         <div className="grid grid-cols-1 gap-6">
           {/* Card Foto */}
-          <div className="flex flex-col items-center space-y-4 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md bg-white dark:bg-gray-800">
+          <div className="flex flex-col items-center space-y-4 p-6 rounded-xl border border-input shadow-md bg-background">
             <Skeleton className="w-64 h-64 rounded-full" />
             <div className="space-y-2 text-center">
               <Skeleton className="h-6 w-32 mx-auto" />
@@ -140,7 +140,7 @@ const ProfilePage = () => {
           </div>
 
           {/* Card Detalhes */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="bg-background p-6 rounded-xl border border-input">
             <div className="flex justify-between mb-6">
               <Skeleton className="h-6 w-32" />
               <div className="flex gap-2">
@@ -161,7 +161,7 @@ const ProfilePage = () => {
   if (error || !user) {
     return (
       <Card className="p-4">
-        <p className="text-red-500 text-center">
+        <p className="text-destructive text-center">
           {error || "Usuário não encontrado."}
         </p>
       </Card>
@@ -173,7 +173,7 @@ const ProfilePage = () => {
       <div className="space-y-6">
         <div className="flex flex-row justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold dark:text-white">Meu Perfil</h2>
+            <h2 className="text-2xl font-bold text-foreground">Meu Perfil</h2>
             <CardDescription>
               Gerencie suas informações pessoais.
             </CardDescription>
@@ -183,7 +183,7 @@ const ProfilePage = () => {
         <div className="grid grid-cols-1 gap-6">
           <Card className="flex flex-col items-center justify-center p-6 space-y-4">
             <div className="relative group">
-              <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-gray-100 dark:border-gray-700 shadow-md bg-gray-100 dark:bg-gray-800">
+              <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-input shadow-md bg-secondary">
                 {isUploading ? (
                   <div className="w-full h-full flex items-center justify-center">
                     <Spinner />
@@ -195,7 +195,7 @@ const ProfilePage = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-indigo-100 dark:bg-indigo-900 text-indigo-500 dark:text-indigo-300">
+                  <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary">
                     <UserIcon size={128} />
                   </div>
                 )}
@@ -204,7 +204,7 @@ const ProfilePage = () => {
               <div className="absolute bottom-0 right-0 flex gap-2">
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 shadow-lg transition-transform hover:scale-105"
+                  className="p-2 bg-primary text-primary-foreground rounded-full hover:bg-primary-hover shadow-lg transition-transform hover:scale-105"
                   title="Alterar foto"
                 >
                   <UploadIcon size={16} />
@@ -212,7 +212,7 @@ const ProfilePage = () => {
                 {user.profile_image && (
                   <button
                     onClick={handleDeleteImage}
-                    className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-lg transition-transform hover:scale-105"
+                    className="p-2 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive-hover shadow-lg transition-transform hover:scale-105"
                     title="Remover foto"
                   >
                     <TrashIcon size={16} />
@@ -230,11 +230,11 @@ const ProfilePage = () => {
             </div>
 
             <div className="text-center">
-              <h3 className="font-semibold text-lg dark:text-white">
+              <h3 className="font-semibold text-lg text-foreground">
                 {user.name}
               </h3>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-secondary-foreground">
                 {user.role === "ADMIN" ? "Administrador" : "Usuário"}
               </p>
             </div>
@@ -266,20 +266,20 @@ const ProfilePage = () => {
             <CardContent>
               <div className="space-y-4 mt-2">
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  <div className="p-3 bg-secondary rounded-lg">
+                    <label className="text-xs font-medium text-secondary-foreground uppercase">
                       Nome Completo
                     </label>
-                    <p className="text-base font-medium dark:text-white mt-1">
+                    <p className="text-base font-medium text-foreground mt-1">
                       {user.name}
                     </p>
                   </div>
 
-                  <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  <div className="p-3 bg-secondary rounded-lg">
+                    <label className="text-xs font-medium text-secondary-foreground uppercase">
                       Email
                     </label>
-                    <p className="text-base font-medium dark:text-white mt-1">
+                    <p className="text-base font-medium text-foreground mt-1">
                       {user.email}
                     </p>
                   </div>

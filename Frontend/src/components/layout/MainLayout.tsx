@@ -7,7 +7,7 @@ const MainLayout = () => {
   const location = useLocation();
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-800 dark:to-gray-950">
+    <div className="flex min-h-screen bg-gradient-to-br from-bg-start to-bg-end text-foreground">
       <Sidebar />
       <div className="flex flex-col flex-grow">
         <Header />

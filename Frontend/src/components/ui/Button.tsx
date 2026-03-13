@@ -8,12 +8,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-indigo-600 text-white hover:bg-indigo-700",
-        destructive: "bg-red-600 text-white hover:bg-red-700",
+        default: "bg-primary text-primary-foreground hover:bg-primary-hover",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary-hover",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive-hover",
         outline:
-          "border border-input dark:text-gray-200 hover:text-gray-300 bg-gray-200 dark:bg-gray-800",
-        secondary: "bg-gray-600 dark:bg-gray-500 text-secondary-foreground hover:bg-gray-300 dark:hover:bg-gray-600",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+          "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+        ghost: "bg-transparent hover:bg-accent hover:text-accent-foreground",
         link: "underline-offset-4 hover:underline text-primary",
       },
       size: {
@@ -26,11 +28,12 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   isLoading?: boolean;
 }
@@ -47,7 +50,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {isLoading ? "Carregando..." : children}
       </button>
     );
-  }
+  },
 );
 Button.displayName = "Button";
 

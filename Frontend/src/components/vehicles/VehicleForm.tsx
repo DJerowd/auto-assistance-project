@@ -41,6 +41,7 @@ const VehicleForm = ({
     current_mileage: 0,
     brand_id: "",
     color_id: "",
+    share_with_friends: false,
     features: [],
   });
 
@@ -86,6 +87,7 @@ const VehicleForm = ({
         current_mileage: initialData.current_mileage,
         brand_id: initialData.brand_id || "",
         color_id: initialData.color_id || "",
+        share_with_friends: initialData.share_with_friends || false,
         features: initialData.features
           ? initialData.features.map((f) => f.id)
           : [],
@@ -94,7 +96,7 @@ const VehicleForm = ({
   }, [initialData]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     let finalValue = value;
@@ -280,11 +282,45 @@ const VehicleForm = ({
         </div>
       </div>
 
+      <div className="col-span-2 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+        <div>
+          <label
+            htmlFor="share_with_friends"
+            className="font-medium text-gray-900 dark:text-white cursor-pointer"
+          >
+            Compartilhar com Amigos
+          </label>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-2">
+            Se ativado, seus amigos poderão ver este veículo na sua garagem (sem
+            acesso a custos).
+          </p>
+        </div>
+        <div className="relative inline-block w-12 h-6 select-none transition duration-200 ease-in">
+          <input
+            type="checkbox"
+            name="share_with_friends"
+            id="share_with_friends"
+            className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-gray-200 border-4 appearance-none cursor-pointer transition-transform duration-200 ease-in-out checked:translate-x-6 checked:border-indigo-500"
+            checked={formData.share_with_friends || false}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                share_with_friends: e.target.checked,
+              }))
+            }
+          />
+          <label
+            htmlFor="share_with_friends"
+            className={`toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors ${formData.share_with_friends ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-600"}`}
+          ></label>
+        </div>
+      </div>
+
       <div className="md:col-span-2 mt-4 border-t pt-4 border-gray-200 dark:border-gray-700">
         <label className="block text-sm font-medium mb-3 dark:text-gray-300">
           Itens Opcionais
         </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {(options.features || []).map((feature) => (
             <label
               key={feature.id}

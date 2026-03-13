@@ -15,13 +15,13 @@ const vehicleModel = {
   async _saveVehicleFeatures(vehicleId, featureIds, connection) {
     await connection.query(
       "DELETE FROM vehicle_features WHERE vehicle_id = ?",
-      [vehicleId]
+      [vehicleId],
     );
     if (featureIds && featureIds.length > 0) {
       const values = featureIds.map((fid) => [vehicleId, fid]);
       await connection.query(
         "INSERT INTO vehicle_features (vehicle_id, feature_id) VALUES ?",
-        [values]
+        [values],
       );
     }
   },
@@ -38,11 +38,14 @@ const vehicleModel = {
       current_mileage,
       nickname,
       features,
+      share_with_friends = false,
     } = vehicleData;
-    const formattedPlate = license_plate ? license_plate.toUpperCase() : license_plate;
+    const formattedPlate = license_plate
+      ? license_plate.toUpperCase()
+      : license_plate;
     const sql = `
-      INSERT INTO vehicles (user_id, brand_id, color_id, license_plate, model, version, year_of_manufacture, year_model, current_mileage, nickname)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO vehicles (user_id, brand_id, color_id, license_plate, model, version, year_of_manufacture, year_model, current_mileage, nickname, share_with_friends)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await connection.query(sql, [
       userId,
@@ -55,6 +58,7 @@ const vehicleModel = {
       year_model,
       current_mileage,
       nickname,
+      share_with_friends,
     ]);
     const vehicleId = result.insertId;
     if (features && Array.isArray(features)) {
@@ -178,12 +182,7 @@ const vehicleModel = {
   },
 
   async findAll(options = {}) {
-    const {
-      page = 1,
-      limit = 20,
-      ownerEmail = null,
-      model = null,
-    } = options;
+    const { page = 1, limit = 20, ownerEmail = null, model = null } = options;
     const offset = (page - 1) * limit;
     let whereClause = "WHERE 1=1";
     const params = [];
@@ -288,12 +287,15 @@ const vehicleModel = {
       year_model,
       current_mileage,
       nickname,
+      share_with_friends,
       features,
     } = vehicleData;
-    const formattedPlate = license_plate ? license_plate.toUpperCase() : license_plate;
+    const formattedPlate = license_plate
+      ? license_plate.toUpperCase()
+      : license_plate;
     const sql = `
       UPDATE vehicles
-      SET brand_id = ?, color_id = ?, license_plate = ?, model = ?, version = ?, year_of_manufacture = ?, year_model = ?, current_mileage = ?, nickname = ?
+      SET brand_id = ?, color_id = ?, license_plate = ?, model = ?, version = ?, year_of_manufacture = ?, year_model = ?, current_mileage = ?, nickname = ?, share_with_friends = ?
       WHERE id = ?
     `;
     const [result] = await connection.query(sql, [
@@ -306,6 +308,7 @@ const vehicleModel = {
       year_model,
       current_mileage,
       nickname,
+      share_with_friends,
       vehicleId,
     ]);
     if (features && Array.isArray(features)) {
@@ -320,10 +323,41 @@ const vehicleModel = {
     return result.affectedRows;
   },
 
+  async toggleShare(vehicleId, connection = pool) {
+    const sql = `UPDATE vehicles SET share_with_friends = NOT share_with_friends WHERE id = ?`;
+    const [result] = await connection.query(sql, [vehicleId]);
+    return result.affectedRows;
+  },
+
   async delete(vehicleId, connection = pool) {
     const sql = "DELETE FROM vehicles WHERE id = ?";
     const [result] = await connection.query(sql, [vehicleId]);
     return result.affectedRows;
+  },
+
+  async findSharedByUserId(userId) {
+    const sql = `
+      SELECT v.*, b.name as brand_name, b.logo_path as brand_logo_path, c.name as color_name
+      FROM vehicles v
+      LEFT JOIN brands b ON v.brand_id = b.id
+      LEFT JOIN colors c ON v.color_id = c.id
+      WHERE v.user_id = ? AND v.share_with_friends = 1
+      ORDER BY v.created_at DESC
+    `;
+    const [vehicles] = await pool.query(sql, [userId]);
+    for (const vehicle of vehicles) {
+      const imagesSql =
+        "SELECT id, image_path, is_primary FROM vehicle_images WHERE vehicle_id = ?";
+      const [images] = await pool.query(imagesSql, [vehicle.id]);
+      vehicle.images = images.map((img) => ({
+        ...img,
+        url: `${process.env.APP_URL}/${img.image_path.replace(/\\/g, "/")}`,
+      }));
+      if (vehicle.brand_logo_path) {
+        vehicle.brand_logo_url = `${process.env.APP_URL}/${vehicle.brand_logo_path}`;
+      }
+    }
+    return vehicles;
   },
 };
 

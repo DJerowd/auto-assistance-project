@@ -65,7 +65,7 @@ const VehicleRemindersPage = () => {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedReminder, setSelectedReminder] = useState<Reminder | null>(
-    null
+    null,
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -161,13 +161,13 @@ const VehicleRemindersPage = () => {
   const getStatusClass = (status: Reminder["status"]) => {
     switch (status) {
       case "PENDING":
-        return "border-yellow-500 dark:border-yellow-500";
+        return "border-pending";
       case "COMPLETED":
-        return "border-green-500 dark:border-green-500";
+        return "border-success";
       case "CANCELLED":
-        return "border-red-500 dark:border-red-500";
+        return "border-destructive";
       default:
-        return "border-gray-300 dark:border-gray-600";
+        return "border-input";
     }
   };
 
@@ -188,7 +188,7 @@ const VehicleRemindersPage = () => {
 
   if (isLoading && !reminderResponse) {
     return (
-      <div className="h-64">
+      <div className="h-64 flex items-center justify-center">
         <Spinner />
       </div>
     );
@@ -201,7 +201,7 @@ const VehicleRemindersPage = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold dark:text-white">Lembretes</h2>
+          <h2 className="text-2xl font-bold text-foreground">Lembretes</h2>
           <CardDescription>
             {vehicle?.nickname || vehicle?.model}
           </CardDescription>
@@ -218,11 +218,11 @@ const VehicleRemindersPage = () => {
         </div>
       </div>
 
-      {isLoading && <Spinner />}
+      {isLoading && <div className="flex justify-center"><Spinner /></div>}
 
       {!isLoading && reminders.length === 0 ? (
         <Card>
-          <CardContent className="pt-6 text-center text-gray-600 dark:text-gray-400">
+          <CardContent className="pt-6 text-center text-secondary-foreground">
             Nenhum lembrete cadastrado para este veículo.
           </CardContent>
         </Card>
@@ -239,7 +239,7 @@ const VehicleRemindersPage = () => {
             if (reminder.mileage_threshold && vehicle) {
               remainingKm = calculateRemainingKm(
                 vehicle.current_mileage,
-                reminder.mileage_threshold
+                reminder.mileage_threshold,
               );
               progressKm = vehicle.current_mileage;
             }
@@ -262,7 +262,9 @@ const VehicleRemindersPage = () => {
 
                   <div className="flex space-x-2 self-end md:self-center flex-shrink-0">
                     <Button
-                      variant="secondary"
+                      variant="ghost"
+                      className="text-foreground/70 hover:text-primary hover:bg-primary/10"
+                      size="sm"
                       onClick={() => handleOpenEditModal(reminder)}
                       title="Editar"
                     >
@@ -270,7 +272,9 @@ const VehicleRemindersPage = () => {
                     </Button>
 
                     <Button
-                      variant="destructive"
+                      variant="ghost"
+                      className="text-foreground/70 hover:text-destructive hover:bg-destructive/10"
+                      size="sm"
                       onClick={() => handleOpenDeleteModal(reminder)}
                       title="Excluir"
                     >
@@ -281,13 +285,13 @@ const VehicleRemindersPage = () => {
 
                 <CardContent>
                   <div className="flex-grow space-y-2 w-full">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <div className="text-sm text-secondary-foreground flex flex-wrap items-center gap-x-4 gap-y-1">
                       {reminder.date_threshold && (
                         <span className="flex items-center gap-1.5">
                           <CalendarIcon size={14} />
                           Alvo:{" "}
                           {new Date(
-                            reminder.date_threshold
+                            reminder.date_threshold,
                           ).toLocaleDateString()}
                         </span>
                       )}
@@ -297,7 +301,7 @@ const VehicleRemindersPage = () => {
                           <SpeedometerIcon size={14} />
                           Alvo:{" "}
                           {reminder.mileage_threshold.toLocaleString(
-                            "pt-BR"
+                            "pt-BR",
                           )}{" "}
                           km
                         </span>
@@ -309,10 +313,10 @@ const VehicleRemindersPage = () => {
                         {reminder.mileage_threshold && (
                           <div className="space-y-1">
                             <div className="flex justify-between text-sm">
-                              <span className="font-medium text-gray-700 dark:text-gray-300">
+                              <span className="font-medium text-foreground">
                                 Progresso (Km)
                               </span>
-                              <span className="text-gray-500 dark:text-gray-400">
+                              <span className="text-secondary-foreground">
                                 Faltam {remainingKm?.toLocaleString("pt-BR")} km
                               </span>
                             </div>
@@ -321,13 +325,13 @@ const VehicleRemindersPage = () => {
                               max={reminder.mileage_threshold}
                             />
 
-                            <div className="flex justify-between text-xs text-gray-500">
+                            <div className="flex justify-between text-xs text-secondary-foreground">
                               <span>
                                 {progressKm.toLocaleString("pt-BR")} km
                               </span>
                               <span>
                                 {reminder.mileage_threshold.toLocaleString(
-                                  "pt-BR"
+                                  "pt-BR",
                                 )}{" "}
                                 km
                               </span>
@@ -337,10 +341,10 @@ const VehicleRemindersPage = () => {
 
                         {reminder.date_threshold && (
                           <div className="text-sm">
-                            <span className="font-medium text-gray-700 dark:text-gray-300">
+                            <span className="font-medium text-foreground">
                               Tempo Restante:{" "}
                             </span>
-                            <span className="text-gray-500 dark:text-gray-400">
+                            <span className="text-secondary-foreground">
                               {remainingDays !== null
                                 ? `${remainingDays} dias`
                                 : "N/A"}
@@ -351,7 +355,7 @@ const VehicleRemindersPage = () => {
                     )}
 
                     {reminder.notes && (
-                      <p className="text-sm text-gray-600 dark:text-gray-300 pt-1 italic">
+                      <p className="text-sm text-foreground/70 pt-1 italic">
                         "{reminder.notes}"
                       </p>
                     )}
@@ -372,7 +376,7 @@ const VehicleRemindersPage = () => {
           >
             Anterior
           </Button>
-          <span className="text-sm text-gray-700 dark:text-gray-300">
+          <span className="text-sm text-secondary-foreground">
             Página {pagination.currentPage} de {pagination.totalPages}
           </span>
           <Button

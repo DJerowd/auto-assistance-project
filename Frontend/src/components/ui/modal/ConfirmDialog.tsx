@@ -21,7 +21,7 @@ const ConfirmDialog = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="space-y-6">
-        <p className="text-gray-600 dark:text-gray-300">{description}</p>
+        <p className="text-foreground">{description}</p>
         <div className="flex justify-end space-x-4">
           <Button variant="outline" onClick={onClose}>
             Cancelar

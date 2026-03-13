@@ -1,4 +1,6 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation, NavLink, useNavigate } from "react-router-dom";
+import { getPendingRequests } from "../../services/friendshipService";
 import { useUiStore } from "../../store/uiStore";
 import { useAuthStore } from "../../store/authStore";
 import { CloseIcon } from "../icons/CloseIcon";
@@ -9,13 +11,18 @@ import { SettingsIcon } from "../icons/SettingsIcon";
 import { LogoutIcon } from "../icons/LogoutIcon";
 import { MaintenanceIcon } from "../icons/MaintenanceIcon";
 import { BellIcon } from "../icons/BellIcon";
-// import ThemeSwitch from "../ui/ThemeSwitch";
+import ThemeSwitch from "../ui/ThemeSwitch";
 import { Button } from "../ui/Button";
 
 const navLinks = [
   { name: "Dashboard", path: "/dashboard", icon: <DashboardIcon size={20} /> },
+  { name: "Amigos", path: "/friends", icon: <UserIcon size={20} /> },
   { name: "Meus Veículos", path: "/vehicles", icon: <CarIcon size={20} /> },
-  { name: "Manutenções", path: "/maintenances", icon: <MaintenanceIcon size={20} /> },
+  {
+    name: "Manutenções",
+    path: "/maintenances",
+    icon: <MaintenanceIcon size={20} />,
+  },
   { name: "Lembretes", path: "/reminders", icon: <BellIcon size={20} /> },
   { name: "Meu Perfil", path: "/profile", icon: <UserIcon size={20} /> },
 ];
@@ -24,6 +31,21 @@ const Sidebar = () => {
   const { isMenuOpen, closeMenu } = useUiStore();
   const { logout, user } = useAuthStore();
   const navigate = useNavigate();
+
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
+  const location = useLocation();
+
+  useEffect(() => {
+    const fetchPendingCount = async () => {
+      try {
+        const requests = await getPendingRequests();
+        setPendingRequestsCount(requests.length);
+      } catch (error) {
+        console.error("Erro ao buscar notificações de amizade", error);
+      }
+    };
+    fetchPendingCount();
+  }, [location.pathname]);
 
   const handleLogout = () => {
     closeMenu();
@@ -41,53 +63,58 @@ const Sidebar = () => {
       ></div>
 
       <aside
-        className={`fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-800 shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-80 bg-background border-r border-input shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-600">
+        <div className="flex justify-between items-center p-4 border-b border-input">
           <h2
-            className="font-bold text-lg dark:text-white truncate"
+            className="font-bold text-lg text-foreground truncate"
             title={`Olá, ${user?.name}`}
           >
             Olá, {user?.name}
           </h2>
-          <button onClick={closeMenu} className="dark:text-gray-300 md:hidden">
+          <button onClick={closeMenu} className="text-foreground/70 hover:text-foreground md:hidden">
             <CloseIcon size={24} />
           </button>
         </div>
 
-        <nav className="p-4 flex-grow">
-          <ul>
+        <nav className="p-4 flex-grow overflow-y-auto">
+          <ul className="space-y-1">
             {navLinks.map((link) => (
               <li key={link.path}>
                 <NavLink
                   to={link.path}
                   onClick={closeMenu}
                   className={({ isActive }) =>
-                    `flex text-gray-800 dark:text-gray-200 items-center gap-3 py-2 px-3 rounded-md transition-colors ${
+                    `flex items-center gap-3 py-2 px-3 rounded-md transition-colors ${
                       isActive
-                        ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-white"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-100 dark:text-gray-300"
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
                     }`
                   }
                 >
                   {link.icon}
-                  <span>{link.name}</span>
+                  <span className="flex-1">{link.name}</span>
+                  {link.name === "Amigos" && pendingRequestsCount > 0 && (
+                    <span className="bg-destructive text-destructive-foreground text-xs font-bold px-2 py-1 rounded-full shadow-sm animate-pulse">
+                      {pendingRequestsCount}
+                    </span>
+                  )}
                 </NavLink>
               </li>
             ))}
 
             {user?.role === "ADMIN" && (
-              <li>
+              <li className="pt-2 mt-2 border-t border-input">
                 <NavLink
                   to="/admin"
                   onClick={closeMenu}
                   className={({ isActive }) =>
-                    `flex text-gray-800 dark:text-gray-200 items-center gap-3 py-2 px-3 rounded-md transition-colors ${
+                    `flex items-center gap-3 py-2 px-3 rounded-md transition-colors ${
                       isActive
-                        ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-white"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-100 dark:text-gray-300"
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
                     }`
                   }
                 >
@@ -99,11 +126,11 @@ const Sidebar = () => {
           </ul>
         </nav>
 
-        <div className="p-4 border-t border-gray-300 dark:border-gray-600 space-y-4">
-          {/* <div className="flex justify-between items-center">
+        <div className="p-4 border-t border-input space-y-4">
+          <div className="flex justify-between items-center">
             <span className="text-sm dark:text-gray-300">Mudar Tema</span>
             <ThemeSwitch />
-          </div> */}
+          </div>
 
           <Button
             variant="destructive"

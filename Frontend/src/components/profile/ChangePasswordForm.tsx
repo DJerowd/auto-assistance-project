@@ -63,7 +63,7 @@ const ChangePasswordForm = ({
   return (
     <form className="space-y-4" onSubmit={handleChangePassword}>
       <div className="relative">
-        <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+        <label className="block text-sm font-medium mb-1 text-foreground">
           Senha Atual
         </label>
         <Input
@@ -76,14 +76,14 @@ const ChangePasswordForm = ({
         <button
           type="button"
           onClick={() => setShowCurrent(!showCurrent)}
-          className="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-gray-500"
+          className="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-foreground/50 hover:text-foreground transition-colors"
         >
           {showCurrent ? <EyeOffIcon /> : <EyeIcon />}
         </button>
       </div>
 
       <div className="relative">
-        <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+        <label className="block text-sm font-medium mb-1 text-foreground">
           Nova Senha
         </label>
         <Input
@@ -96,14 +96,14 @@ const ChangePasswordForm = ({
         <button
           type="button"
           onClick={() => setShowNew(!showNew)}
-          className="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-gray-500"
+          className="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-foreground/50 hover:text-foreground transition-colors"
         >
           {showNew ? <EyeOffIcon /> : <EyeIcon />}
         </button>
       </div>
 
       <div className="relative">
-        <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+        <label className="block text-sm font-medium mb-1 text-foreground">
           Confirmar Nova Senha
         </label>
         <Input
@@ -116,7 +116,7 @@ const ChangePasswordForm = ({
         <button
           type="button"
           onClick={() => setShowConfirm(!showConfirm)}
-          className="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-gray-500"
+          className="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-foreground/50 hover:text-foreground transition-colors"
         >
           {showConfirm ? <EyeOffIcon /> : <EyeIcon />}
         </button>
@@ -125,7 +125,7 @@ const ChangePasswordForm = ({
       {message.text && (
         <p
           className={`text-sm ${
-            message.type === "error" ? "text-red-600" : "text-green-600"
+            message.type === "error" ? "text-destructive" : "text-success"
           }`}
         >
           {message.text}

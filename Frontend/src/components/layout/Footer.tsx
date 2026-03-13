@@ -59,7 +59,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 mt-auto transition-colors duration-300">
+    <footer className="bg-background/80 backdrop-blur-md border-t border-input mt-auto transition-colors duration-300">
       <div className="max-w-7xl mx-auto pt-10 pb-6 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Coluna 1 */}
@@ -70,11 +70,11 @@ const Footer = () => {
                 alt="Auto Assistance Logo"
                 className="h-8 w-8"
               />
-              <span className="text-lg font-bold text-gray-900 dark:text-white">
+              <span className="text-lg font-bold text-foreground">
                 Auto Assistance
               </span>
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs leading-relaxed">
+            <p className="text-sm text-foreground/60 max-w-xs leading-relaxed">
               Simplificando a gestão do seu veículo com tecnologia e
               praticidade. Monitore manutenções, gastos e receba lembretes em um
               só lugar.
@@ -83,14 +83,14 @@ const Footer = () => {
 
           {/* Coluna 2 */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
               Plataforma
             </h3>
             <ul className="space-y-3">
               <li>
                 <Link
                   to="/dashboard"
-                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  className="text-sm text-secondary-foreground hover:text-primary transition-colors"
                 >
                   Dashboard
                 </Link>
@@ -98,7 +98,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/vehicles"
-                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  className="text-sm text-secondary-foreground hover:text-primary transition-colors"
                 >
                   Meus Veículos
                 </Link>
@@ -106,7 +106,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/profile"
-                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  className="text-sm text-secondary-foreground hover:text-primary transition-colors"
                 >
                   Minha Conta
                 </Link>
@@ -116,7 +116,7 @@ const Footer = () => {
 
           {/* Coluna 3 */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
               Contatos
             </h3>
             <ul className="space-y-3">
@@ -125,9 +125,9 @@ const Footer = () => {
                   href="https://www.linkedin.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group"
+                  className="flex items-center gap-2 text-sm text-secondary-foreground hover:text-primary transition-colors group"
                 >
-                  <LinkedInIcon className="w-5 h-5 text-gray-500 group-hover:text-indigo-600 dark:text-gray-400 dark:group-hover:text-indigo-400 transition-colors" />
+                  <LinkedInIcon className="w-5 h-5 text-foreground/50 group-hover:text-primary transition-colors" />
                   LinkedIn
                 </a>
               </li>
@@ -136,18 +136,18 @@ const Footer = () => {
                   href="https://github.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group"
+                  className="flex items-center gap-2 text-sm text-secondary-foreground hover:text-primary transition-colors group"
                 >
-                  <GithubIcon className="w-5 h-5 text-gray-500 group-hover:text-indigo-600 dark:text-gray-400 dark:group-hover:text-indigo-400 transition-colors" />
+                  <GithubIcon className="w-5 h-5 text-foreground/50 group-hover:text-primary transition-colors" />
                   GitHub
                 </a>
               </li>
               <li>
                 <a
                   href="mailto:dev@autoassistance.com"
-                  className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors group"
+                  className="flex items-center gap-2 text-sm text-secondary-foreground hover:text-primary transition-colors group"
                 >
-                  <MailIcon className="w-5 h-5 text-gray-500 group-hover:text-indigo-600 dark:text-gray-400 dark:group-hover:text-indigo-400 transition-colors" />
+                  <MailIcon className="w-5 h-5 text-foreground/50 group-hover:text-primary transition-colors" />
                   Gmail
                 </a>
               </li>
@@ -155,8 +155,8 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-500 dark:text-gray-400 text-center md:text-left">
+        <div className="border-t border-input pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-foreground/60 text-center md:text-left">
             © {currentYear} Auto Assistance. Todos os direitos reservados.
           </p>
         </div>

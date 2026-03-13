@@ -80,7 +80,7 @@ const MaintenanceForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+          <label className="block text-sm font-medium mb-1 text-foreground">
             Tipo de Serviço
           </label>
           <Input
@@ -99,7 +99,7 @@ const MaintenanceForm = ({
           </datalist>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+          <label className="block text-sm font-medium mb-1 text-foreground">
             Data
           </label>
           <Input
@@ -111,7 +111,7 @@ const MaintenanceForm = ({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+          <label className="block text-sm font-medium mb-1 text-foreground">
             Quilometragem (km)
           </label>
           <InputNumber
@@ -122,7 +122,7 @@ const MaintenanceForm = ({
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+          <label className="block text-sm font-medium mb-1 text-foreground">
             Custo (R$)
           </label>
           <InputNumber
@@ -134,7 +134,7 @@ const MaintenanceForm = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+        <label className="block text-sm font-medium mb-1 text-foreground">
           Prestador de Serviço
         </label>
         <Input
@@ -146,7 +146,7 @@ const MaintenanceForm = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+        <label className="block text-sm font-medium mb-1 text-foreground">
           Observações
         </label>
         <textarea
@@ -154,7 +154,7 @@ const MaintenanceForm = ({
           value={formData.notes}
           onChange={handleChange}
           rows={3}
-          className="flex w-full rounded-md border border-gray-300 bg-transparent py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 dark:border-gray-700 dark:text-white"
+          className="flex w-full rounded-md border border-input bg-transparent py-2 px-3 text-sm text-foreground placeholder:text-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
         />
       </div>
 
