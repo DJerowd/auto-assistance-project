@@ -14,7 +14,7 @@ const imageController = {
       const vehicle = await vehicleModel.findById(vehicleId);
       if (!vehicle || vehicle.user_id !== userId) {
         const error = new Error(
-          "Forbidden: Vehicle not found or not owned by user."
+          "Forbidden: Vehicle not found or not owned by user.",
         );
         error.statusCode = 403;
         throw error;
@@ -45,6 +45,9 @@ const imageController = {
       });
     } catch (error) {
       if (connection) await connection.rollback();
+      if (req.file) {
+        await fs.unlink(req.file.path).catch(console.error);
+      }
       next(error);
     } finally {
       if (connection) connection.release();
@@ -54,32 +57,32 @@ const imageController = {
   async setPrimaryImage(req, res, next) {
     let connection;
     try {
-        const { id } = req.params;
-        const userId = req.user.userId;
-        connection = await pool.getConnection();
-        await connection.beginTransaction();
-        const image = await vehicleImageModel.findById(id);
-        if (!image) {
-            const error = new Error("Image not found.");
-            error.statusCode = 404;
-            throw error;
-        }
-        const vehicle = await vehicleModel.findById(image.vehicle_id);
-        if (!vehicle || vehicle.user_id !== userId) {
-            const error = new Error(
-                "Forbidden: You do not have permission for this image."
-            );
-            error.statusCode = 403;
-            throw error;
-        }
-        await vehicleImageModel.setAsPrimary(id, image.vehicle_id, connection);
-        await connection.commit();
-        res.status(200).json({ message: "Primary image updated successfully." });
+      const { id } = req.params;
+      const userId = req.user.userId;
+      connection = await pool.getConnection();
+      await connection.beginTransaction();
+      const image = await vehicleImageModel.findById(id);
+      if (!image) {
+        const error = new Error("Image not found.");
+        error.statusCode = 404;
+        throw error;
+      }
+      const vehicle = await vehicleModel.findById(image.vehicle_id);
+      if (!vehicle || vehicle.user_id !== userId) {
+        const error = new Error(
+          "Forbidden: You do not have permission for this image.",
+        );
+        error.statusCode = 403;
+        throw error;
+      }
+      await vehicleImageModel.setAsPrimary(id, image.vehicle_id, connection);
+      await connection.commit();
+      res.status(200).json({ message: "Primary image updated successfully." });
     } catch (error) {
-        if (connection) await connection.rollback();
-        next(error);
+      if (connection) await connection.rollback();
+      next(error);
     } finally {
-        if (connection) connection.release();
+      if (connection) connection.release();
     }
   },
 
@@ -97,7 +100,7 @@ const imageController = {
       const vehicle = await vehicleModel.findById(image.vehicle_id);
       if (!vehicle || vehicle.user_id !== userId) {
         const error = new Error(
-          "Forbidden: You do not have permission to delete this image."
+          "Forbidden: You do not have permission to delete this image.",
         );
         error.statusCode = 403;
         throw error;

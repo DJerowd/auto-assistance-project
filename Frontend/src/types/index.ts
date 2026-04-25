@@ -83,6 +83,9 @@ export interface Friend {
   name: string;
   email: string;
   profile_image?: string | null;
+  status: "ACCEPTED" | "PENDING" | "REJECTED" | string;
+  unread_count: number;
+  last_message_at?: string | null;
 }
 
 export interface FriendRequest {

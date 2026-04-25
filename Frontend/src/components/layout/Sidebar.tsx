@@ -74,7 +74,10 @@ const Sidebar = () => {
           >
             Olá, {user?.name}
           </h2>
-          <button onClick={closeMenu} className="text-foreground/70 hover:text-foreground md:hidden">
+          <button
+            onClick={closeMenu}
+            className="text-foreground/70 hover:text-foreground md:hidden"
+          >
             <CloseIcon size={24} />
           </button>
         </div>
@@ -131,7 +134,7 @@ const Sidebar = () => {
             <span className="text-sm dark:text-gray-300">Mudar Tema</span>
             <ThemeSwitch />
           </div>
-
+          
           <Button
             variant="destructive"
             size="sm"

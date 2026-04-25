@@ -6,7 +6,7 @@ import { CloseIcon } from "../icons/CloseIcon";
 interface DrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title: React.ReactNode;
   children: React.ReactNode;
 }
 

@@ -19,7 +19,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
       <div className="relative flex items-center">
         <Input
           type="number"
-          className={cn("pr-12 appearance: textfield", className)}
+          className={cn("pr-12 [appearance:textfield]", className)}
           ref={ref}
           value={value}
           onChange={(e) => onValueChange(e.target.valueAsNumber || 0)}

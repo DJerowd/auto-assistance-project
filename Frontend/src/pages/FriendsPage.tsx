@@ -25,6 +25,7 @@ import { XCircleIcon } from "../components/icons/XCircleIcon";
 import Spinner from "../components/ui/Spinner";
 import { useToastStore } from "../store/toastStore";
 import ConfirmDialog from "../components/ui/modal/ConfirmDialog";
+import { useChatStore } from "../store/chatStore";
 
 import { useRef } from "react";
 import { searchPotentialFriends } from "../services/friendshipService";
@@ -36,6 +37,7 @@ const FriendsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const addToast = useToastStore((state) => state.addToast);
+  const openChat = useChatStore((state) => state.openChat);
 
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 500);
@@ -217,10 +219,7 @@ const FriendsPage = () => {
                               {user.email}
                             </p>
                           </div>
-                          <Button
-                            size="sm"
-                            className="ml-auto"
-                          >
+                          <Button size="sm" className="ml-auto">
                             Adicionar
                           </Button>
                         </li>
@@ -249,14 +248,14 @@ const FriendsPage = () => {
       {requests.length > 0 && (
         <div className="space-y-4">
           <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-orange-500"></span>
+            <span className="w-2 h-2 rounded-full bg-pending"></span>
             Solicitações Pendentes
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {requests.map((req) => (
               <div
                 key={req.friendship_id}
-                className="bg-background p-4 rounded-xl border border-orange-500/30 shadow-sm flex items-center justify-between"
+                className="bg-background p-4 rounded-xl border border-pending/30 shadow-sm flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-secondary overflow-hidden flex items-center justify-center">
@@ -266,20 +265,25 @@ const FriendsPage = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <UserIcon size={20} className="text-secondary-foreground" />
+                      <UserIcon
+                        size={20}
+                        className="text-secondary-foreground"
+                      />
                     )}
                   </div>
                   <div>
                     <p className="font-medium text-foreground text-sm">
                       {req.name}
                     </p>
-                    <p className="text-xs text-secondary-foreground">{req.email}</p>
+                    <p className="text-xs text-secondary-foreground">
+                      {req.email}
+                    </p>
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleRespond(req.friendship_id, "ACCEPT")}
-                    className="text-green-500 hover:bg-green-500/10 p-1 rounded transition-colors"
+                    className="text-success hover:bg-success/10 p-1 rounded transition-colors"
                   >
                     <CheckCircleIcon size={20} />
                   </button>
@@ -325,22 +329,35 @@ const FriendsPage = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-foreground">{friend.name}</h4>
-                    <p className="text-xs text-secondary-foreground">{friend.email}</p>
+                    <p className="text-xs text-secondary-foreground">
+                      {friend.email}
+                    </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+
+                <div className="flex gap-2 mt-auto">
                   <Link
                     to={`/friends/${friend.user_id}/garage`}
                     className="flex-1"
                   >
-                    <Button variant="secondary" className="w-full text-sm">
-                      <CarIcon className="mr-2 h-4 w-4" /> Ver Garagem
+                    <Button variant="outline" className="w-full text-sm">
+                      <CarIcon className="mr-2 h-4 w-4" /> Garagem
                     </Button>
                   </Link>
+
+                  <Button
+                    variant="outline"
+                    className="flex-1 text-sm bg-primary/5 hover:bg-primary/10 border-primary/20"
+                    onClick={() => openChat(friend.user_id, friend.name)}
+                  >
+                    Conversar
+                  </Button>
+
                   <Button
                     variant="ghost"
                     onClick={() => confirmDelete(friend.friendship_id)}
-                    className="text-destructive hover:text-destructive-hover hover:bg-destructive/10"
+                    className="text-destructive hover:text-destructive-hover hover:bg-destructive/10 px-2"
+                    title="Remover amigo"
                   >
                     <TrashIcon size={16} />
                   </Button>

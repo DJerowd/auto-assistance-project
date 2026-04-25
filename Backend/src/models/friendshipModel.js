@@ -51,19 +51,40 @@ const friendshipModel = {
         u.id as user_id, 
         u.name, 
         u.email, 
-        u.profile_image 
+        u.profile_image,
+        f.status,
+        (
+          SELECT COUNT(*) 
+          FROM messages m 
+          WHERE m.sender_id = u.id AND m.receiver_id = ? AND m.is_read = FALSE
+        ) as unread_count,
+        (
+          SELECT MAX(created_at) 
+          FROM messages m 
+          WHERE (m.sender_id = u.id AND m.receiver_id = ?) 
+            OR (m.sender_id = ? AND m.receiver_id = u.id)
+        ) as last_message_at
       FROM friendships f
       JOIN users u ON (u.id = f.requester_id OR u.id = f.addressee_id)
       WHERE (f.requester_id = ? OR f.addressee_id = ?)
       AND f.status = 'ACCEPTED'
       AND u.id != ?
+      ORDER BY last_message_at IS NULL, last_message_at DESC
     `;
-    const [rows] = await pool.query(sql, [userId, userId, userId]);
+    const [rows] = await pool.query(sql, [
+      userId,
+      userId,
+      userId,
+      userId,
+      userId,
+      userId,
+    ]);
     return rows.map((user) => ({
       ...user,
       profile_image: user.profile_image
         ? `${process.env.APP_URL}/${user.profile_image}`
         : null,
+      unread_count: parseInt(user.unread_count || 0, 10),
     }));
   },
 
