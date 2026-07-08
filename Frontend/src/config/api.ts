@@ -24,7 +24,9 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
+    const requestUrl = error.config?.url || "";
+    const isLoginRequest = requestUrl.includes("/login");
+    if (error.response && error.response.status === 401 && !isLoginRequest) {
       const { logout } = useAuthStore.getState();
       const { disconnect } = useChatStore.getState();
       disconnect();

@@ -61,10 +61,10 @@ const MaintenanceForm = ({
   }, [initialData]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: name === "service_type_id" ? Number(value) : value }));
   };
 
   const handleNumberChange = (name: "mileage" | "cost") => (value: number) => {
@@ -83,20 +83,22 @@ const MaintenanceForm = ({
           <label className="block text-sm font-medium mb-1 text-foreground">
             Tipo de Serviço
           </label>
-          <Input
+          <select
             name="service_type"
             value={formData.service_type}
             onChange={handleChange}
             required
-            placeholder="Ex: Troca de Óleo"
-            list="service-types-list"
-            autoComplete="off"
-          />
-          <datalist id="service-types-list">
+            className="flex w-full rounded-md border border-input bg-transparent py-2 px-3 text-sm text-foreground placeholder:text-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+          >
+            <option value="" disabled>
+              Selecione um tipo de serviço...
+            </option>
             {serviceTypes.map((type) => (
-              <option key={type.id} value={type.name} />
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
             ))}
-          </datalist>
+          </select>
         </div>
         <div>
           <label className="block text-sm font-medium mb-1 text-foreground">

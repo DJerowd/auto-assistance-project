@@ -553,7 +553,7 @@ const AdminPage = () => {
               {activeTab === "colors" && (
                 <div
                   className="w-6 h-6 rounded-full border border-input flex-shrink-0"
-                  style={{ backgroundColor: (item as Color).hex }}
+                  style={{ background: (item as Color).hex }}
                 ></div>
               )}
               {activeTab === "brands" && (item as Brand).logo_url && (

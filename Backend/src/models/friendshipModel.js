@@ -112,7 +112,9 @@ const friendshipModel = {
     return rows.map((user) => ({
       ...user,
       profile_image: user.profile_image
-        ? `${process.env.APP_URL}/${user.profile_image}`
+        ? user.profile_image.startsWith("http")
+          ? user.profile_image
+          : `${process.env.APP_URL}/${user.profile_image}`
         : null,
     }));
   },
@@ -133,7 +135,9 @@ const friendshipModel = {
     return rows.map((user) => ({
       ...user,
       profile_image: user.profile_image
-        ? `${process.env.APP_URL}/${user.profile_image}`
+        ? user.profile_image.startsWith("http")
+          ? user.profile_image
+          : `${process.env.APP_URL}/${user.profile_image}`
         : null,
     }));
   },

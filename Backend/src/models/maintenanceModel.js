@@ -47,13 +47,14 @@ const maintenanceModel = {
     const safeSortBy = allowedSortBy.includes(sortBy)
       ? sortBy
       : "maintenance_date";
-    const sortColumn =
-      safeSortBy === "vehicle_model" ? "v.model" : `m.${safeSortBy}`;
+    let sortColumn = `m.${safeSortBy}`;
+    if (safeSortBy === "vehicle_model") sortColumn = "v.model";
+    if (safeSortBy === "service_type") sortColumn = "st.name";
     const safeOrder = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
     let whereClause = "WHERE v.user_id = ?";
     const params = [userId];
     if (service_type) {
-      whereClause += " AND m.service_type LIKE ?";
+      whereClause += " AND st.name LIKE ?";
       params.push(`%${service_type}%`);
     }
     if (vehicle_model) {
@@ -72,15 +73,17 @@ const maintenanceModel = {
       SELECT COUNT(*) as total 
       FROM maintenances m
       JOIN vehicles v ON m.vehicle_id = v.id
+      LEFT JOIN service_types st ON m.service_type = st.id
       ${whereClause}
     `;
     const [countResult] = await pool.query(countSql, params);
     const totalItems = countResult[0].total;
     const totalPages = Math.ceil(totalItems / limit);
     const dataSql = `
-      SELECT m.*, v.model as vehicle_model, v.license_plate, v.nickname
+      SELECT m.*, st.name as service_type, v.model as vehicle_model, v.license_plate, v.nickname
       FROM maintenances m
       JOIN vehicles v ON m.vehicle_id = v.id
+      LEFT JOIN service_types st ON m.service_type = st.id
       ${whereClause}
       ORDER BY ${sortColumn} ${safeOrder}
       LIMIT ? OFFSET ?
@@ -112,9 +115,11 @@ const maintenanceModel = {
     const safeSortBy = allowedSortBy.includes(sortBy)
       ? sortBy
       : "maintenance_date";
+    let sortColumn = `m.${safeSortBy}`;
+    if (safeSortBy === "service_type") sortColumn = "st.name";
     const safeOrder = order.toUpperCase() === "ASC" ? "ASC" : "DESC";
     let countSql =
-      "SELECT COUNT(*) as total FROM maintenances WHERE vehicle_id = ?";
+      "SELECT COUNT(*) as total FROM maintenances m LEFT JOIN service_types st ON m.service_type = st.id WHERE vehicle_id = ?";
     const params = [vehicleId];
     if (service_type) {
       countSql += " AND service_type LIKE ?";
@@ -123,7 +128,7 @@ const maintenanceModel = {
     const [countResult] = await pool.query(countSql, params);
     const totalItems = countResult[0].total;
     const totalPages = Math.ceil(totalItems / limit);
-    let dataSql = "SELECT * FROM maintenances WHERE vehicle_id = ?";
+    let dataSql = `SELECT m.*, st.name AS service_type FROM maintenances m LEFT JOIN service_types st ON m.service_type = st.id WHERE m.vehicle_id = ?`;
     if (service_type) {
       dataSql += " AND service_type LIKE ?";
     }
